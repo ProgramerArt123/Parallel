@@ -1,0 +1,45 @@
+#include "CLANG_X86_64.h"
+#include "common.h"
+
+const char *CLANG_X86_64::registers[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
+size_t CLANG_X86_64::registersCount = sizeof(registers) / sizeof(const char*);
+
+CLANG_X86_64 &CLANG_X86_64::GetInstance() {
+	static CLANG_X86_64 instance;
+	return instance;
+}
+
+void CLANG_X86_64::PageHeaderGenerate(const char *fileName, std::ofstream &file) {
+	file << '\t' << ".section	__TEXT,__text,regular,pure_instructions" << std::endl;
+	file << '\t' << ".macosx_version_min 10, 11" << std::endl;
+}
+
+void CLANG_X86_64::PageFooterGenerate(std::ofstream &file) {
+	file << '\t' << ".subsections_via_symbols" << std::endl;
+}
+
+void CLANG_X86_64::ConstGenerate(std::ofstream &file) {
+	file << '\t' << ".section	__TEXT,__cstring,cstring_literals" << std::endl;
+}
+
+void CLANG_X86_64::StringGenerate(const char *content, std::stringstream& output) {
+	consts << '\t' << ".asciz " << content << std::endl;
+}
+
+void CLANG_X86_64::ProcStatementGenerate(const char *name, std::stringstream& output) {
+	output << '\t' << ".globl _" << name << std::endl;
+	output << '\t' << ".align	4, 0x90" << std::endl;
+	output << '_' << name << ":" << std::endl;
+}
+
+void CLANG_X86_64::ProcSizeGenerate(const char *name, std::stringstream& output) {
+}
+
+void CLANG_X86_64::ProcCallGenerate(const char *name, std::stringstream& output) {
+	output << '\t' << "call" << "\t_" << name << std::endl;
+}
+
+void CLANG_X86_64::ProcStringArgmentGenerate(int NO, const char *dst, std::stringstream& output) {
+	output << '\t' << "leaq	.LC" << NO
+		<< "(%rip), " << dst << std::endl;
+}

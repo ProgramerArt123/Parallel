@@ -1,0 +1,53 @@
+#include "SyntaxNodeProcCall.h"
+#include "common.h"
+
+SyntaxNodeProcCall::SyntaxNodeProcCall(const char *name, Scope &scope):
+	SyntaxNode(name), m_scope(scope){
+	m_type = SYNTAX_NODE_TYPE_PROC_CALL;
+}
+
+SyntaxNodeProcCall::~SyntaxNodeProcCall() {
+
+}
+
+void SyntaxNodeProcCall::FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) {
+	effectives.insert(self);
+}
+
+GENERATE_PARALLEL_RESULT SyntaxNodeProcCall::GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) {
+	if (m_is_paralleled) {
+		return GENERATE_PARALLEL_RESULT_COMPLETED;
+	}
+	bool isHaveNoFind = false;
+	for (std::shared_ptr<SyntaxNode> &argment : m_children) {
+		argment->m_generate_line = m_line;
+		GENERATE_PARALLEL_RESULT result = argment->GenerateParallel(argment, parallel);
+		if (GENERATE_PARALLEL_RESULT_FINDED == result) {
+			return GENERATE_PARALLEL_RESULT_FINDED;
+		}
+		else if (GENERATE_PARALLEL_RESULT_NO_FIND == result) {
+			isHaveNoFind = true;
+		}
+	}
+	if (isHaveNoFind) {
+		return GENERATE_PARALLEL_RESULT_NO_FIND;
+	}
+	else {
+		if (parallel.CheckLastType(GetType())) {
+			parallel.AddNode(self);
+			m_is_paralleled = true;
+			return GENERATE_PARALLEL_RESULT_FINDED;
+		}
+		else {
+			return GENERATE_PARALLEL_RESULT_NO_FIND;
+		}
+	}
+}
+
+void SyntaxNodeProcCall::generate(std::stringstream& output) {
+	uint32_t top = m_scope.CallGenerate(output, m_children);
+	PLATFORM.ProcCallGenerate(m_content.c_str(), output);
+	if (top > 0) {
+		output << '\t' << "addq   $" << top << ", %rsp" << std::endl;
+	}
+}
