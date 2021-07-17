@@ -32,18 +32,21 @@ void SyntaxNode::AddChild(std::shared_ptr<SyntaxNode> &child) {
 }
 
 GENERATE_PARALLEL_RESULT SyntaxNode::GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel)  throw (std::exception) {
-	if (!m_is_paralleled) {
-		if (parallel.CheckLastType(GetType())) {
-			parallel.AddNode(self);
-			m_is_paralleled = true;
-			return GENERATE_PARALLEL_RESULT_FINDED;
-		}
-		else {
-			return GENERATE_PARALLEL_RESULT_NO_FIND;
-		}
+	if (UINT64_MAX == m_parallel_index) {
+		return GenerateParallelSelf(self, parallel);
 	}
 	else {
 		return GENERATE_PARALLEL_RESULT_COMPLETED;
+	}
+}
+
+GENERATE_PARALLEL_RESULT SyntaxNode::GenerateParallelSelf(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) {
+	if (parallel.CheckLastElement(m_parent) && parallel.CheckLastType(GetType())) {
+		m_parallel_index = parallel.AddNode(self);
+		return GENERATE_PARALLEL_RESULT_FINDED;
+	}
+	else {
+		return GENERATE_PARALLEL_RESULT_NO_FIND;
 	}
 }
 
@@ -119,9 +122,15 @@ bool SyntaxNode::IsRoot() {
 	return this == &m_parent;
 }
 
-void SyntaxNode::generate(std::stringstream& output) {
+void SyntaxNode::OutputSerial(std::stringstream& output) {
 	for (std::shared_ptr<SyntaxNode> &child : m_children) {
-		child->generate(output);
+		child->OutputSerial(output);
+	}
+}
+
+void SyntaxNode::OutputParallel(std::stringstream& output) {
+	for (std::shared_ptr<SyntaxNode> &child : m_children) {
+		child->OutputParallel(output);
 	}
 }
 

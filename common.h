@@ -2,7 +2,6 @@
 #define __COMMON_H__
 
 #include <stack>
-#include "SyntaxTree.h"
 #include "SyntaxNode.h"
 #include "SyntaxNodeNumber.h"
 #include "SyntaxNodeString.h"
@@ -25,6 +24,6 @@ extern std::stack<std::shared_ptr<Scope>> scopes;
 
 extern std::stringstream consts;
 
-#define PLATFORM GCC_X86_64::GetInstance()
+#define PLATFORM CLANG_X86_64::GetInstance()
 
 #endif

@@ -12,7 +12,7 @@ SyntaxNodeVariable::~SyntaxNodeVariable() {
 
 
 GENERATE_PARALLEL_RESULT SyntaxNodeVariable::GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) {
-	if (m_is_paralleled) {
+	if (UINT64_MAX != m_parallel_index) {
 		return GENERATE_PARALLEL_RESULT_COMPLETED;
 	}
 	std::shared_ptr<SyntaxNodeAssignment> lastAssign = GetLastAssign();
@@ -22,11 +22,11 @@ GENERATE_PARALLEL_RESULT SyntaxNodeVariable::GenerateParallel(const std::shared_
 			return GENERATE_PARALLEL_RESULT_NO_FIND;
 		}
 	}
-	m_is_paralleled = true;
+	m_parallel_index = 0;
 	return GENERATE_PARALLEL_RESULT_FINDED;
 }
 
-void SyntaxNodeVariable::generate(std::stringstream& output) {
+void SyntaxNodeVariable::OutputSerial(std::stringstream& output) {
 	output << '\t' << "movq	" << GetScopePos() << "(%rbp), %rax" << std::endl;
 }
 

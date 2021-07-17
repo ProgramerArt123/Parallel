@@ -1,9 +1,11 @@
 #include "SyntaxNodeProcDef.h"
 #include "common.h"
 
+unsigned int SyntaxNodeProcDef::NO = 0;
+
 SyntaxNodeProcDef::SyntaxNodeProcDef(const char *name, Scope &outter):
 	SyntaxNode(name) {
-	Scope *scope = new Scope(outter);
+	Scope *scope = new Scope(outter, name);
 	m_body = std::shared_ptr<Scope>(scope);
 	m_type = SYNTAX_NODE_TYPE_PROC_DEF;
 }
@@ -17,38 +19,54 @@ std::shared_ptr<Scope> &SyntaxNodeProcDef::GetBody() {
 }
 
 void SyntaxNodeProcDef::FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) {
-	std::shared_ptr<SyntaxNode> body = m_body;
-	SyntaxNode::FindEffectives(body, effectives);
+	effectives.insert(self);
+	m_body->FindEffectives();
 }
 
-void SyntaxNodeProcDef::generate(std::stringstream& output) {
-	static unsigned int NO = 0;
+GENERATE_PARALLEL_RESULT SyntaxNodeProcDef::GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) {
+	m_body->GenerateParallel();
+	return GENERATE_PARALLEL_RESULT_COMPLETED;
+}
+
+void SyntaxNodeProcDef::OutputSerial(std::stringstream& output) {
+	OutputHead(output);
+	m_body->DefGenerate(output);
+	OutputTail(output);
+}
+
+void SyntaxNodeProcDef::OutputParallel(std::stringstream& output) {
+	OutputHead(output);
+	m_body->OutputParallel(output);
+	OutputTail(output);
+}
+
+void SyntaxNodeProcDef::OutputHead(std::stringstream& output) {
 	
-	PLATFORM.ProcStatementGenerate(m_content.c_str(), output);
-	
-	output << ".LFB" << NO << ":" << std::endl;
+	PLATFORM.ProcStatementGenerateSerial(m_content.c_str(), output);
+
+	output << ".LFB" << SyntaxNodeProcDef::NO << ":" << std::endl;
 	output << '\t' << ".cfi_startproc" << std::endl;
 	output << '\t' << "pushq %rbp" << std::endl;
-	
+
 	output << '\t' << ".cfi_def_cfa_offset 16" << std::endl;
 
 	output << '\t' << ".cfi_offset 6, -16" << std::endl;
 	output << '\t' << "movq	%rsp, %rbp" << std::endl;
 	output << '\t' << ".cfi_def_cfa_register 6" << std::endl;
+}
 
-	m_body->DefGenerate(output);
-	
+void SyntaxNodeProcDef::OutputTail(std::stringstream& output) {
 	output << '\t' << "leave" << std::endl;
 
 	output << '\t' << ".cfi_def_cfa 7, 8" << std::endl;
 	output << '\t' << "ret" << std::endl;
 	output << '\t' << ".cfi_endproc" << std::endl;
 
-	output << ".LFE" << NO << ":" << std::endl;
+	output << ".LFE" << SyntaxNodeProcDef::NO << ":" << std::endl;
 
-	PLATFORM.ProcSizeGenerate(m_content.c_str(), output);
-	
-	NO++;
+	PLATFORM.ProcSizeGenerateSerial(m_content.c_str(), output);
+
+	SyntaxNodeProcDef::NO++;
 }
 
 std::ostream &operator<<(std::ostream &out, SyntaxNodeProcDef &def) {

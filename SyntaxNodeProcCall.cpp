@@ -15,7 +15,7 @@ void SyntaxNodeProcCall::FindEffectives(std::shared_ptr<SyntaxNode> &self, std::
 }
 
 GENERATE_PARALLEL_RESULT SyntaxNodeProcCall::GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) {
-	if (m_is_paralleled) {
+	if (UINT64_MAX != m_parallel_index) {
 		return GENERATE_PARALLEL_RESULT_COMPLETED;
 	}
 	bool isHaveNoFind = false;
@@ -33,20 +33,13 @@ GENERATE_PARALLEL_RESULT SyntaxNodeProcCall::GenerateParallel(const std::shared_
 		return GENERATE_PARALLEL_RESULT_NO_FIND;
 	}
 	else {
-		if (parallel.CheckLastType(GetType())) {
-			parallel.AddNode(self);
-			m_is_paralleled = true;
-			return GENERATE_PARALLEL_RESULT_FINDED;
-		}
-		else {
-			return GENERATE_PARALLEL_RESULT_NO_FIND;
-		}
+		return GenerateParallelSelf(self, parallel);
 	}
 }
 
-void SyntaxNodeProcCall::generate(std::stringstream& output) {
+void SyntaxNodeProcCall::OutputSerial(std::stringstream& output) {
 	uint32_t top = m_scope.CallGenerate(output, m_children);
-	PLATFORM.ProcCallGenerate(m_content.c_str(), output);
+	PLATFORM.ProcCallGenerateSerial(m_content.c_str(), output);
 	if (top > 0) {
 		output << '\t' << "addq   $" << top << ", %rsp" << std::endl;
 	}

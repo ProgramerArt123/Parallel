@@ -10,7 +10,7 @@ SyntaxNodeMod::~SyntaxNodeMod() {
 	
 }
 
-void SyntaxNodeMod::generate(std::stringstream& output) {
+void SyntaxNodeMod::OutputSerial(std::stringstream& output) {
 	SYNTAX_NODE_TYPE leftType = m_children.front()->GetType();
 	SYNTAX_NODE_TYPE rightType = m_children.back()->GetType();
 	if (SYNTAX_NODE_TYPE_NUMBER == leftType &&

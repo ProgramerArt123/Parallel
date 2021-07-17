@@ -11,7 +11,7 @@ SyntaxNodeSub::~SyntaxNodeSub() {
 }
 
 GENERATE_PARALLEL_RESULT SyntaxNodeSub::GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) {
-	if (m_is_paralleled) {
+	if (UINT64_MAX != m_parallel_index) {
 		return GENERATE_PARALLEL_RESULT_COMPLETED;
 	}
 	std::shared_ptr<SyntaxNode> &left = self->m_children.front();
@@ -30,17 +30,10 @@ GENERATE_PARALLEL_RESULT SyntaxNodeSub::GenerateParallel(const std::shared_ptr<S
 			return GENERATE_PARALLEL_RESULT_NO_FIND;
 		}
 	}
-	if (parallel.CheckLastType(GetType())) {
-		parallel.AddNode(self);
-		m_is_paralleled = true;
-		return GENERATE_PARALLEL_RESULT_FINDED;
-	}
-	else {
-		return GENERATE_PARALLEL_RESULT_NO_FIND;
-	}
+	return GenerateParallelSelf(self, parallel);
 }
 
-void SyntaxNodeSub::generate(std::stringstream& output) {
+void SyntaxNodeSub::OutputSerial(std::stringstream& output) {
 	SYNTAX_NODE_TYPE leftType = m_children.front()->GetType();
 	SYNTAX_NODE_TYPE rightType = m_children.back()->GetType();
 	if (SYNTAX_NODE_TYPE_NUMBER == leftType &&

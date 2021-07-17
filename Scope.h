@@ -4,7 +4,8 @@
 #include <stack>
 #include <memory>
 #include <map>
-#include "SyntaxTree.h"
+#include "SyntaxNode.h"
+#include "Parallel.h"
 
 class SyntaxNodeVariable ;
 class SyntaxNodeProcDef;
@@ -13,10 +14,10 @@ class SyntaxNodeLoop;
 class SyntaxNodeNumber;
 class SyntaxNodeAssignment;
 
-class Scope : public SyntaxTree {
+class Scope : public SyntaxNode {
 public:
-	explicit Scope();
-	explicit Scope(Scope &outter);
+	explicit Scope(const char *content = "");
+	explicit Scope(Scope &outter, const char *content = "");
 
 
 	void PushAdd();
@@ -44,7 +45,11 @@ public:
 
 	void AddArgment(uint64_t argment);
 	void AddParam(const char *param);
-	void generate(const char *fileName) throw (std::exception);
+
+	void OutputSerial(const char *fileName) throw (std::exception);
+	void OutputParallel(const char *fileName) throw (std::exception);
+	void OutputParallel(std::stringstream& output) override;
+
 	void DefGenerate(std::stringstream& output);
 	uint32_t CallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
 	void LoopGenerate(std::stringstream& output);
@@ -52,6 +57,10 @@ public:
 
 	void FindEffectives();
 	void GenerateParallel() throw (std::exception);
+
+	void FindEffectives(std::set<std::shared_ptr<SyntaxNode>> &effectives);
+	void GenerateParallel(std::set<std::shared_ptr<SyntaxNode>> &effectives) throw (std::exception);
+
 	std::shared_ptr<SyntaxNodeAssignment> GetLastAssign(const char *name, int line, bool findedVariable = false);
 protected:
 	bool IsProcExist(const char *name);
@@ -69,7 +78,7 @@ protected:
 	size_t m_runtime_pos = 0;
 
 	std::set<std::shared_ptr<SyntaxNode>> m_effectives;
-
+	Parallel m_parallel;
 };
 
 #endif

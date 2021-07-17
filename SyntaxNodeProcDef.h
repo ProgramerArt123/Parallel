@@ -14,9 +14,17 @@ public:
 	std::shared_ptr<Scope> &GetBody();
 	
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;
-	
-	void generate(std::stringstream& output) override;
+	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
+
+	void OutputSerial(std::stringstream& output) override;
+	void OutputParallel(std::stringstream& output) override;
 	friend std::ostream &operator<<(std::ostream &out, SyntaxNodeProcDef &def);
+
+private:
+	void OutputHead(std::stringstream& output);
+	void OutputTail(std::stringstream& output);
+
+	static unsigned int NO;
 private:
 	std::shared_ptr<Scope> m_body;
 	

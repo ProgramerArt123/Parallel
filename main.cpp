@@ -20,7 +20,7 @@ int main() {
 	
 	scopes.push(std::shared_ptr<Scope>(new Scope));
 
-	FILE *in = fopen("/home/rootroot/projects/test.p", "r");
+	FILE *in = fopen("/mnt/hgfs/G/users/administrator/source/repos/Project1/Project1/test.p", "r");
 	if (in) {
 		printf("123\n");
 		yyin = in;
@@ -88,8 +88,8 @@ int main() {
 		//std::cout << scopes.top() << std::endl;
 		scopes.top()->FindEffectives();
 		scopes.top()->GenerateParallel();
-		std::cout << *scopes.top() << std::endl;
-		scopes.top()->generate("test.s");
+		scopes.top()->OutputSerial("test.s");
+		scopes.top()->OutputParallel("test2.s");
 	}
 	catch (const std::exception &e) {
 		std::cout << *scopes.top() << std::endl;

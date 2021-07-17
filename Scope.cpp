@@ -3,15 +3,13 @@
 #include "Scope.h"
 #include "common.h"
 
-Scope::Scope(){
+Scope::Scope(const char *content):SyntaxNode(content){
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
-	m_content = "Scope";
 }
 
-Scope::Scope(Scope &outter) :
-	SyntaxTree(*static_cast<SyntaxNode *>(&outter)) {
+Scope::Scope(Scope &outter, const char *content) :
+	SyntaxNode(*static_cast<SyntaxNode *>(&outter), content) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
-	m_content = "Scope";
 }
 
 void Scope::PushAdd() {
@@ -186,25 +184,51 @@ void Scope::AddParam(const char *param) {
 }
 
 
-void Scope::generate(const char *fileName) throw (std::exception) {
+void Scope::OutputSerial(const char *fileName) throw (std::exception) {
 	std::stringstream output;
-	SyntaxTree::generate(output);
+	SyntaxNode::OutputSerial(output);
 	std::ofstream file(fileName);
 	if (!file.is_open()) {
 		throw std::exception();
 	}
-	PLATFORM.PageHeaderGenerate(fileName, file);
+	PLATFORM.PageHeaderGenerateSerial(fileName, file);
 	const std::string &constContent = consts.str();
 	if (!constContent.empty()) {
-		PLATFORM.ConstGenerate(file);
+		PLATFORM.ConstGenerateSerial(file);
 		file << constContent;
 	}
 	file << '\t' << ".text" << std::endl;
 	file << output.str();
-	PLATFORM.PageFooterGenerate(file);
+	PLATFORM.PageFooterGenerateSerial(file);
 }
 
+void Scope::OutputParallel(const char *fileName) throw (std::exception) {
+	std::stringstream output;
+	OutputParallel(output);
+	std::ofstream file(fileName);
+	if (!file.is_open()) {
+		throw std::exception();
+	}
+	PLATFORM.PageHeaderGenerateSerial(fileName, file);
+	const std::string &constContent = consts.str();
+	if (!constContent.empty()) {
+		PLATFORM.ConstGenerateSerial(file);
+		file << constContent;
+	}
+	file << '\t' << ".text" << std::endl;
+	file << output.str();
+	PLATFORM.PageFooterGenerateSerial(file);
+}
 
+void Scope::OutputParallel(std::stringstream& output) {
+	for (std::shared_ptr<SyntaxNode> &child : m_children) {
+		SYNTAX_NODE_TYPE type = child->GetType();
+		if (SYNTAX_NODE_TYPE_PROC_DEF == type || SYNTAX_NODE_TYPE_LOOP == type) {
+			child->OutputParallel(output);
+		}
+	}
+	m_parallel.Output(output);
+}
 
 void Scope::DefGenerate(std::stringstream& output) {
 	//1.参数赋值需要启用其他内存
@@ -222,7 +246,7 @@ void Scope::DefGenerate(std::stringstream& output) {
 			<< std::to_string(assginsCount+4+index * 4) << 
 			"(%rbp)" << std::endl;
 	}
-	SyntaxNode::generate(output);*/
+	SyntaxNode::OutputSerial(output);*/
 	size_t parametersCount = m_parameters.size();
 	uint32_t index = 0;
 	for (std::shared_ptr<SyntaxNodeVariable> &parameter : m_parameters) {
@@ -239,7 +263,7 @@ void Scope::DefGenerate(std::stringstream& output) {
 		}
 		index++;
 	}
-	SyntaxNode::generate(output);
+	SyntaxNode::OutputSerial(output);
 }
 
 uint32_t Scope::CallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments) {
@@ -273,8 +297,8 @@ uint32_t Scope::CallGenerate(std::stringstream& output, std::list<std::shared_pt
 		case SYNTAX_NODE_TYPE_STRING:
 		{
 			SyntaxNodeString *string = static_cast<SyntaxNodeString *>(argment.get());
-			string->generate(output);
-			PLATFORM.ProcStringArgmentGenerate(string->GetNO(), dst.c_str(), output);
+			string->OutputSerial(output);
+			PLATFORM.ProcStringArgmentGenerateSerial(string->GetNO(), dst.c_str(), output);
 		}
 		break;
 		case SYNTAX_NODE_TYPE_VARIABLE:
@@ -303,7 +327,7 @@ uint32_t Scope::CallGenerate(std::stringstream& output, std::list<std::shared_pt
 }
 
 void Scope::LoopGenerate(std::stringstream& output) {
-	SyntaxNode::generate(output);
+	SyntaxNode::OutputSerial(output);
 	int times = m_argments.front()->GetValue();
 	output << '\t' << "cmpq    $" << std::to_string(times) <<
 		",  %rcx" << std::endl;
@@ -344,12 +368,13 @@ bool Scope::IsVariableExist(const char *name) {
 }
 
 void Scope::FindEffectives() {
-	SyntaxTree::FindEffectives(m_effectives);
+	FindEffectives(m_effectives);
 }
 
 void Scope::GenerateParallel() throw (std::exception) {
-	SyntaxTree::GenerateParallel(m_effectives);
-	std::cout << m_nodes << std::endl;
+	std::cout << std::endl << "Scope(" << GetContent() << "):";
+	GenerateParallel(m_effectives);
+	std::cout << m_parallel <<std::endl;
 }
 
 std::shared_ptr<SyntaxNodeAssignment> Scope::GetLastAssign(const char *name, int line, bool findedVariable) {
@@ -378,4 +403,26 @@ std::shared_ptr<SyntaxNodeAssignment> Scope::GetLastAssign(const char *name, int
 	else {
 		return std::shared_ptr<SyntaxNodeAssignment>();
 	}
+}
+
+
+void Scope::FindEffectives(std::set<std::shared_ptr<SyntaxNode>> &effectives) {
+	for (std::shared_ptr<SyntaxNode> &child : m_children) {
+		child->FindEffectives(child, effectives);
+	}
+}
+
+void Scope::GenerateParallel(std::set<std::shared_ptr<SyntaxNode>> &effectives) throw (std::exception) {
+	for (const std::shared_ptr<SyntaxNode> &effective : effectives) {
+		while (true) {
+			GENERATE_PARALLEL_RESULT result = effective->GenerateParallel(effective, m_parallel);
+			if (GENERATE_PARALLEL_RESULT_COMPLETED == result) {
+				break;
+			}
+			else if (GENERATE_PARALLEL_RESULT_NO_FIND == result) {
+				m_parallel.AddElement();
+			}
+		}
+	}
+	m_parallel.Truncation();
 }

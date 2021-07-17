@@ -11,14 +11,14 @@ public:
 
 	static CLANG_X86_64 &GetInstance();
 
-	void PageHeaderGenerate(const char *fileName, std::ofstream &file) override;
-	void PageFooterGenerate(std::ofstream &file) override;
-	void ConstGenerate(std::ofstream &file) override;
-	void StringGenerate(const char *content, std::stringstream& output) override;
-	void ProcStatementGenerate(const char *name, std::stringstream& output) override;
-	void ProcSizeGenerate(const char *name, std::stringstream& output) override;
-	void ProcCallGenerate(const char *name, std::stringstream& output) override;
-	void ProcStringArgmentGenerate(int NO, const char *dst, std::stringstream& output) override;
+	void PageHeaderGenerateSerial(const char *fileName, std::ofstream &file) override;
+	void PageFooterGenerateSerial(std::ofstream &file) override;
+	void ConstGenerateSerial(std::ofstream &file) override;
+	void StringGenerateSerial(const char *content, std::stringstream& output) override;
+	void ProcStatementGenerateSerial(const char *name, std::stringstream& output) override;
+	void ProcSizeGenerateSerial(const char *name, std::stringstream& output) override;
+	void ProcCallGenerateSerial(const char *name, std::stringstream& output) override;
+	void ProcStringArgmentGenerateSerial(int NO, const char *dst, std::stringstream& output) override;
 };
 
 

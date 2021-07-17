@@ -10,7 +10,7 @@ SyntaxNodeDiv::~SyntaxNodeDiv() {
 
 }
 
-void SyntaxNodeDiv::generate(std::stringstream& output) {
+void SyntaxNodeDiv::OutputSerial(std::stringstream& output) {
 	SYNTAX_NODE_TYPE leftType = m_children.front()->GetType();
 	SYNTAX_NODE_TYPE rightType = m_children.back()->GetType();
 	if (SYNTAX_NODE_TYPE_NUMBER == leftType &&

@@ -8,7 +8,7 @@ public:
 	explicit SyntaxNodeDiv();
 	virtual ~SyntaxNodeDiv();
 
-	void generate(std::stringstream& output) override;
+	void OutputSerial(std::stringstream& output) override;
 };
 
 

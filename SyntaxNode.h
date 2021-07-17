@@ -33,6 +33,8 @@ public:
 
 	virtual GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception);
 
+	GENERATE_PARALLEL_RESULT GenerateParallelSelf(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel);
+
 	const char* GetContent();
 
 	size_t GetChildrenCount();
@@ -41,7 +43,9 @@ public:
 
 	int GetLine();
 
-	virtual void generate(std::stringstream& output);
+	virtual void OutputSerial(std::stringstream& output);
+
+	virtual void OutputParallel(std::stringstream& output);
 	
 	friend std::ostream &operator<<(std::ostream &out, SyntaxNode &node);
 protected:
@@ -68,7 +72,7 @@ protected:
 	
 	SYNTAX_NODE_TYPE m_type = SYNTAX_NODE_TYPE_NONE;
 
-	bool m_is_paralleled = false;
+	uint64_t m_parallel_index = UINT64_MAX;
 
 	int m_line = 0;
 };

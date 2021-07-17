@@ -15,7 +15,7 @@ public:
 
 	int GetNO();
 
-	void generate(std::stringstream& output) override;
+	void OutputSerial(std::stringstream& output) override;
 private:
 	int m_NO;
 };
