@@ -2,6 +2,7 @@
 #define __COMMON_H__
 
 #include <stack>
+
 #include "SyntaxNode.h"
 #include "SyntaxNodeNumber.h"
 #include "SyntaxNodeString.h"

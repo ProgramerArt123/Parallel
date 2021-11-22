@@ -2,14 +2,15 @@
 #include "Parallel.h"
 #include "SyntaxNodeProcDef.h"
 
+extern int yylineno;
 
 SyntaxNode::SyntaxNode(const char *content, int priority) :
 	m_content(content), m_parent(*this) {
-	m_line = lineno;
+	m_line = yylineno;
 }
 SyntaxNode::SyntaxNode(SyntaxNode &parent, const char *content, int priority) :
 	m_content(content), m_parent(parent) {
-	m_line = lineno;
+	m_line = yylineno;
 }
 SyntaxNode::~SyntaxNode() {
 }

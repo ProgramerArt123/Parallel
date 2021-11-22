@@ -13,7 +13,6 @@
 
 class Parallel;
 
-extern int lineno;
 
 class SyntaxNode {
 public:

@@ -1,6 +1,6 @@
 %{
 #include "y.tab.h"
-int lineno = 1;
+extern int yylineno;
 %}
 
 %%
@@ -11,7 +11,7 @@ return					{ return RETURN; }
 [_a-zA-Z][a-zA-Z0-9]*	{ yylval.strv = strdup(yytext); return NAME; }
 [0-9]+			{ yylval.intv = atoi(yytext); return NUMBER; }
 [,;]			{ return SEPARATE; }
-\n				lineno++;
+\n				yylineno++;
 [ \t\r]+		;
 "//".*$			;
 .			return yytext[0];

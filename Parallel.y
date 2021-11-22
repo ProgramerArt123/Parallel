@@ -1,7 +1,27 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
-#include "common.h"
+#include <stdint.h>
+void PushStatement();
+void PushReturn();
+void PushAssignmentStatement(const char *variable);
+void PushAdd();
+void PushSub();
+void PushMul();
+void PushDiv();
+void PushMod();
+void PushBlock();
+void PushString(const char *itera);
+void PushNumber(int number);
+void PushVariable(const char *name);
+void AddArgment(uint64_t argment);
+void PushLoopEnter();
+void PushLoopExit();
+void PushProcDefEnter(const char *name);
+void PushProcDefExit();
+void AddParam(const char *param);
+void PushProcCallEnter(const char *name);
+void PushProcCallExit();
 %}
 
 %union {
@@ -26,34 +46,34 @@ statements:	statement SEPARATE
 	|	statements statement SEPARATE
 	;
 
-statement:	loop			{ scopes.top()->PushStatement();}
-	|	proc_def			{ scopes.top()->PushStatement();}
-	|	RETURN expression	{ scopes.top()->PushReturn();}
-	|	NAME '=' expression	{ scopes.top()->PushAssignmentStatement($1);}
-	|	expression			{ scopes.top()->PushStatement();}
+statement:	loop			{ PushStatement();}
+	|	proc_def			{ PushStatement();}
+	|	RETURN expression	{ PushReturn();}
+	|	NAME '=' expression	{ PushAssignmentStatement($1);}
+	|	expression			{ PushStatement();}
 	;
 
-expression:	expression '+' expression 	{ $$ = $1 + $3; scopes.top()->PushAdd();}
-	|	expression '-' expression 		{ $$ = $1 - $3; scopes.top()->PushSub();}
-	|	expression '*' expression 		{ $$ = $1 * $3; scopes.top()->PushMul();}
-	|	expression '/' expression 		{ $$ = $1 / $3; scopes.top()->PushDiv();}
-	|	expression '%' expression 		{ $$ = $1 % $3; scopes.top()->PushMod();}
+expression:	expression '+' expression 	{ $$ = $1 + $3; PushAdd();}
+	|	expression '-' expression 		{ $$ = $1 - $3; PushSub();}
+	|	expression '*' expression 		{ $$ = $1 * $3; PushMul();}
+	|	expression '/' expression 		{ $$ = $1 / $3; PushDiv();}
+	|	expression '%' expression 		{ $$ = $1 % $3; PushMod();}
 	|   '-' expression %prec UMINUS  	{ $$ = -$2; printf("---%d\n", $$);} 
-	|	'(' expression ')'				{ $$ = $2; scopes.top()->PushBlock();}
-	|	STRING							{ scopes.top()->PushString($1);}
-	|	NUMBER							{ scopes.top()->PushNumber($1);}
+	|	'(' expression ')'				{ $$ = $2; PushBlock();}
+	|	STRING							{ PushString($1);}
+	|	NUMBER							{ PushNumber($1);}
 	|	proc_call						
-	|	NAME							{ scopes.top()->PushVariable($1);}
+	|	NAME							{ PushVariable($1);}
 	;
 
 
 loop : loop_head loop_block_exit loop_scope_enter statements loop_scope_exit
 	;
 
-loop_head : loop_block_enter NUMBER {scopes.top()->AddArgment($2);}
+loop_head : loop_block_enter NUMBER {AddArgment($2);}
 	;
 
-loop_block_enter: FOR '(' { scopes.push(scopes.top()->PushLoopEnter()); }
+loop_block_enter: FOR '(' { PushLoopEnter(); }
 	;
 
 loop_block_exit: ')'
@@ -62,13 +82,13 @@ loop_block_exit: ')'
 loop_scope_enter: '{'
 	;
 
-loop_scope_exit: '}'		{ scopes.pop(); scopes.top()->PushLoopExit(); }
+loop_scope_exit: '}'		{ PushLoopExit(); }
 	;
 
 proc_def:  proc_def_block_enter parameters proc_def_block_exit proc_def_scope_enter statements proc_def_scope_exit	
 	;
 
-proc_def_block_enter: DEF NAME '(' { scopes.push(scopes.top()->PushProcDefEnter($2)); }
+proc_def_block_enter: DEF NAME '(' { PushProcDefEnter($2); }
 	;
 
 proc_def_block_exit: ')'
@@ -77,21 +97,21 @@ proc_def_block_exit: ')'
 proc_def_scope_enter: '{'
 	;
 
-proc_def_scope_exit: '}'		{ scopes.pop(); scopes.top()->PushProcDefExit(); }
+proc_def_scope_exit: '}'		{ PushProcDefExit(); }
 	;
 
-parameters:	NAME					{ scopes.top()->AddParam($1); }							
-	|	parameters SEPARATE NAME	{ scopes.top()->AddParam($3); }							
+parameters:	NAME					{ AddParam($1); }							
+	|	parameters SEPARATE NAME	{ AddParam($3); }							
 	|													
 	;
 
 proc_call:	proc_call_block_enter arguments proc_call_block_exit
 	;
 
-proc_call_block_enter: NAME '(' { scopes.top()->PushProcCallEnter($1); }
+proc_call_block_enter: NAME '(' { PushProcCallEnter($1); }
 	;
 
-proc_call_block_exit: ')'		{ scopes.top()->PushProcCallExit();  }
+proc_call_block_exit: ')'		{ PushProcCallExit();  }
 	;
 
 arguments:	statement

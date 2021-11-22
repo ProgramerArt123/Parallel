@@ -476,7 +476,7 @@ char *yytext;
 #line 1 "Parallel.l"
 #line 2 "Parallel.l"
 #include "y.tab.h"
-int lineno = 1;
+extern int yylineno;
 #line 481 "lex.yy.c"
 
 #define INITIAL 0
@@ -789,7 +789,7 @@ case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
 #line 14 "Parallel.l"
-lineno++;
+yylineno++;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP

@@ -17,6 +17,7 @@ def main(){
                 k = c + g;
                 l = d + h;
 
+                function(i, j, k, l);
         };
         finish = clock();
         t = finish - begin;

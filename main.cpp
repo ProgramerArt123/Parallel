@@ -20,7 +20,7 @@ int main() {
 	
 	scopes.push(std::shared_ptr<Scope>(new Scope));
 
-	FILE *in = fopen("/mnt/hgfs/G/users/administrator/source/repos/Project1/Project1/test.p", "r");
+	FILE *in = fopen("/mnt/hgfs/H/Users/Administrator/source/repos/ConsoleApplication1/ConsoleApplication1/test.p", "r");
 	if (in) {
 		printf("123\n");
 		yyin = in;
