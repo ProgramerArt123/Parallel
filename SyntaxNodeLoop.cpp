@@ -33,13 +33,23 @@ void SyntaxNodeLoop::OutputSerial(std::stringstream& output) {
 	output << ".LL" << std::to_string(loopCount+1) << ":" << std::endl;
 	output << '\t' << "addq    $1,  %rcx" << std::endl;
 	output << ".LL" << std::to_string(loopCount) << ":" << std::endl;
-	m_body->LoopGenerate(output);
-	output << '\t' << "setle   %al" << std::endl;
+	m_body->LoopGenerateSerial(output);
+	output << '\t' << "setl   %al" << std::endl;
 	output << '\t' << "testb   %al, %al" << std::endl;
 	output << '\t' << "jne	.LL" << std::to_string(loopCount+1) << "" << std::endl;
 	loopCount += 2;
 }
 
 void SyntaxNodeLoop::OutputParallel(std::stringstream& output) {
-	m_body->OutputParallel(output);
+	static int loopCount = 0;
+	output << '\t' << "movq    $1, %rcx" << std::endl;
+	output << '\t' << "jmp	.LL" << std::to_string(loopCount) << std::endl;
+	output << ".LL" << std::to_string(loopCount + 1) << ":" << std::endl;
+	output << '\t' << "addq    $1,  %rcx" << std::endl;
+	output << ".LL" << std::to_string(loopCount) << ":" << std::endl;
+	m_body->LoopGenerateParallel(output);
+	output << '\t' << "setl   %al" << std::endl;
+	output << '\t' << "testb   %al, %al" << std::endl;
+	output << '\t' << "jne	.LL" << std::to_string(loopCount + 1) << "" << std::endl;
+	loopCount += 2;
 }

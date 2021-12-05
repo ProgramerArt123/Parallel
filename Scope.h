@@ -51,8 +51,10 @@ public:
 	void OutputParallel(std::stringstream& output) override;
 
 	void DefGenerate(std::stringstream& output);
-	uint32_t CallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
-	void LoopGenerate(std::stringstream& output);
+	uint32_t BeginCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
+	void EndCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
+	void LoopGenerateSerial(std::stringstream& output);
+	void LoopGenerateParallel(std::stringstream& output);
 	void UpdateRuntimePos(size_t pos);
 
 	void FindEffectives();

@@ -38,9 +38,13 @@ GENERATE_PARALLEL_RESULT SyntaxNodeProcCall::GenerateParallel(const std::shared_
 }
 
 void SyntaxNodeProcCall::OutputSerial(std::stringstream& output) {
-	uint32_t top = m_scope.CallGenerate(output, m_children);
+	uint32_t top = m_scope.BeginCallGenerate(output, m_children);
+	if (top) {
+		output << '\t' << "subq    $" << top << ", %rsp" << std::endl;
+	}
 	PLATFORM.ProcCallGenerateSerial(m_content.c_str(), output);
-	if (top > 0) {
+	if (top) {
 		output << '\t' << "addq   $" << top << ", %rsp" << std::endl;
 	}
+	m_scope.EndCallGenerate(output, m_children);
 }

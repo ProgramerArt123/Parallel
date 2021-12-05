@@ -1,7 +1,11 @@
+def function(a,b,c,d){
+	 printf("a:%d,d:%d\n", a, d);
+     return 123;
+};
 
 def main(){
         begin = clock();
-        for(9999999){
+        for(2){
                 a = 1;
                 b = 2;
                 c = 3;
@@ -17,7 +21,7 @@ def main(){
                 k = c + g;
                 l = d + h;
 
-                function(i, j, k, l);
+				function(i,j,k,l);
         };
         finish = clock();
         t = finish - begin;
