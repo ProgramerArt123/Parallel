@@ -18,14 +18,17 @@ void ParallelElement::OutPut(std::stringstream &output) {
 				add->OutputParallel(output);
 			}
 			output << '\t' << "vpunpcklqdq     %xmm0, %xmm1, %xmm0" << std::endl;
-			output << '\t' << "vinserti128     $0, %xmm0, %ymm0, %ymm0" << std::endl;
+			output << '\t' << "vinserti128     $1, %xmm0, %ymm0, %ymm0" << std::endl;
 			output << '\t' << "vpunpcklqdq     %xmm2, %xmm3, %xmm2" << std::endl;
-			output << '\t' << "vinserti128     $1, %xmm2, %ymm0, %ymm0" << std::endl;
+			output << '\t' << "vinserti128     $0, %xmm2, %ymm0, %ymm0" << std::endl;
 			output << '\t' << "vpunpcklqdq     %xmm4, %xmm5, %xmm4" << std::endl;
-			output << '\t' << "vinserti128     $0, %xmm4, %ymm1, %ymm1" << std::endl;
+			output << '\t' << "vinserti128     $1, %xmm4, %ymm1, %ymm1" << std::endl;
 			output << '\t' << "vpunpcklqdq     %xmm6, %xmm7, %xmm6" << std::endl;
-			output << '\t' << "vinserti128     $1, %xmm6, %ymm1, %ymm1" << std::endl;
+			output << '\t' << "vinserti128     $0, %xmm6, %ymm1, %ymm1" << std::endl;
 			output << '\t' << "vpaddq  %ymm0, %ymm1, %ymm0" << std::endl;
+			//cache result
+			SyntaxNodeAdd *add = static_cast<SyntaxNodeAdd *>(m_nodes[index].get());
+			output << '\t' << "vmovdqu  %ymm0, -" << add->GetRightChildStackTop() + 56 << "(%rbp)" << std::endl;
 		}
 	}
 		break;

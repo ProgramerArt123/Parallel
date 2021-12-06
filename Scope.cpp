@@ -377,7 +377,7 @@ void Scope::LoopGenerateSerial(std::stringstream& output) {
 }
 
 void Scope::LoopGenerateParallel(std::stringstream& output) {
-	OutputParallel(output);
+	Scope::OutputParallel(output);
 	int times = m_argments.front()->GetValue();
 	output << '\t' << "cmpq    $" << std::to_string(times) <<
 		",  %rcx" << std::endl;
