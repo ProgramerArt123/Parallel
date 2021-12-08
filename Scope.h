@@ -50,7 +50,8 @@ public:
 	void OutputParallel(const char *fileName) throw (std::exception);
 	void OutputParallel(std::stringstream& output) override;
 
-	void DefGenerate(std::stringstream& output);
+	void DefGenerateSerial(std::stringstream& output);
+	void DefGenerateParallel(std::stringstream& output);
 	uint32_t BeginCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
 	void EndCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
 	void LoopGenerateSerial(std::stringstream& output);

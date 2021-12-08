@@ -45,7 +45,13 @@ void SyntaxNodeAssignment::OutputParallel(std::stringstream& output) {
 			<< ", -" << (variable->GetScopePos() + 1) * 8 << "(%rbp)" << std::endl;
 	}
 	else {
-		output << '\t' << "movq	%rax, -" << (variable->GetScopePos() + 1) * 8 << "(%rbp)" << std::endl;
+		if (SYNTAX_NODE_TYPE_ADD == value->GetType()) {
+			SyntaxNodeAdd *add = static_cast<SyntaxNodeAdd *>(value);
+			if (add->GetRightChildStackTop() + 32 != (variable->GetScopePos() + 1) * 8) {
+				output << '\t' << "movq	-" << add->GetRightChildStackTop() + 32 << "(%rbp), %rax" << std::endl;
+				output << '\t' << "movq	%rax, -" << (variable->GetScopePos() + 1) * 8 << "(%rbp)" << std::endl;
+			}
+		}
 	}
 	m_scope.UpdateRuntimePos(variable->GetScopePos() + 1);
 }

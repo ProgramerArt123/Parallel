@@ -30,13 +30,13 @@ GENERATE_PARALLEL_RESULT SyntaxNodeProcDef::GenerateParallel(const std::shared_p
 
 void SyntaxNodeProcDef::OutputSerial(std::stringstream& output) {
 	OutputHead(output);
-	m_body->DefGenerate(output);
+	m_body->DefGenerateSerial(output);
 	OutputTail(output);
 }
 
 void SyntaxNodeProcDef::OutputParallel(std::stringstream& output) {
 	OutputHead(output);
-	m_body->OutputParallel(output);
+	m_body->DefGenerateParallel(output);
 	OutputTail(output);
 }
 

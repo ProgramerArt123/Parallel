@@ -230,7 +230,7 @@ void Scope::OutputParallel(std::stringstream& output) {
 	m_parallel.Output(output);
 }
 
-void Scope::DefGenerate(std::stringstream& output) {
+void Scope::DefGenerateSerial(std::stringstream& output) {
 	//1.参数赋值需要启用其他内存
 	//2.registers放在栈的最上面
 	//3.定义的变量逆序入栈
@@ -264,6 +264,26 @@ void Scope::DefGenerate(std::stringstream& output) {
 		index++;
 	}
 	SyntaxNode::OutputSerial(output);
+}
+
+void Scope::DefGenerateParallel(std::stringstream& output) {
+	size_t parametersCount = m_parameters.size();
+	uint32_t index = 0;
+	for (std::shared_ptr<SyntaxNodeVariable> &parameter : m_parameters) {
+		if (index < PLATFORM.registersCount) {
+			output << '\t' << "movq	%" << PLATFORM.registers[index] << ", -"
+				<< std::to_string((parameter->GetScopePos() + 1) * 8) <<
+				"(%rbp)" << std::endl;
+		}
+		else {
+			output << '\t' << "movq	" << 16 + 8 * (parametersCount - 1 - index) <<
+				"(%rbp), %rax" << std::endl;
+			output << '\t' << "movq	%rax, -" << std::to_string((parameter->GetScopePos() + 1) * 8)
+				<< "(%rbp)" << std::endl;
+		}
+		index++;
+	}
+	Scope::OutputParallel(output);
 }
 
 uint32_t Scope::BeginCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments) {
