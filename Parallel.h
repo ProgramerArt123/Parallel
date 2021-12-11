@@ -10,11 +10,12 @@
 #include "SyntaxNodeType.h"
 
 class SyntaxNode;
+class Output;
 
 typedef struct _ParallelElement {
 	SYNTAX_NODE_TYPE m_type = SYNTAX_NODE_TYPE_NONE;
 	std::vector<std::shared_ptr<SyntaxNode>> m_nodes;
-	void OutPut(std::stringstream &output);
+	void OutputInstructions(std::unique_ptr<Output>& output);
 }ParallelElement;
 
 class Parallel {
@@ -24,7 +25,7 @@ public:
 	void Truncation();
 	bool CheckLastType(SYNTAX_NODE_TYPE type);
 	bool CheckLastElement(const SyntaxNode &node);
-	void Output(std::stringstream& output);
+	void OutputInstructions(std::unique_ptr<Output>& output);
 	friend std::ostream &operator<<(std::ostream &out, Parallel &parallel);
 
 private:

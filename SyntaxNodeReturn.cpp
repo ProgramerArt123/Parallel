@@ -14,11 +14,11 @@ void SyntaxNodeReturn::FindEffectives(std::shared_ptr<SyntaxNode> &self, std::se
 	effectives.insert(self);
 }
 
-void SyntaxNodeReturn::OutputSerial(std::stringstream& output) {
+void SyntaxNodeReturn::OutputInstructions(std::unique_ptr<Output>& output) {
 	SYNTAX_NODE_TYPE value = m_children.front()->GetType();
 	if (SYNTAX_NODE_TYPE_NUMBER == value) {
 		const int intValue = static_cast<SyntaxNodeNumber *>(m_children.front().get())->GetValue();
-		output << '\t' << "movq	$" << std::to_string(intValue) << ", %rax" << std::endl;
+		output->GetStream() << '\t' << "movq	$" << std::to_string(intValue) << ", %rax" << std::endl;
 	}
 	else {
 		

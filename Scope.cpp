@@ -184,109 +184,49 @@ void Scope::AddParam(const char *param) {
 }
 
 
-void Scope::OutputSerial(const char *fileName) throw (std::exception) {
-	std::stringstream output;
-	SyntaxNode::OutputSerial(output);
-	std::ofstream file(fileName);
-	if (!file.is_open()) {
-		throw std::exception();
-	}
-	PLATFORM.PageHeaderGenerateSerial(fileName, file);
-	const std::string &constContent = consts.str();
-	if (!constContent.empty()) {
-		PLATFORM.ConstGenerateSerial(file);
-		file << constContent;
-	}
-	file << '\t' << ".text" << std::endl;
-	file << output.str();
-	PLATFORM.PageFooterGenerateSerial(file);
+void Scope::OutputFile(std::unique_ptr<Output>& output) throw (std::exception) {
+	SyntaxNode::OutputInstructions(output);
 }
 
-void Scope::OutputParallel(const char *fileName) throw (std::exception) {
-	std::stringstream output;
-	SyntaxNode::OutputParallel(output);
-	std::ofstream file(fileName);
-	if (!file.is_open()) {
-		throw std::exception();
-	}
-	PLATFORM.PageHeaderGenerateSerial(fileName, file);
-	const std::string &constContent = consts.str();
-	if (!constContent.empty()) {
-		PLATFORM.ConstGenerateSerial(file);
-		file << constContent;
-	}
-	file << '\t' << ".text" << std::endl;
-	file << output.str();
-	PLATFORM.PageFooterGenerateSerial(file);
-}
 
-void Scope::OutputParallel(std::stringstream& output) {
+void Scope::OutputInstructions(std::unique_ptr<Output>& output) {
 	for (std::shared_ptr<SyntaxNode> &child : m_children) {
 		SYNTAX_NODE_TYPE type = child->GetType();
 		if (SYNTAX_NODE_TYPE_PROC_DEF == type || SYNTAX_NODE_TYPE_LOOP == type) {
-			child->OutputParallel(output);
+			child->OutputInstructions(output);
 		}
 	}
-	m_parallel.Output(output);
+	m_parallel.OutputInstructions(output);
 }
 
-void Scope::DefGenerateSerial(std::stringstream& output) {
+void Scope::DefGenerate(std::unique_ptr<Output>& output) {
 	//1.参数赋值需要启用其他内存
 	//2.registers放在栈的最上面
 	//3.定义的变量逆序入栈
 	//4.取实参值时需要和外部调用采用一致的对应机制
 	//5.fast_call调用者依实参顺序依次将值写入registers
 	//6.registers的值会被都复制到内存再使用，其他的参数直接使用入参时的内存
-	/*size_t assginsCount = StatisticsAssginsCount();
-	size_t parametersCount = m_parameters.size();
-	size_t registersParametersCount = parametersCount < registersCount ?
-		parametersCount : registersCount;
-	for (size_t index = 0; index < registersParametersCount; index ++) {
-		output << '\t' << "movq	%" << registers[index] << ", -"
-			<< std::to_string(assginsCount+4+index * 4) << 
-			"(%rbp)" << std::endl;
-	}
-	SyntaxNode::OutputSerial(output);*/
+
 	size_t parametersCount = m_parameters.size();
 	uint32_t index = 0;
 	for (std::shared_ptr<SyntaxNodeVariable> &parameter : m_parameters) {
 		if (index < PLATFORM.registersCount) {
-			output << '\t' << "movq	%" << PLATFORM.registers[index] << ", -"
+			output->GetStream() << '\t' << "movq	%" << PLATFORM.registers[index] << ", -"
 				<< std::to_string((parameter->GetScopePos() + 1) * 8) <<
 				"(%rbp)" << std::endl;
 		}
 		else {
-			output << '\t' << "movq	" << 16 + 8 * (parametersCount - 1 - index) << 
+			output->GetStream() << '\t' << "movq	" << 16 + 8 * (parametersCount - 1 - index) <<
 				"(%rbp), %rax" << std::endl;
-			output << '\t' << "movq	%rax, -" << std::to_string((parameter->GetScopePos() + 1) * 8)
+			output->GetStream() << '\t' << "movq	%rax, -" << std::to_string((parameter->GetScopePos() + 1) * 8)
 				<< "(%rbp)" << std::endl;
 		}
 		index++;
 	}
-	SyntaxNode::OutputSerial(output);
+	OutputInstructions(output);
 }
 
-void Scope::DefGenerateParallel(std::stringstream& output) {
-	size_t parametersCount = m_parameters.size();
-	uint32_t index = 0;
-	for (std::shared_ptr<SyntaxNodeVariable> &parameter : m_parameters) {
-		if (index < PLATFORM.registersCount) {
-			output << '\t' << "movq	%" << PLATFORM.registers[index] << ", -"
-				<< std::to_string((parameter->GetScopePos() + 1) * 8) <<
-				"(%rbp)" << std::endl;
-		}
-		else {
-			output << '\t' << "movq	" << 16 + 8 * (parametersCount - 1 - index) <<
-				"(%rbp), %rax" << std::endl;
-			output << '\t' << "movq	%rax, -" << std::to_string((parameter->GetScopePos() + 1) * 8)
-				<< "(%rbp)" << std::endl;
-		}
-		index++;
-	}
-	Scope::OutputParallel(output);
-}
-
-uint32_t Scope::BeginCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments) {
+uint32_t Scope::BeginCallGenerate(std::unique_ptr<Output>& output, std::list<std::shared_ptr<SyntaxNode>> &argments) {
 	uint32_t index = 0;
 	uint32_t top = (m_runtime_pos + 1) / 2 * 16;
 
@@ -310,27 +250,27 @@ uint32_t Scope::BeginCallGenerate(std::stringstream& output, std::list<std::shar
 		case SYNTAX_NODE_TYPE_NUMBER:
 		{
 			SyntaxNodeNumber *number = static_cast<SyntaxNodeNumber *>(argment.get());
-			output << '\t' << "movq	$" << number->GetValue()
+			output->GetStream() << '\t' << "movq	$" << number->GetValue()
 				<< ", " << dst << std::endl;
 		}
 		break;
 		case SYNTAX_NODE_TYPE_STRING:
 		{
 			SyntaxNodeString *string = static_cast<SyntaxNodeString *>(argment.get());
-			string->OutputSerial(output);
-			PLATFORM.ProcStringArgmentGenerateSerial(string->GetNO(), dst.c_str(), output);
+			string->OutputInstructions(output);
+			PLATFORM.ProcStringArgmentGenerateSerial(string->GetNO(), dst.c_str(), output->GetStream());
 		}
 		break;
 		case SYNTAX_NODE_TYPE_VARIABLE:
 		{
 			SyntaxNodeVariable *variable = static_cast<SyntaxNodeVariable *>(argment.get());
 			if (index < PLATFORM.registersCount) {
-				output << '\t' << "movq	" << dst << ", -"<< (variable->GetScopePos() + 1 + (argments.size() + 1)/2*2) * 8 << "(%rbp)" << std::endl;
-				output << '\t' << "movq	-" << (variable->GetScopePos() + 1) * 8 << "(%rbp), " << dst << std::endl;
+				output->GetStream() << '\t' << "movq	" << dst << ", -"<< (variable->GetScopePos() + 1 + (argments.size() + 1)/2*2) * 8 << "(%rbp)" << std::endl;
+				output->GetStream() << '\t' << "movq	-" << (variable->GetScopePos() + 1) * 8 << "(%rbp), " << dst << std::endl;
 			}
 			else {
-				output << '\t' << "movq	-" << (variable->GetScopePos() + 1) * 8 << "(%rbp), %rax" << std::endl;
-				output << '\t' << "movq	%rax, " << dst << std::endl;
+				output->GetStream() << '\t' << "movq	-" << (variable->GetScopePos() + 1) * 8 << "(%rbp), %rax" << std::endl;
+				output->GetStream() << '\t' << "movq	%rax, " << dst << std::endl;
 			}
 		}
 		break;
@@ -389,17 +329,10 @@ void Scope::EndCallGenerate(std::stringstream& output, std::list<std::shared_ptr
 	}
 }
 
-void Scope::LoopGenerateSerial(std::stringstream& output) {
-	SyntaxNode::OutputSerial(output);
+void Scope::LoopGenerate(std::unique_ptr<Output>& output) {
+	OutputInstructions(output);
 	int times = m_argments.front()->GetValue();
-	output << '\t' << "cmpq    $" << std::to_string(times) <<
-		",  %rcx" << std::endl;
-}
-
-void Scope::LoopGenerateParallel(std::stringstream& output) {
-	Scope::OutputParallel(output);
-	int times = m_argments.front()->GetValue();
-	output << '\t' << "cmpq    $" << std::to_string(times) <<
+	output->GetStream() << '\t' << "cmpq    $" << std::to_string(times) <<
 		",  %rcx" << std::endl;
 }
 

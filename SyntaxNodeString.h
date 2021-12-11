@@ -2,6 +2,7 @@
 #define _SYNTAX_NODE_STRING_H_
 
 #include <string>
+#include <memory>
 #include "SyntaxNode.h"
 
 class SyntaxNodeString : public SyntaxNode {
@@ -15,7 +16,7 @@ public:
 
 	int GetNO();
 
-	void OutputSerial(std::stringstream& output) override;
+	void OutputInstructions(std::unique_ptr<Output>& output) override;
 private:
 	int m_NO;
 };

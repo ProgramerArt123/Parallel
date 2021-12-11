@@ -2,6 +2,7 @@
 #include "Parallel.h"
 #include "SyntaxNodeProcDef.h"
 
+
 extern int yylineno;
 
 SyntaxNode::SyntaxNode(const char *content, int priority) :
@@ -123,15 +124,10 @@ bool SyntaxNode::IsRoot() {
 	return this == &m_parent;
 }
 
-void SyntaxNode::OutputSerial(std::stringstream& output) {
+void SyntaxNode::OutputInstructions(std::unique_ptr<Output>& output) {
 	for (std::shared_ptr<SyntaxNode> &child : m_children) {
-		child->OutputSerial(output);
+		child->OutputInstructions(output);
 	}
 }
 
-void SyntaxNode::OutputParallel(std::stringstream& output) {
-	for (std::shared_ptr<SyntaxNode> &child : m_children) {
-		child->OutputParallel(output);
-	}
-}
 

@@ -10,9 +10,9 @@
 #include <sstream>
 #include "SyntaxNodeType.h"
 #include "GenerateParallelResult.h"
+#include "Output.h"
 
 class Parallel;
-
 
 class SyntaxNode {
 public:
@@ -42,10 +42,8 @@ public:
 
 	int GetLine();
 
-	virtual void OutputSerial(std::stringstream& output);
+	virtual void OutputInstructions(std::unique_ptr<Output>& output);
 
-	virtual void OutputParallel(std::stringstream& output);
-	
 	friend std::ostream &operator<<(std::ostream &out, SyntaxNode &node);
 protected:
 
@@ -74,6 +72,10 @@ protected:
 	uint64_t m_parallel_index = UINT64_MAX;
 
 	int m_line = 0;
+
+protected:
+	friend class SerialOutput;
+	friend class ParallelOutput;
 };
 
 

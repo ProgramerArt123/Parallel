@@ -46,16 +46,14 @@ public:
 	void AddArgment(uint64_t argment);
 	void AddParam(const char *param);
 
-	void OutputSerial(const char *fileName) throw (std::exception);
-	void OutputParallel(const char *fileName) throw (std::exception);
-	void OutputParallel(std::stringstream& output) override;
+	void OutputFile(std::unique_ptr<Output>& output) throw (std::exception);
 
-	void DefGenerateSerial(std::stringstream& output);
-	void DefGenerateParallel(std::stringstream& output);
-	uint32_t BeginCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
+	void OutputInstructions(std::unique_ptr<Output>& output) override;
+
+	void DefGenerate(std::unique_ptr<Output>& output);
+	uint32_t BeginCallGenerate(std::unique_ptr<Output>& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
 	void EndCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments);
-	void LoopGenerateSerial(std::stringstream& output);
-	void LoopGenerateParallel(std::stringstream& output);
+	void LoopGenerate(std::unique_ptr<Output>& output);
 	void UpdateRuntimePos(size_t pos);
 
 	void FindEffectives();

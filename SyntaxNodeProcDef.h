@@ -16,8 +16,7 @@ public:
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
 
-	void OutputSerial(std::stringstream& output) override;
-	void OutputParallel(std::stringstream& output) override;
+	void OutputInstructions(std::unique_ptr<Output>& output) override;
 	friend std::ostream &operator<<(std::ostream &out, SyntaxNodeProcDef &def);
 
 private:

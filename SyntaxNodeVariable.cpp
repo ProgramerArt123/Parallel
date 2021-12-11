@@ -26,8 +26,8 @@ GENERATE_PARALLEL_RESULT SyntaxNodeVariable::GenerateParallel(const std::shared_
 	return GENERATE_PARALLEL_RESULT_FINDED;
 }
 
-void SyntaxNodeVariable::OutputSerial(std::stringstream& output) {
-	output << '\t' << "movq	" << GetScopePos() << "(%rbp), %rax" << std::endl;
+void SyntaxNodeVariable::OutputInstructions(std::unique_ptr<Output>& output) {
+	output->GetStream() << '\t' << "movq	" << GetScopePos() << "(%rbp), %rax" << std::endl;
 }
 
 size_t SyntaxNodeVariable::GetScopePos() {

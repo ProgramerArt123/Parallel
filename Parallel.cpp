@@ -3,7 +3,7 @@
 #include "SyntaxNode.h"
 #include "common.h"
 
-void ParallelElement::OutPut(std::stringstream &output) {
+void ParallelElement::OutputInstructions(std::unique_ptr<Output>& output) {
 	switch (m_type)
 	{
 	case SYNTAX_NODE_TYPE_ADD:
@@ -15,20 +15,20 @@ void ParallelElement::OutPut(std::stringstream &output) {
 					break;
 				}
 				std::shared_ptr<SyntaxNode> &add = m_nodes[index + j];
-				add->OutputParallel(output);
+				add->OutputInstructions(output);
 			}
-			output << '\t' << "vpunpcklqdq     %xmm0, %xmm1, %xmm0" << std::endl;
-			output << '\t' << "vinserti128     $1, %xmm0, %ymm0, %ymm0" << std::endl;
-			output << '\t' << "vpunpcklqdq     %xmm2, %xmm3, %xmm2" << std::endl;
-			output << '\t' << "vinserti128     $0, %xmm2, %ymm0, %ymm0" << std::endl;
-			output << '\t' << "vpunpcklqdq     %xmm4, %xmm5, %xmm4" << std::endl;
-			output << '\t' << "vinserti128     $1, %xmm4, %ymm1, %ymm1" << std::endl;
-			output << '\t' << "vpunpcklqdq     %xmm6, %xmm7, %xmm6" << std::endl;
-			output << '\t' << "vinserti128     $0, %xmm6, %ymm1, %ymm1" << std::endl;
-			output << '\t' << "vpaddq  %ymm0, %ymm1, %ymm0" << std::endl;
+			output->GetStream() << '\t' << "vpunpcklqdq     %xmm0, %xmm1, %xmm0" << std::endl;
+			output->GetStream() << '\t' << "vinserti128     $1, %xmm0, %ymm0, %ymm0" << std::endl;
+			output->GetStream() << '\t' << "vpunpcklqdq     %xmm2, %xmm3, %xmm2" << std::endl;
+			output->GetStream() << '\t' << "vinserti128     $0, %xmm2, %ymm0, %ymm0" << std::endl;
+			output->GetStream() << '\t' << "vpunpcklqdq     %xmm4, %xmm5, %xmm4" << std::endl;
+			output->GetStream() << '\t' << "vinserti128     $1, %xmm4, %ymm1, %ymm1" << std::endl;
+			output->GetStream() << '\t' << "vpunpcklqdq     %xmm6, %xmm7, %xmm6" << std::endl;
+			output->GetStream() << '\t' << "vinserti128     $0, %xmm6, %ymm1, %ymm1" << std::endl;
+			output->GetStream() << '\t' << "vpaddq  %ymm0, %ymm1, %ymm0" << std::endl;
 			//cache result
 			SyntaxNodeAdd *add = static_cast<SyntaxNodeAdd *>(m_nodes[index].get());
-			output << '\t' << "vmovdqu  %ymm0, -" << add->GetRightChildStackTop() + 56 << "(%rbp)" << std::endl;
+			output->GetStream() << '\t' << "vmovdqu  %ymm0, -" << add->GetRightChildStackTop() + 56 << "(%rbp)" << std::endl;
 		}
 	}
 		break;
@@ -47,14 +47,14 @@ void ParallelElement::OutPut(std::stringstream &output) {
 	case SYNTAX_NODE_TYPE_ASSIGNMENT:
 	{
 		for (std::shared_ptr<SyntaxNode> &node : m_nodes) {
-			node->OutputParallel(output);
+			node->OutputInstructions(output);
 		}
 	}
 		break;
 	default:
 	{
 		for (std::shared_ptr<SyntaxNode> &node : m_nodes) {
-			node->OutputSerial(output);
+			node->OutputInstructions(output);
 		}
 	}
 		break;
@@ -108,9 +108,9 @@ bool Parallel::CheckLastElement(const SyntaxNode &node) {
 	return true;
 }
 
-void Parallel::Output(std::stringstream& output) {
+void Parallel::OutputInstructions(std::unique_ptr<Output>& output) {
 	for (ParallelElement &element : m_elements) {
-		element.OutPut(output);
+		element.OutputInstructions(output);
 	}
 }
 

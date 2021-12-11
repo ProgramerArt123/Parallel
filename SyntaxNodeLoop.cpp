@@ -26,30 +26,16 @@ std::shared_ptr<Scope> &SyntaxNodeLoop::GetBody() {
 }
 
 
-void SyntaxNodeLoop::OutputSerial(std::stringstream& output) {
+void SyntaxNodeLoop::OutputInstructions(std::unique_ptr<Output>& output) {
 	static int loopCount = 0;
-	output << '\t' << "movq    $1, %rcx" << std::endl;
-	output << '\t' << "jmp	.LL" << std::to_string(loopCount) << std::endl;
-	output << ".LL" << std::to_string(loopCount+1) << ":" << std::endl;
-	output << '\t' << "addq    $1,  %rcx" << std::endl;
-	output << ".LL" << std::to_string(loopCount) << ":" << std::endl;
-	m_body->LoopGenerateSerial(output);
-	output << '\t' << "setl   %al" << std::endl;
-	output << '\t' << "testb   %al, %al" << std::endl;
-	output << '\t' << "jne	.LL" << std::to_string(loopCount+1) << "" << std::endl;
-	loopCount += 2;
-}
-
-void SyntaxNodeLoop::OutputParallel(std::stringstream& output) {
-	static int loopCount = 0;
-	output << '\t' << "movq    $1, %rcx" << std::endl;
-	output << '\t' << "jmp	.LL" << std::to_string(loopCount) << std::endl;
-	output << ".LL" << std::to_string(loopCount + 1) << ":" << std::endl;
-	output << '\t' << "addq    $1,  %rcx" << std::endl;
-	output << ".LL" << std::to_string(loopCount) << ":" << std::endl;
-	m_body->LoopGenerateParallel(output);
-	output << '\t' << "setl   %al" << std::endl;
-	output << '\t' << "testb   %al, %al" << std::endl;
-	output << '\t' << "jne	.LL" << std::to_string(loopCount + 1) << "" << std::endl;
+	output->GetStream() << '\t' << "movq    $1, %rcx" << std::endl;
+	output->GetStream() << '\t' << "jmp	.LL" << std::to_string(loopCount) << std::endl;
+	output->GetStream() << ".LL" << std::to_string(loopCount+1) << ":" << std::endl;
+	output->GetStream() << '\t' << "addq    $1,  %rcx" << std::endl;
+	output->GetStream() << ".LL" << std::to_string(loopCount) << ":" << std::endl;
+	m_body->LoopGenerate(output);
+	output->GetStream() << '\t' << "setl   %al" << std::endl;
+	output->GetStream() << '\t' << "testb   %al, %al" << std::endl;
+	output->GetStream() << '\t' << "jne	.LL" << std::to_string(loopCount+1) << "" << std::endl;
 	loopCount += 2;
 }

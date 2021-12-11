@@ -4,6 +4,9 @@ void yyerror(char* e);
 
 #include "common.h"
 
+#include "SerialOutput.h"
+#include "ParallelOutput.h"
+
 #include "lex.yy.c"
 #include "y.tab.c"
 
@@ -88,8 +91,10 @@ int main() {
 		//std::cout << scopes.top() << std::endl;
 		scopes.top()->FindEffectives();
 		scopes.top()->GenerateParallel();
-		scopes.top()->OutputSerial("test1.s");
-		scopes.top()->OutputParallel("test2.s");
+		std::unique_ptr<Output> serial(new SerialOutput("test1.s"));
+		scopes.top()->OutputFile(serial);
+		std::unique_ptr<Output> parallel(new ParallelOutput("test2.s"));
+		scopes.top()->OutputFile(parallel);
 	}
 	catch (const std::exception &e) {
 		std::cout << *scopes.top() << std::endl;

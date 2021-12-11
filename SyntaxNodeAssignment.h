@@ -12,8 +12,8 @@ public:
 
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
 
-	void OutputSerial(std::stringstream& output) override;
-	void OutputParallel(std::stringstream& output) override;
+	void OutputInstructions(std::unique_ptr<Output>& output) override;
+	
 private:
 	Scope &m_scope;
 };

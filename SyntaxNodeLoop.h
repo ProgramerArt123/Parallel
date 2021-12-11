@@ -15,8 +15,7 @@ public:
 
 	std::shared_ptr<Scope> &GetBody();
 	void SetTimes(uint64_t times);
-	void OutputSerial(std::stringstream& output) override;
-	void OutputParallel(std::stringstream& output) override;
+	void OutputInstructions(std::unique_ptr<Output>& output) override;
 private:
 	std::shared_ptr<Scope> m_body;
 };

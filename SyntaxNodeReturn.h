@@ -10,7 +10,7 @@ public:
 
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;
 
-	void OutputSerial(std::stringstream& output) override;
+	void OutputInstructions(std::unique_ptr<Output>& output) override;
 };
 
 

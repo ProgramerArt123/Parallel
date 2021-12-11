@@ -8,7 +8,6 @@ public:
 	explicit SyntaxNodeMul();
 	virtual ~SyntaxNodeMul();
 
-	void OutputSerial(std::stringstream& output) override;
 };
 
 
