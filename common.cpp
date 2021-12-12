@@ -2,8 +2,6 @@
 
 std::stack<std::shared_ptr<Scope>> scopes;
 
-std::stringstream consts;
-
 void PushStatement() {
 	scopes.top()->PushStatement();
 }

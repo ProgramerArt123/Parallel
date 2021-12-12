@@ -23,7 +23,6 @@
 
 extern std::stack<std::shared_ptr<Scope>> scopes;
 
-extern std::stringstream consts;
 
 #define PLATFORM CLANG_X86_64::GetInstance()
 

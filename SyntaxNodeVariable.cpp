@@ -30,7 +30,7 @@ void SyntaxNodeVariable::OutputInstructions(std::unique_ptr<Output>& output) {
 	output->GetStream() << '\t' << "movq	" << GetScopePos() << "(%rbp), %rax" << std::endl;
 }
 
-size_t SyntaxNodeVariable::GetScopePos() {
+const size_t SyntaxNodeVariable::GetScopePos()const {
 	return m_scope_pos;
 }
 

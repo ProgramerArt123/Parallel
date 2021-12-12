@@ -23,7 +23,7 @@ private:
 	void OutputHead(std::stringstream& output);
 	void OutputTail(std::stringstream& output);
 
-	static unsigned int NO;
+	unsigned int m_NO = 0;
 private:
 	std::shared_ptr<Scope> m_body;
 	

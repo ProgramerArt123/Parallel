@@ -1,38 +1,19 @@
 #include <iostream>
-#include "Parallel.h"
+#include "ParallelOutput.h"
 #include "SyntaxNode.h"
 #include "common.h"
 
+#include "Parallel.h"
+
 void ParallelElement::OutputInstructions(std::unique_ptr<Output>& output) {
+	ParallelOutput *parallel = static_cast<ParallelOutput *>(output.get());
 	switch (m_type)
 	{
 	case SYNTAX_NODE_TYPE_ADD:
-	{
-		size_t count = m_nodes.size();
-		for (size_t index = 0; index < count; index += 4) {
-			for (size_t j = 0; j < 4; j ++) {
-				if (index + j >= count) {
-					break;
-				}
-				std::shared_ptr<SyntaxNode> &add = m_nodes[index + j];
-				add->OutputInstructions(output);
-			}
-			output->GetStream() << '\t' << "vpunpcklqdq     %xmm0, %xmm1, %xmm0" << std::endl;
-			output->GetStream() << '\t' << "vinserti128     $1, %xmm0, %ymm0, %ymm0" << std::endl;
-			output->GetStream() << '\t' << "vpunpcklqdq     %xmm2, %xmm3, %xmm2" << std::endl;
-			output->GetStream() << '\t' << "vinserti128     $0, %xmm2, %ymm0, %ymm0" << std::endl;
-			output->GetStream() << '\t' << "vpunpcklqdq     %xmm4, %xmm5, %xmm4" << std::endl;
-			output->GetStream() << '\t' << "vinserti128     $1, %xmm4, %ymm1, %ymm1" << std::endl;
-			output->GetStream() << '\t' << "vpunpcklqdq     %xmm6, %xmm7, %xmm6" << std::endl;
-			output->GetStream() << '\t' << "vinserti128     $0, %xmm6, %ymm1, %ymm1" << std::endl;
-			output->GetStream() << '\t' << "vpaddq  %ymm0, %ymm1, %ymm0" << std::endl;
-			//cache result
-			SyntaxNodeAdd *add = static_cast<SyntaxNodeAdd *>(m_nodes[index].get());
-			output->GetStream() << '\t' << "vmovdqu  %ymm0, -" << add->GetRightChildStackTop() + 56 << "(%rbp)" << std::endl;
-		}
-	}
+		parallel->ElementAdd(*this, output);
 		break;
 	case SYNTAX_NODE_TYPE_SUB:
+		parallel->ElementSub(*this, output);
 		break;
 	case SYNTAX_NODE_TYPE_MUL:
 		break;

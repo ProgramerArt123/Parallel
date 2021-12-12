@@ -24,5 +24,5 @@ GENERATE_PARALLEL_RESULT SyntaxNodeAssignment::GenerateParallel(const std::share
 }
 
 void SyntaxNodeAssignment::OutputInstructions(std::unique_ptr<Output>& output) {
-	m_scope.UpdateRuntimePos(output->Assignment(this, output));
+	m_scope.UpdateRuntimePos(output->Assignment(*this, output));
 }

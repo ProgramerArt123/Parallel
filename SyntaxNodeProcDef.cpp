@@ -1,8 +1,6 @@
 #include "SyntaxNodeProcDef.h"
 #include "common.h"
 
-unsigned int SyntaxNodeProcDef::NO = 0;
-
 SyntaxNodeProcDef::SyntaxNodeProcDef(const char *name, Scope &outter):
 	SyntaxNode(name) {
 	Scope *scope = new Scope(outter, name);
@@ -29,6 +27,7 @@ GENERATE_PARALLEL_RESULT SyntaxNodeProcDef::GenerateParallel(const std::shared_p
 }
 
 void SyntaxNodeProcDef::OutputInstructions(std::unique_ptr<Output>& output) {
+	m_NO = output->GetFuncNO();
 	OutputHead(output->GetStream());
 	m_body->DefGenerate(output);
 	OutputTail(output->GetStream());
@@ -38,7 +37,7 @@ void SyntaxNodeProcDef::OutputHead(std::stringstream& output) {
 	
 	PLATFORM.ProcStatementGenerateSerial(m_content.c_str(), output);
 
-	output << ".LFB" << SyntaxNodeProcDef::NO << ":" << std::endl;
+	output << ".LFB" << m_NO << ":" << std::endl;
 	output << '\t' << ".cfi_startproc" << std::endl;
 	output << '\t' << "pushq %rbp" << std::endl;
 
@@ -56,11 +55,10 @@ void SyntaxNodeProcDef::OutputTail(std::stringstream& output) {
 	output << '\t' << "ret" << std::endl;
 	output << '\t' << ".cfi_endproc" << std::endl;
 
-	output << ".LFE" << SyntaxNodeProcDef::NO << ":" << std::endl;
+	output << ".LFE" << m_NO << ":" << std::endl;
 
 	PLATFORM.ProcSizeGenerateSerial(m_content.c_str(), output);
 
-	SyntaxNodeProcDef::NO++;
 }
 
 std::ostream &operator<<(std::ostream &out, SyntaxNodeProcDef &def) {

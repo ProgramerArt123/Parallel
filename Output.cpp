@@ -1,5 +1,4 @@
 #include <fstream>
-
 #include "common.h"
 #include "Output.h"
 
@@ -10,7 +9,7 @@ Output::~Output() {
 	std::ofstream file(m_file_path);
 	if (file.is_open()) {
 		PLATFORM.PageHeaderGenerateSerial(m_file_path.c_str(), file);
-		const std::string &constContent = consts.str();
+		const std::string &constContent = m_consts.str();
 		if (!constContent.empty()) {
 			PLATFORM.ConstGenerateSerial(file);
 			file << constContent;
@@ -24,6 +23,32 @@ Output::~Output() {
 	}
 }
 
+
+void Output::Add(const SyntaxNodeAdd &add) {
+	ComputeOne(add, "addq");
+}
+
+void Output::Sub(const SyntaxNodeSub &sub) {
+	ComputeOne(sub, "subq");
+}
+
+
 std::stringstream &Output::GetStream() {
 	return m_output;
+}
+
+std::stringstream &Output::GetConstStream() {
+	return m_consts;
+}
+
+unsigned int Output::GetConstNO() {
+	return m_const_NO++;
+}
+
+unsigned int Output::GetFuncNO() {
+	return m_func_NO++;
+}
+
+unsigned int Output::GetLabelNO() {
+	return m_label_NO++;
 }

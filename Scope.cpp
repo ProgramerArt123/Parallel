@@ -190,13 +190,7 @@ void Scope::OutputFile(std::unique_ptr<Output>& output) throw (std::exception) {
 
 
 void Scope::OutputInstructions(std::unique_ptr<Output>& output) {
-	for (std::shared_ptr<SyntaxNode> &child : m_children) {
-		SYNTAX_NODE_TYPE type = child->GetType();
-		if (SYNTAX_NODE_TYPE_PROC_DEF == type || SYNTAX_NODE_TYPE_LOOP == type) {
-			child->OutputInstructions(output);
-		}
-	}
-	m_parallel.OutputInstructions(output);
+	output->ProcessScope(*this, output);
 }
 
 void Scope::DefGenerate(std::unique_ptr<Output>& output) {

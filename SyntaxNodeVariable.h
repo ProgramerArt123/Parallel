@@ -16,13 +16,13 @@ public:
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 
-	size_t GetScopePos();
+	const size_t GetScopePos()const;
 private:
 	std::shared_ptr<SyntaxNodeAssignment> GetLastAssign();
 	
 private:
 	std::string m_name;
-	size_t m_scope_pos = 0;
+	const size_t m_scope_pos = 0;
 };
 
 #endif

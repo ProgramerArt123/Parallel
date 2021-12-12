@@ -3,6 +3,9 @@
 
 #include <sstream>
 #include <fstream>
+#include <memory>
+
+class Output;
 
 class Platform {
 public:
@@ -13,7 +16,7 @@ public:
 	virtual void PageFooterGenerateSerial(std::ofstream &file) = 0;
 
 	virtual void ConstGenerateSerial(std::ofstream &file) = 0;
-	virtual void StringGenerateSerial(const char *content, std::stringstream& output) = 0;
+	virtual void StringGenerate(const char *content, std::unique_ptr<Output>& output) = 0;
 
 	virtual void ProcStatementGenerateSerial(const char *name, std::stringstream& output) = 0;
 	virtual void ProcSizeGenerateSerial(const char *name, std::stringstream& output) = 0;

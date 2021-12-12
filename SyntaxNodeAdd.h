@@ -1,9 +1,9 @@
 #ifndef __SYNTAX_NODE_ADD_H__
 #define __SYNTAX_NODE_ADD_H__
 
-#include "SyntaxNode.h"
+#include "SyntaxNodeCompute.h"
 
-class SyntaxNodeAdd : public SyntaxNode {
+class SyntaxNodeAdd : public SyntaxNodeCompute {
 public:
 	explicit SyntaxNodeAdd();
 	virtual ~SyntaxNodeAdd();
@@ -12,7 +12,6 @@ public:
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 
-	int GetRightChildStackTop()const;
 
 };
 

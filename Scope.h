@@ -80,6 +80,10 @@ protected:
 
 	std::set<std::shared_ptr<SyntaxNode>> m_effectives;
 	Parallel m_parallel;
+
+protected:
+	friend class SerialOutput;
+	friend class ParallelOutput;
 };
 
 #endif

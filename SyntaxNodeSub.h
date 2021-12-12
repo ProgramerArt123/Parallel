@@ -1,9 +1,9 @@
 #ifndef __SYNTAX_NODE_SUB_H__
 #define __SYNTAX_NODE_SUB_H__
 
-#include "SyntaxNode.h"
+#include "SyntaxNodeCompute.h"
 
-class SyntaxNodeSub : public SyntaxNode {
+class SyntaxNodeSub : public SyntaxNodeCompute {
 public:
 	explicit SyntaxNodeSub();
 	virtual ~SyntaxNodeSub();

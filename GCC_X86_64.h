@@ -14,7 +14,7 @@ public:
 	void PageHeaderGenerateSerial(const char *fileName, std::ofstream &file) override;
 	void PageFooterGenerateSerial(std::ofstream &file) override;
 	void ConstGenerateSerial(std::ofstream &file) override;
-	void StringGenerateSerial(const char *content, std::stringstream& output) override;
+	void StringGenerate(const char *content, std::unique_ptr<Output>& output) override;
 	void ProcStatementGenerateSerial(const char *name, std::stringstream& output) override;
 	void ProcSizeGenerateSerial(const char *name, std::stringstream& output) override;
 	void ProcCallGenerateSerial(const char *name, std::stringstream& output) override;

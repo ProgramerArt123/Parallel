@@ -2,7 +2,7 @@
 #include "common.h"
 
 SyntaxNodeSub::SyntaxNodeSub():
-	SyntaxNode("-"){
+	SyntaxNodeCompute("-"){
 	m_type = SYNTAX_NODE_TYPE_SUB;
 }
 
@@ -34,5 +34,5 @@ GENERATE_PARALLEL_RESULT SyntaxNodeSub::GenerateParallel(const std::shared_ptr<S
 }
 
 void SyntaxNodeSub::OutputInstructions(std::unique_ptr<Output>& output) {
-	//output->Sub(this);
+	output->Sub(*this);
 }

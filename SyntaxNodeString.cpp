@@ -17,8 +17,7 @@ int SyntaxNodeString::GetNO() {
 
 
 void SyntaxNodeString::OutputInstructions(std::unique_ptr<Output>& output) {
-	static unsigned int NO = 0;
-	m_NO = NO ++;
-	consts << ".LC" << std::to_string(m_NO)<< ":" << std::endl;
-	PLATFORM.StringGenerateSerial(m_content.c_str(), output->GetStream());
+	m_NO = output->GetConstNO();
+	output->GetConstStream() << ".LC" << std::to_string(m_NO)<< ":" << std::endl;
+	PLATFORM.StringGenerate(m_content.c_str(), output);
 }

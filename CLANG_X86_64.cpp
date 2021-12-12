@@ -22,8 +22,8 @@ void CLANG_X86_64::ConstGenerateSerial(std::ofstream &file) {
 	file << '\t' << ".section	__TEXT,__cstring,cstring_literals" << std::endl;
 }
 
-void CLANG_X86_64::StringGenerateSerial(const char *content, std::stringstream& output) {
-	consts << '\t' << ".asciz " << content << std::endl;
+void CLANG_X86_64::StringGenerate(const char *content, std::unique_ptr<Output>& output) {
+	output->GetConstStream() << '\t' << ".asciz " << content << std::endl;
 }
 
 void CLANG_X86_64::ProcStatementGenerateSerial(const char *name, std::stringstream& output) {

@@ -3,13 +3,23 @@
 
 #include "Output.h"
 
+typedef struct _ParallelElement ParallelElement;
+
 class ParallelOutput : public Output {
 public:
 	explicit ParallelOutput(const char *filePath);
 
-	void Add(const SyntaxNodeAdd *add) override;
+	size_t Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) override;
 
-	size_t Assignment(const SyntaxNodeAssignment *assign, std::unique_ptr<Output>& output) override;
+	void ProcessScope(Scope &scope, std::unique_ptr<Output>& output) override;
+
+	void ElementAdd(ParallelElement &element, std::unique_ptr<Output>& output);
+
+	void ElementSub(ParallelElement &element, std::unique_ptr<Output>& output);
+private:
+
+	void ComputeOne(const SyntaxNodeCompute &one, const char *instructions) override;
+
 };
 
 #endif

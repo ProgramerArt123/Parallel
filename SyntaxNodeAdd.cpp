@@ -3,7 +3,7 @@
 #include "SyntaxNodeAdd.h"
 
 SyntaxNodeAdd::SyntaxNodeAdd():
-	SyntaxNode("+"){
+	SyntaxNodeCompute("+"){
 	m_type = SYNTAX_NODE_TYPE_ADD;
 }
 
@@ -35,16 +35,6 @@ GENERATE_PARALLEL_RESULT SyntaxNodeAdd::GenerateParallel(const std::shared_ptr<S
 }
 
 void SyntaxNodeAdd::OutputInstructions(std::unique_ptr<Output>& output) {
-	output->Add(this);
+	output->Add(*this);
 }
 
-int SyntaxNodeAdd::GetRightChildStackTop()const {
-	SYNTAX_NODE_TYPE rightType = m_children.back()->GetType();
-	if (SYNTAX_NODE_TYPE_VARIABLE == rightType) {
-		const int rightPos = static_cast<SyntaxNodeVariable *>(m_children.back().get())->GetScopePos();
-		return (rightPos + 1) * 8;
-	}
-	else {
-		return 0;
-	}
-}
