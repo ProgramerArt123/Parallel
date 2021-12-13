@@ -8,8 +8,6 @@ public:
 	explicit SyntaxNodeSub();
 	virtual ~SyntaxNodeSub();
 
-	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
-
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 };
 

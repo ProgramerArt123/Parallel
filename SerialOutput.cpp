@@ -1,3 +1,4 @@
+#include <string.h>
 #include "SyntaxNodeAdd.h"
 #include "SyntaxNodeSub.h"
 #include "SyntaxNodeNumber.h"
@@ -14,6 +15,9 @@ SerialOutput::SerialOutput(const char *filePath) :
 }
 
 void SerialOutput::ComputeOne(const SyntaxNodeCompute &one, const char *instructions) {
+	if (0==strcmp(instructions, "mulq")) {
+		return;
+	}
 	SYNTAX_NODE_TYPE leftType = one.m_children.front()->GetType();
 	SYNTAX_NODE_TYPE rightType = one.m_children.back()->GetType();
 	if (SYNTAX_NODE_TYPE_NUMBER == leftType &&

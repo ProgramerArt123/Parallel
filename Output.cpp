@@ -32,6 +32,9 @@ void Output::Sub(const SyntaxNodeSub &sub) {
 	ComputeOne(sub, "subq");
 }
 
+void Output::Mul(const SyntaxNodeMul &mul) {
+	ComputeOne(mul, "mulq");
+}
 
 std::stringstream &Output::GetStream() {
 	return m_output;

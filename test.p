@@ -16,10 +16,10 @@ def main(){
                 g = 7;
                 h = 8;
 
-                i = a - e;
-                j = b - f;
-                k = c - g;
-                l = d - h;
+                i = a * e;
+                j = b * f;
+                k = c * g;
+                l = d * h;
 
 				function(i,j,k,l);
         };

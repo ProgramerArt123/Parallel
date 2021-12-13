@@ -16,6 +16,8 @@ public:
 	void ElementAdd(ParallelElement &element, std::unique_ptr<Output>& output);
 
 	void ElementSub(ParallelElement &element, std::unique_ptr<Output>& output);
+
+	void ElementMul(ParallelElement &element, std::unique_ptr<Output>& output);
 private:
 
 	void ComputeOne(const SyntaxNodeCompute &one, const char *instructions) override;

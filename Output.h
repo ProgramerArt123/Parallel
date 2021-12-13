@@ -7,6 +7,7 @@
 
 class SyntaxNodeAdd;
 class SyntaxNodeSub;
+class SyntaxNodeMul;
 class SyntaxNodeAssignment;
 class SyntaxNode;
 class SyntaxNodeCompute;
@@ -24,6 +25,7 @@ public:
 
 	void Add(const SyntaxNodeAdd &add);
 	void Sub(const SyntaxNodeSub &sub);
+	void Mul(const SyntaxNodeMul &mul);
 	virtual size_t Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) = 0;
 
 	virtual void ProcessScope(Scope &scope, std::unique_ptr<Output>& output) = 0;

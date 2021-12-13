@@ -16,6 +16,7 @@ void ParallelElement::OutputInstructions(std::unique_ptr<Output>& output) {
 		parallel->ElementSub(*this, output);
 		break;
 	case SYNTAX_NODE_TYPE_MUL:
+		parallel->ElementMul(*this, output);
 		break;
 	case SYNTAX_NODE_TYPE_DIV:
 		break;

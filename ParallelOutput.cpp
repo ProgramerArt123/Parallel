@@ -1,6 +1,7 @@
 #include "SyntaxNodeNumber.h"
 #include "SyntaxNodeAdd.h"
 #include "SyntaxNodeSub.h"
+#include "SyntaxNodeMul.h"
 #include "SyntaxNodeVariable.h"
 #include "SyntaxNodeAssignment.h"
 #include "Parallel.h"
@@ -109,5 +110,31 @@ void ParallelOutput::ElementSub(ParallelElement &element, std::unique_ptr<Output
 		//cache result
 		SyntaxNodeSub *sub = static_cast<SyntaxNodeSub *>(element.m_nodes[index].get());
 		GetStream() << '\t' << "vmovdqu  %ymm0, -" << sub->GetRightChildStackTop() + 56 << "(%rbp)" << std::endl;
+	}
+}
+
+
+void ParallelOutput::ElementMul(ParallelElement &element, std::unique_ptr<Output>& output) {
+	size_t count = element.m_nodes.size();
+	for (size_t index = 0; index < count; index += 4) {
+		for (size_t j = 0; j < 4; j++) {
+			if (index + j >= count) {
+				break;
+			}
+			std::shared_ptr<SyntaxNode> &add = element.m_nodes[index + j];
+			add->OutputInstructions(output);
+		}
+		GetStream() << '\t' << "vpunpcklqdq     %xmm0, %xmm1, %xmm0" << std::endl;
+		GetStream() << '\t' << "vinserti128     $1, %xmm0, %ymm0, %ymm0" << std::endl;
+		GetStream() << '\t' << "vpunpcklqdq     %xmm2, %xmm3, %xmm2" << std::endl;
+		GetStream() << '\t' << "vinserti128     $0, %xmm2, %ymm0, %ymm0" << std::endl;
+		GetStream() << '\t' << "vpunpcklqdq     %xmm4, %xmm5, %xmm4" << std::endl;
+		GetStream() << '\t' << "vinserti128     $1, %xmm4, %ymm1, %ymm1" << std::endl;
+		GetStream() << '\t' << "vpunpcklqdq     %xmm6, %xmm7, %xmm6" << std::endl;
+		GetStream() << '\t' << "vinserti128     $0, %xmm6, %ymm1, %ymm1" << std::endl;
+		GetStream() << '\t' << "vpmuldq  %ymm1, %ymm0, %ymm0" << std::endl;
+		//cache result
+		SyntaxNodeMul *mul = static_cast<SyntaxNodeMul *>(element.m_nodes[index].get());
+		GetStream() << '\t' << "vmovdqu  %ymm0, -" << mul->GetRightChildStackTop() + 56 << "(%rbp)" << std::endl;
 	}
 }
