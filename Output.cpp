@@ -33,7 +33,11 @@ void Output::Sub(const SyntaxNodeSub &sub) {
 }
 
 void Output::Mul(const SyntaxNodeMul &mul) {
-	ComputeOne(mul, "mulq");
+	ComputeOne(mul, "imulq");
+}
+
+void Output::Div(const SyntaxNodeDiv &div) {
+	ComputeTwo(div, "divq");
 }
 
 std::stringstream &Output::GetStream() {

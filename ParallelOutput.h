@@ -22,6 +22,7 @@ private:
 
 	void ComputeOne(const SyntaxNodeCompute &one, const char *instructions) override;
 
+	void ComputeTwo(const SyntaxNodeCompute &two, const char *instructions) override {}
 };
 
 #endif
