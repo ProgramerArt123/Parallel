@@ -43,7 +43,7 @@ protected:
 
 private:
 	virtual void ComputeOne(const SyntaxNodeCompute &one, const char *instructions) = 0;
-	virtual void ComputeTwo(const SyntaxNodeCompute &two, const char *instructions) = 0;
+	void ComputeTwo(const SyntaxNodeCompute &two, const char *instructions);
 private:
 	unsigned int m_const_NO = 0;
 	unsigned int m_func_NO = 0;
