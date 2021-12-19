@@ -35,10 +35,14 @@ GENERATE_PARALLEL_RESULT SyntaxNodeCompute::GenerateParallel(const std::shared_p
 int SyntaxNodeCompute::GetRightChildStackTop()const {
 	SYNTAX_NODE_TYPE rightType = m_children.back()->GetType();
 	if (SYNTAX_NODE_TYPE_VARIABLE == rightType) {
-		const int rightPos = static_cast<SyntaxNodeVariable *>(m_children.back().get())->GetScopePos();
-		return (rightPos + 1) * 8;
+		const int rightOffset = static_cast<SyntaxNodeVariable *>(m_children.back().get())->GetScopeStackTopOffset();
+		return rightOffset;
 	}
 	else {
 		return 0;
 	}
+}
+
+const char *SyntaxNodeCompute::GetResultRegName() {
+	return "rax";
 }

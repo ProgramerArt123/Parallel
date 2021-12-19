@@ -9,10 +9,11 @@ class SyntaxNodeAdd;
 class SyntaxNodeSub;
 class SyntaxNodeMul;
 class SyntaxNodeDiv;
+class SyntaxNodeMod;
 class SyntaxNodeAssignment;
 class SyntaxNode;
 class SyntaxNodeCompute;
-class Scope;
+class SyntaxNodeScope;
 class Parallel;
 
 
@@ -28,9 +29,10 @@ public:
 	void Sub(const SyntaxNodeSub &sub);
 	void Mul(const SyntaxNodeMul &mul);
 	void Div(const SyntaxNodeDiv &div);
-	virtual size_t Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) = 0;
+	void Mod(const SyntaxNodeMod &mod);
+	virtual void Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) = 0;
 
-	virtual void ProcessScope(Scope &scope, std::unique_ptr<Output>& output) = 0;
+	virtual void ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) = 0;
 
 	unsigned int GetConstNO();
 	unsigned int GetFuncNO();

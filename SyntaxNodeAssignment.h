@@ -3,11 +3,11 @@
 
 #include "SyntaxNode.h"
 
-class Scope;
+class SyntaxNodeScope;
 
 class SyntaxNodeAssignment : public SyntaxNode {
 public:
-	explicit SyntaxNodeAssignment(Scope &scope);
+	explicit SyntaxNodeAssignment(SyntaxNodeScope &scope);
 	virtual ~SyntaxNodeAssignment();
 
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
@@ -15,7 +15,7 @@ public:
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 	
 private:
-	Scope &m_scope;
+	SyntaxNodeScope &m_scope;
 };
 
 

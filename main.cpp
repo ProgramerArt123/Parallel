@@ -16,12 +16,10 @@ void yyerror(char* e) {
 	perror(e);
 };
 
-
-
 int main() {
 	std::cout << "Hello World!" << std::endl;
 	
-	scopes.push(std::shared_ptr<Scope>(new Scope));
+	scopes.push(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope));
 
 	FILE *in = fopen("/root/projects/ConsoleApplication1/test.p", "r");
 	if (in) {

@@ -1,13 +1,16 @@
 #ifndef __SYNTAX_NODE_MOD_H__
 #define __SYNTAX_NODE_MOD_H__
 
-#include "SyntaxNode.h"
+#include "SyntaxNodeCompute.h"
 
-class SyntaxNodeMod : public SyntaxNode {
+class SyntaxNodeMod : public SyntaxNodeCompute {
 public:
 	explicit SyntaxNodeMod();
 	virtual ~SyntaxNodeMod();
 
+	void OutputInstructions(std::unique_ptr<Output>& output) override;
+
+	const char *GetResultRegName() override;
 };
 
 

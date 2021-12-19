@@ -1,8 +1,9 @@
 #include "SyntaxNodeVariable.h"
 #include "common.h"
 
-SyntaxNodeVariable::SyntaxNodeVariable(SyntaxNode &scope, const char *name, size_t pos):
-	SyntaxNode(scope, name), m_name(name), m_scope_pos(pos){
+SyntaxNodeVariable::SyntaxNodeVariable(SyntaxNodeScope &scope, const char *name, size_t pos):
+	SyntaxNode(scope, name), m_name(name), 
+	m_scope_pos(pos){
 	m_type = SYNTAX_NODE_TYPE_VARIABLE;
 }
 
@@ -34,7 +35,11 @@ const size_t SyntaxNodeVariable::GetScopePos()const {
 	return m_scope_pos;
 }
 
+const size_t SyntaxNodeVariable::GetScopeStackTopOffset()const {
+	return (GetScopePos() + 1) * 8;
+}
+
 std::shared_ptr<SyntaxNodeAssignment> SyntaxNodeVariable::GetLastAssign() {
-	Scope &scope = *static_cast<Scope *>(&m_parent);
+	SyntaxNodeScope &scope = *static_cast<SyntaxNodeScope *>(&m_parent);
 	return scope.GetLastAssign(m_content.c_str(), m_generate_line);
 }

@@ -1,6 +1,6 @@
 #include "common.h"
 
-std::stack<std::shared_ptr<Scope>> scopes;
+std::stack<std::shared_ptr<SyntaxNodeScope>> scopes;
 
 void PushStatement() {
 	scopes.top()->PushStatement();

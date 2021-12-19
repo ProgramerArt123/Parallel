@@ -40,6 +40,10 @@ void Output::Div(const SyntaxNodeDiv &div) {
 	ComputeTwo(div, "divq");
 }
 
+void Output::Mod(const SyntaxNodeMod &mod) {
+	ComputeTwo(mod, "divq");
+}
+
 std::stringstream &Output::GetStream() {
 	return m_output;
 }
@@ -72,23 +76,23 @@ void Output::ComputeTwo(const SyntaxNodeCompute &two, const char *instructions) 
 	}
 	else {
 		if (SYNTAX_NODE_TYPE_NUMBER == leftType) {
-			const int rightPos = static_cast<SyntaxNodeVariable *>(two.m_children.back().get())->GetScopePos();
-			m_output << '\t' << "movq	-" << (rightPos + 1) * 8 << "(%rbp), %rax" << std::endl;
+			const int rightOffset = static_cast<SyntaxNodeVariable *>(two.m_children.back().get())->GetScopeStackTopOffset();
+			m_output << '\t' << "movq	-" << rightOffset << "(%rbp), %rax" << std::endl;
 			const int left = static_cast<SyntaxNodeNumber *>(two.m_children.front().get())->GetValue();
 			m_output << '\t' << "addq	$" << std::to_string(left) << ", %rax" << std::endl;
 		}
 		else if (SYNTAX_NODE_TYPE_NUMBER == rightType) {
-			const int leftPos = static_cast<SyntaxNodeVariable *>(two.m_children.front().get())->GetScopePos();
-			m_output << '\t' << "movq	-" << (leftPos + 1) * 8 << "(%rbp), %rax" << std::endl;
+			const int leftOffset = static_cast<SyntaxNodeVariable *>(two.m_children.front().get())->GetScopeStackTopOffset();
+			m_output << '\t' << "movq	-" << leftOffset << "(%rbp), %rax" << std::endl;
 			const int right = static_cast<SyntaxNodeNumber *>(two.m_children.back().get())->GetValue();
 			m_output << '\t' << "addq	$" << std::to_string(right) << ", %rax" << std::endl;
 		}
 		else {
-			const int leftPos = static_cast<SyntaxNodeVariable *>(two.m_children.front().get())->GetScopePos();
-			m_output << '\t' << "movq	-" << (leftPos + 1) * 8 << "(%rbp), %rax" << std::endl;
+			const int leftOffset = static_cast<SyntaxNodeVariable *>(two.m_children.front().get())->GetScopeStackTopOffset();
+			m_output << '\t' << "movq	-" << leftOffset << "(%rbp), %rax" << std::endl;
 			m_output << '\t' << "xorl	%edx, %edx" << std::endl;
-			const int rightPos = static_cast<SyntaxNodeVariable *>(two.m_children.back().get())->GetScopePos();
-			m_output << '\t' << instructions << "	-" << (rightPos + 1) * 8 << "(%rbp)" << std::endl;
+			const int rightOffset = static_cast<SyntaxNodeVariable *>(two.m_children.back().get())->GetScopeStackTopOffset();
+			m_output << '\t' << instructions << "	-" << rightOffset << "(%rbp)" << std::endl;
 		}
 	}
 }

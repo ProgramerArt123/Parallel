@@ -7,9 +7,9 @@ class SerialOutput : public Output {
 public:
 	explicit SerialOutput(const char *filePath);
 
-	size_t Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) override;
+	void Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) override;
 
-	void ProcessScope(Scope &scope, std::unique_ptr<Output>& output) override;
+	void ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) override;
 private:
 
 	void ComputeOne(const SyntaxNodeCompute &one, const char *instructions) override;

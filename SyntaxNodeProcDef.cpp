@@ -1,10 +1,10 @@
 #include "SyntaxNodeProcDef.h"
 #include "common.h"
 
-SyntaxNodeProcDef::SyntaxNodeProcDef(const char *name, Scope &outter):
+SyntaxNodeProcDef::SyntaxNodeProcDef(const char *name, SyntaxNodeScope &outter):
 	SyntaxNode(name) {
-	Scope *scope = new Scope(outter, name);
-	m_body = std::shared_ptr<Scope>(scope);
+	SyntaxNodeScope *scope = new SyntaxNodeScope(outter, name);
+	m_body = std::shared_ptr<SyntaxNodeScope>(scope);
 	m_type = SYNTAX_NODE_TYPE_PROC_DEF;
 }
 
@@ -12,7 +12,7 @@ SyntaxNodeProcDef::~SyntaxNodeProcDef() {
 
 }
 
-std::shared_ptr<Scope> &SyntaxNodeProcDef::GetBody() {
+std::shared_ptr<SyntaxNodeScope> &SyntaxNodeProcDef::GetBody() {
 	return m_body;
 }
 

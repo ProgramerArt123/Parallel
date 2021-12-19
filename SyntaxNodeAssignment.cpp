@@ -2,7 +2,7 @@
 #include "SyntaxNodeVariable.h"
 #include "common.h"
 
-SyntaxNodeAssignment::SyntaxNodeAssignment(Scope &scope):
+SyntaxNodeAssignment::SyntaxNodeAssignment(SyntaxNodeScope &scope):
 	SyntaxNode("="), m_scope(scope){
 	m_type = SYNTAX_NODE_TYPE_ASSIGNMENT;
 }
@@ -24,5 +24,5 @@ GENERATE_PARALLEL_RESULT SyntaxNodeAssignment::GenerateParallel(const std::share
 }
 
 void SyntaxNodeAssignment::OutputInstructions(std::unique_ptr<Output>& output) {
-	m_scope.UpdateRuntimePos(output->Assignment(*this, output));
+	output->Assignment(*this, output);
 }

@@ -2,11 +2,11 @@
 #define __SYNTAX_NODE_PROC_CALL_H__
 
 #include "SyntaxNode.h"
-#include "Scope.h"
+#include "SyntaxNodeScope.h"
 
 class SyntaxNodeProcCall : public SyntaxNode {
 public:
-	explicit SyntaxNodeProcCall(const char *name, Scope &scope);
+	explicit SyntaxNodeProcCall(const char *name, SyntaxNodeScope &scope);
 	virtual ~SyntaxNodeProcCall();
 
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;
@@ -15,7 +15,7 @@ public:
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 private:
-	Scope &m_scope;
+	SyntaxNodeScope &m_scope;
 };
 
 

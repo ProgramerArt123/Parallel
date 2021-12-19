@@ -9,17 +9,18 @@ class SyntaxNodeProcCall;
 
 class SyntaxNodeVariable : public SyntaxNode {
 public:
-	explicit SyntaxNodeVariable(SyntaxNode &scope, const char *name, size_t pos);
+	explicit SyntaxNodeVariable(SyntaxNodeScope &scope, const char *name, size_t pos);
 	virtual ~SyntaxNodeVariable();
 
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 
-	const size_t GetScopePos()const;
+	const size_t GetScopeStackTopOffset()const;
 private:
 	std::shared_ptr<SyntaxNodeAssignment> GetLastAssign();
-	
+
+	const size_t GetScopePos()const;
 private:
 	std::string m_name;
 	const size_t m_scope_pos = 0;

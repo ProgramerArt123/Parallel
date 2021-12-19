@@ -17,11 +17,11 @@
 #include "SyntaxNodeVariable.h"
 #include "SyntaxNodeReturn.h"
 #include "SyntaxNodeLoop.h"
-#include "Scope.h"
+#include "SyntaxNodeScope.h"
 #include "GCC_X86_64.h"
 #include "CLANG_X86_64.h"
 
-extern std::stack<std::shared_ptr<Scope>> scopes;
+extern std::stack<std::shared_ptr<SyntaxNodeScope>> scopes;
 
 
 #define PLATFORM CLANG_X86_64::GetInstance()

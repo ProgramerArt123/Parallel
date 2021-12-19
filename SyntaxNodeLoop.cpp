@@ -1,9 +1,9 @@
 #include "SyntaxNodeLoop.h"
 #include "common.h"
 
-SyntaxNodeLoop::SyntaxNodeLoop(Scope &outter) :
+SyntaxNodeLoop::SyntaxNodeLoop(SyntaxNodeScope &outter) :
 	SyntaxNode(*static_cast<SyntaxNode *>(&outter), "LOOP"),
-	m_body(std::shared_ptr<Scope>(new Scope(outter, "LOOP"))){
+	m_body(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(outter, "LOOP"))){
 	m_type = SYNTAX_NODE_TYPE_LOOP;
 }
 
@@ -21,7 +21,7 @@ GENERATE_PARALLEL_RESULT SyntaxNodeLoop::GenerateParallel(const std::shared_ptr<
 	return GENERATE_PARALLEL_RESULT_COMPLETED;
 }
 
-std::shared_ptr<Scope> &SyntaxNodeLoop::GetBody() {
+std::shared_ptr<SyntaxNodeScope> &SyntaxNodeLoop::GetBody() {
 	return m_body;
 }
 

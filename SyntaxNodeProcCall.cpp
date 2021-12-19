@@ -1,7 +1,7 @@
 #include "SyntaxNodeProcCall.h"
 #include "common.h"
 
-SyntaxNodeProcCall::SyntaxNodeProcCall(const char *name, Scope &scope):
+SyntaxNodeProcCall::SyntaxNodeProcCall(const char *name, SyntaxNodeScope &scope):
 	SyntaxNode(name), m_scope(scope){
 	m_type = SYNTAX_NODE_TYPE_PROC_CALL;
 }
@@ -38,13 +38,7 @@ GENERATE_PARALLEL_RESULT SyntaxNodeProcCall::GenerateParallel(const std::shared_
 }
 
 void SyntaxNodeProcCall::OutputInstructions(std::unique_ptr<Output>& output) {
-	uint32_t top = m_scope.BeginCallGenerate(output, m_children);
-	if (top) {
-		output->GetStream() << '\t' << "subq    $" << top << ", %rsp" << std::endl;
-	}
+	m_scope.BeginCallGenerate(output, m_children);
 	PLATFORM.ProcCallGenerateSerial(m_content.c_str(), output->GetStream());
-	if (top) {
-		output->GetStream() << '\t' << "addq   $" << top << ", %rsp" << std::endl;
-	}
 	m_scope.EndCallGenerate(output->GetStream(), m_children);
 }

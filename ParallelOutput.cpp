@@ -6,7 +6,7 @@
 #include "SyntaxNodeVariable.h"
 #include "SyntaxNodeAssignment.h"
 #include "Parallel.h"
-#include "Scope.h"
+#include "SyntaxNodeScope.h"
 
 #include "ParallelOutput.h"
 
@@ -21,8 +21,8 @@ void ParallelOutput::ComputeOne(const SyntaxNodeCompute &one, const char *instru
 		m_output << '\t' << "vmovq $" << left << ", %xmm" << one.m_parallel_index % 4 << std::endl;
 	}
 	else {
-		const int leftPos = static_cast<SyntaxNodeVariable *>(one.m_children.front().get())->GetScopePos();
-		m_output << '\t' << "vmovq -" << (leftPos + 1) * 8 << "(%rbp), %xmm" << one.m_parallel_index % 4 << std::endl;
+		const int leftOffset = static_cast<SyntaxNodeVariable *>(one.m_children.front().get())->GetScopeStackTopOffset();
+		m_output << '\t' << "vmovq -" << leftOffset << "(%rbp), %xmm" << one.m_parallel_index % 4 << std::endl;
 	}
 
 	SYNTAX_NODE_TYPE rightType = one.m_children.back()->GetType();
@@ -35,28 +35,25 @@ void ParallelOutput::ComputeOne(const SyntaxNodeCompute &one, const char *instru
 	}
 }
 
-
-
-size_t ParallelOutput::Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) {
+void ParallelOutput::Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) {
 	SyntaxNodeVariable *variable = static_cast<SyntaxNodeVariable *>(assign.m_children.front().get());
 	SyntaxNode *value = assign.m_children.back().get();
 	if (SYNTAX_NODE_TYPE_NUMBER == value->GetType()) {
 		m_output << '\t' << "movq	$" << std::to_string(static_cast<SyntaxNodeNumber *>(value)->GetValue())
-			<< ", -" << (variable->GetScopePos() + 1) * 8 << "(%rbp)" << std::endl;
+			<< ", -" << variable->GetScopeStackTopOffset() << "(%rbp)" << std::endl;
 	}
 	else {
 		if (SYNTAX_NODE_TYPE_ADD <= value->GetType() && value->GetType() <= SYNTAX_NODE_TYPE_OR) {
 			SyntaxNodeCompute *compute = static_cast<SyntaxNodeCompute *>(value);
-			if (compute->GetRightChildStackTop() + 32 != (variable->GetScopePos() + 1) * 8) {
+			if (compute->GetRightChildStackTop() + 32 != variable->GetScopeStackTopOffset()) {
 				m_output << '\t' << "movq	-" << compute->GetRightChildStackTop() + 32 << "(%rbp), %rax" << std::endl;
-				m_output << '\t' << "movq	%rax, -" << (variable->GetScopePos() + 1) * 8 << "(%rbp)" << std::endl;
+				m_output << '\t' << "movq	%rax, -" << variable->GetScopeStackTopOffset() << "(%rbp)" << std::endl;
 			}
 		}
 	}
-	return variable->GetScopePos() + 1;
 }
 
-void ParallelOutput::ProcessScope(Scope &scope, std::unique_ptr<Output>& output) {	//for (std::shared_ptr<SyntaxNode> &child : m_children) {
+void ParallelOutput::ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) {	//for (std::shared_ptr<SyntaxNode> &child : m_children) {
 	for (std::shared_ptr<SyntaxNode> &child : scope.m_children) {
 		SYNTAX_NODE_TYPE type = child->GetType();
 		if (SYNTAX_NODE_TYPE_PROC_DEF == type || SYNTAX_NODE_TYPE_LOOP == type) {
@@ -146,7 +143,17 @@ void ParallelOutput::ElementDiv(ParallelElement &element, std::unique_ptr<Output
 	for (size_t index = 0; index < count; index ++) {
 		std::shared_ptr<SyntaxNode> &node = element.m_nodes[index];
 		node->OutputInstructions(output);
-		SyntaxNodeDiv *div = static_cast<SyntaxNodeDiv *>(node.get());
-		GetStream() << '\t' << "movq  %rax, -" << div->GetRightChildStackTop() + 32 << "(%rbp)" << std::endl;
+		SyntaxNodeCompute *compute = static_cast<SyntaxNodeCompute *>(node.get());
+		GetStream() << '\t' << "movq  %"<< compute->GetResultRegName() <<", -" << compute->GetRightChildStackTop() + 32 << "(%rbp)" << std::endl;
+	}
+}
+
+void ParallelOutput::ElementMod(ParallelElement &element, std::unique_ptr<Output>& output) {
+	size_t count = element.m_nodes.size();
+	for (size_t index = 0; index < count; index++) {
+		std::shared_ptr<SyntaxNode> &node = element.m_nodes[index];
+		node->OutputInstructions(output);
+		SyntaxNodeCompute *compute = static_cast<SyntaxNodeCompute *>(node.get());
+		GetStream() << '\t' << "movq  %" << compute->GetResultRegName() << ", -" << compute->GetRightChildStackTop() + 32 << "(%rbp)" << std::endl;
 	}
 }
