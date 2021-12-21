@@ -20,7 +20,7 @@ public:
 
 	virtual void ProcStatementGenerateSerial(const char *name, std::stringstream& output) = 0;
 	virtual void ProcSizeGenerateSerial(const char *name, std::stringstream& output) = 0;
-	virtual void ProcCallGenerateSerial(const char *name, std::stringstream& output) = 0;
+	virtual void ProcCallGenerate(const char *name, std::stringstream& output) = 0;
 	virtual void ProcStringArgmentGenerateSerial(int NO, const char *dst, std::stringstream& output) = 0;
 };
 

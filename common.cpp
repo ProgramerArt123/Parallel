@@ -1,83 +1,83 @@
 #include "common.h"
 
-std::stack<std::shared_ptr<SyntaxNodeScope>> scopes;
+std::unique_ptr<SourceCodeFile> source;
 
 void PushStatement() {
-	scopes.top()->PushStatement();
+	source->m_scopes.top()->PushStatement();
 }
 
 void PushReturn() {
-	scopes.top()->PushReturn();
+	source->m_scopes.top()->PushReturn();
 }
 
 void PushAssignmentStatement(const char *variable) {
-	scopes.top()->PushAssignmentStatement(variable);
+	source->m_scopes.top()->PushAssignmentStatement(variable);
 }
 
 void PushAdd() {
-	scopes.top()->PushAdd();
+	source->m_scopes.top()->PushAdd();
 }
 
 void PushSub() {
-	scopes.top()->PushSub();
+	source->m_scopes.top()->PushSub();
 }
 
 void PushMul() {
-	scopes.top()->PushMul();
+	source->m_scopes.top()->PushMul();
 }
 
 void PushDiv() {
-	scopes.top()->PushDiv();
+	source->m_scopes.top()->PushDiv();
 }
 
 void PushMod() {
-	scopes.top()->PushMod();
+	source->m_scopes.top()->PushMod();
 }
 
 void PushBlock() {
-	scopes.top()->PushBlock();
+	source->m_scopes.top()->PushBlock();
 }
 
 void PushString(const char *itera) {
-	scopes.top()->PushString(itera);
+	source->m_scopes.top()->PushString(itera);
 }
 
 void PushNumber(int number) {
-	scopes.top()->PushNumber(number);
+	source->m_scopes.top()->PushNumber(number);
 }
 
 void PushVariable(const char *name) {
-	scopes.top()->PushVariable(name);
+	source->m_scopes.top()->PushVariable(name);
 }
 
 void AddArgment(uint64_t argment) {
-	scopes.top()->AddArgment(argment);
+	source->m_scopes.top()->AddArgment(argment);
 }
 
 void PushLoopEnter() {
-	scopes.push(scopes.top()->PushLoopEnter());
+	source->m_scopes.push(source->m_scopes.top()->PushLoopEnter());
 }
 
 void PushLoopExit() {
-	scopes.pop(); scopes.top()->PushLoopExit();
+	source->m_scopes.pop(); source->m_scopes.top()->PushLoopExit();
 }
 
 void PushProcDefEnter(const char *name) {
-	scopes.push(scopes.top()->PushProcDefEnter(name));
+	source->m_scopes.push(source->m_scopes.top()->PushProcDefEnter(name));
 }
 
 void PushProcDefExit() {
-	scopes.pop(); scopes.top()->PushProcDefExit();
+	source->m_scopes.pop(); source->m_scopes.top()->PushProcDefExit();
 }
 
 void AddParam(const char *param) {
-	scopes.top()->AddParam(param);
+	source->m_scopes.top()->AddParam(param);
 }
 
 void PushProcCallEnter(const char *name) {
-	scopes.top()->PushProcCallEnter(name);
+	source->m_scopes.top()->PushProcCallEnter(name);
 }
 
 void PushProcCallExit() {
-	scopes.top()->PushProcCallExit();
+	source->m_scopes.top()->PushProcCallExit();
 }

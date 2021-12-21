@@ -32,7 +32,7 @@ GENERATE_PARALLEL_RESULT SyntaxNodeCompute::GenerateParallel(const std::shared_p
 	return GenerateParallelSelf(self, parallel);
 }
 
-int SyntaxNodeCompute::GetRightChildStackTop()const {
+int SyntaxNodeCompute::GetRightChildStackTopOffset()const {
 	SYNTAX_NODE_TYPE rightType = m_children.back()->GetType();
 	if (SYNTAX_NODE_TYPE_VARIABLE == rightType) {
 		const int rightOffset = static_cast<SyntaxNodeVariable *>(m_children.back().get())->GetScopeStackTopOffset();

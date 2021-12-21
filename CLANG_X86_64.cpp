@@ -35,7 +35,7 @@ void CLANG_X86_64::ProcStatementGenerateSerial(const char *name, std::stringstre
 void CLANG_X86_64::ProcSizeGenerateSerial(const char *name, std::stringstream& outputSerial) {
 }
 
-void CLANG_X86_64::ProcCallGenerateSerial(const char *name, std::stringstream& output) {
+void CLANG_X86_64::ProcCallGenerate(const char *name, std::stringstream& output) {
 	output << '\t' << "call" << "\t_" << name << std::endl;
 }
 

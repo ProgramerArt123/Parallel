@@ -2,7 +2,6 @@
 #include "Parallel.h"
 #include "SyntaxNodeProcDef.h"
 
-
 extern int yylineno;
 
 SyntaxNode::SyntaxNode(const char *content, int priority) :

@@ -10,7 +10,7 @@ public:
 
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
 
-	int GetRightChildStackTop()const;
+	int GetRightChildStackTopOffset()const;
 
 	virtual const char *GetResultRegName();
 };

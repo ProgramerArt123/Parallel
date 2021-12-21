@@ -21,7 +21,7 @@ public:
 	void StringGenerate(const char *content, std::unique_ptr<Output>& output) override;
 	void ProcStatementGenerateSerial(const char *name, std::stringstream& output) override;
 	void ProcSizeGenerateSerial(const char *name, std::stringstream& output) override;
-	void ProcCallGenerateSerial(const char *name, std::stringstream& output) override;
+	void ProcCallGenerate(const char *name, std::stringstream& output) override;
 	void ProcStringArgmentGenerateSerial(int NO, const char *dst, std::stringstream& output) override;
 };
 

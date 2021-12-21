@@ -18,11 +18,11 @@
 #include "SyntaxNodeReturn.h"
 #include "SyntaxNodeLoop.h"
 #include "SyntaxNodeScope.h"
+#include "SourceCodeFile.h"
 #include "GCC_X86_64.h"
 #include "CLANG_X86_64.h"
 
-extern std::stack<std::shared_ptr<SyntaxNodeScope>> scopes;
-
+extern std::unique_ptr<SourceCodeFile> source;
 
 #define PLATFORM CLANG_X86_64::GetInstance()
 

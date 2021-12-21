@@ -37,7 +37,7 @@ void GCC_X86_64::ProcSizeGenerateSerial(const char *name, std::stringstream& out
 	output << '\t' << ".size " << name << ", .-" << name << std::endl;
 }
 
-void GCC_X86_64::ProcCallGenerateSerial(const char *name, std::stringstream& output) {
+void GCC_X86_64::ProcCallGenerate(const char *name, std::stringstream& output) {
 	output << '\t' << "call" << '\t' << name << std::endl;
 }
 

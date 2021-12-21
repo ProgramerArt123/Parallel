@@ -39,6 +39,6 @@ GENERATE_PARALLEL_RESULT SyntaxNodeProcCall::GenerateParallel(const std::shared_
 
 void SyntaxNodeProcCall::OutputInstructions(std::unique_ptr<Output>& output) {
 	m_scope.BeginCallGenerate(output, m_children);
-	PLATFORM.ProcCallGenerateSerial(m_content.c_str(), output->GetStream());
+	PLATFORM.ProcCallGenerate(m_content.c_str(), output->GetStream());
 	m_scope.EndCallGenerate(output->GetStream(), m_children);
 }

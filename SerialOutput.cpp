@@ -62,6 +62,7 @@ void SerialOutput::Assignment(const SyntaxNodeAssignment &assign, std::unique_pt
 	else if (SYNTAX_NODE_TYPE_PROC_CALL == value->GetType()) {
 		SyntaxNodeProcCall *call = static_cast<SyntaxNodeProcCall *>(value);
 		call->OutputInstructions(output);
+		m_output << '\t' << "movq	%rax, -" << variable->GetScopeStackTopOffset() << "(%rbp)" << std::endl;
 	}
 }
 
