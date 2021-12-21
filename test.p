@@ -1,30 +1,30 @@
-int function(a,b,c,d,e,f,g,h,i){
+int function(int a, int b, int c, int d, int e, int f, int g, int h, int i){
 	 printf("a:%d,d:%d\n", a, i);
      return 123;
 };
 
 int main(){
-        begin = clock();
+        int begin = clock();
         for(9){
-                a = 5;
-                b = 6;
-                c = 7;
-                d = 8;
+                int a = 5;
+                int b = 6;
+                int c = 7;
+                int d = 8;
                 
-                e = 4;
-                f = 2;
-                g = 3;
-                h = 5;
+                int e = 4;
+                int f = 2;
+                int g = 3;
+                int h = 5;
 
-                i = a % e;
-                j = b % f;
-                k = c % g;
-                l = d % h;
+                int i = a % e;
+                int j = b % f;
+                int k = c % g;
+                int l = d % h;
 
 				function(i,j,k,l,1,3,99,999,9999);
         };
-        finish = clock();
-        t = finish - begin;
+        int finish = clock();
+        int t = finish - begin;
         printf("time:%d,%d\n", t, t);
 		return 0;
 };

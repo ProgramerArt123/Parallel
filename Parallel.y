@@ -49,7 +49,7 @@ statements:	statement SEPARATE
 statement:	loop			{ PushStatement();}
 	|	proc_def			{ PushStatement();}
 	|	RETURN expression	{ PushReturn();}
-	|	NAME '=' expression	{ PushAssignmentStatement($1);}
+	|	INT NAME '=' expression	{ PushAssignmentStatement($2);}
 	|	expression			{ PushStatement();}
 	;
 
@@ -57,13 +57,13 @@ expression:	expression '+' expression 	{ $$ = $1 + $3; PushAdd();}
 	|	expression '-' expression 		{ $$ = $1 - $3; PushSub();}
 	|	expression '*' expression 		{ $$ = $1 * $3; PushMul();}
 	|	expression '/' expression 		{ $$ = $1 / $3; PushDiv();}
-	|	expression '%' expression 		{ $$ = 0; PushMod();}
+	|	expression '%' expression 		{ $$ = $1 % $3; PushMod();}
 	|   '-' expression %prec UMINUS  	{ $$ = -$2; printf("---%d\n", $$);} 
 	|	'(' expression ')'				{ $$ = $2; PushBlock();}
-	|	STRING							{ $$ = 0;PushString($1);}
-	|	NUMBER							{ $$ = $1;PushNumber($1);}
-	|	proc_call						{ $$ = 0;}
-	|	NAME							{ $$ = 0;PushVariable($1);}
+	|	STRING							{ PushString($1);}
+	|	NUMBER							{ PushNumber($1);}
+	|	proc_call						{ }
+	|	NAME							{ PushVariable($1);}
 	;
 
 
@@ -100,15 +100,15 @@ proc_def_scope_enter: '{'
 proc_def_scope_exit: '}'		{ PushProcDefExit(); }
 	;
 
-parameters:	NAME					{ AddParam($1); }							
-	|	parameters SEPARATE NAME	{ AddParam($3); }							
+parameters:	INT NAME					{ AddParam($2); }							
+	|	parameters SEPARATE INT NAME	{ AddParam($4); }							
 	|													
 	;
 
 proc_call:	proc_call_block_enter arguments proc_call_block_exit
 	;
 
-proc_call_block_enter: NAME '(' { PushProcCallEnter($1); }
+proc_call_block_enter: NAME '(' { printf("NAME=%s\n", $1); PushProcCallEnter($1); }
 	;
 
 proc_call_block_exit: ')'		{ PushProcCallExit();  }
