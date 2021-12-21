@@ -11,7 +11,7 @@ int main() {
 		source.reset(new SourceCodeFile("/root/projects/ConsoleApplication1/test.p"));
 		source->Parse();
 		std::unique_ptr<Output> serial(new SerialOutput("test1.s"));
-		//source->OutputFile(serial);
+		source->OutputFile(serial);
 		std::unique_ptr<Output> parallel(new ParallelOutput("test2.s"));
 		source->OutputFile(parallel);
 	}

@@ -5,7 +5,7 @@ extern int yylineno;
 
 %%
 for						{ return FOR; }
-def						{ return DEF; }
+int						{ return INT; }
 return					{ return RETURN; }
 \"[^\"]*\"			{ yylval.strv = strdup(yytext); return STRING; }
 [_a-zA-Z][a-zA-Z0-9]*	{ yylval.strv = strdup(yytext); return NAME; }

@@ -1,9 +1,9 @@
-def function(a,b,c,d,e,f,g,h,i){
+int function(a,b,c,d,e,f,g,h,i){
 	 printf("a:%d,d:%d\n", a, i);
      return 123;
 };
 
-def main(){
+int main(){
         begin = clock();
         for(9){
                 a = 5;
@@ -26,4 +26,5 @@ def main(){
         finish = clock();
         t = finish - begin;
         printf("time:%d,%d\n", t, t);
+		return 0;
 };

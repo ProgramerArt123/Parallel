@@ -29,7 +29,7 @@ void PushProcCallExit();
 	char *strv;
 }
 %token <strv> FOR
-%token <strv> DEF
+%token <strv> INT
 %token <strv> RETURN
 %token <strv> STRING
 %token <strv> NAME
@@ -57,13 +57,13 @@ expression:	expression '+' expression 	{ $$ = $1 + $3; PushAdd();}
 	|	expression '-' expression 		{ $$ = $1 - $3; PushSub();}
 	|	expression '*' expression 		{ $$ = $1 * $3; PushMul();}
 	|	expression '/' expression 		{ $$ = $1 / $3; PushDiv();}
-	|	expression '%' expression 		{ $$ = $1 % $3; PushMod();}
+	|	expression '%' expression 		{ $$ = 0; PushMod();}
 	|   '-' expression %prec UMINUS  	{ $$ = -$2; printf("---%d\n", $$);} 
 	|	'(' expression ')'				{ $$ = $2; PushBlock();}
-	|	STRING							{ PushString($1);}
-	|	NUMBER							{ PushNumber($1);}
-	|	proc_call						
-	|	NAME							{ PushVariable($1);}
+	|	STRING							{ $$ = 0;PushString($1);}
+	|	NUMBER							{ $$ = $1;PushNumber($1);}
+	|	proc_call						{ $$ = 0;}
+	|	NAME							{ $$ = 0;PushVariable($1);}
 	;
 
 
@@ -88,7 +88,7 @@ loop_scope_exit: '}'		{ PushLoopExit(); }
 proc_def:  proc_def_block_enter parameters proc_def_block_exit proc_def_scope_enter statements proc_def_scope_exit	
 	;
 
-proc_def_block_enter: DEF NAME '(' { PushProcDefEnter($2); }
+proc_def_block_enter: INT NAME '(' { PushProcDefEnter($2); }
 	;
 
 proc_def_block_exit: ')'
