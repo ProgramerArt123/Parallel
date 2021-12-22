@@ -14,6 +14,10 @@ void PushAssignmentStatement(const char *variable) {
 	source->m_scopes.top()->PushAssignmentStatement(variable);
 }
 
+void DecalreVariable(const char *variable) {
+	source->m_scopes.top()->DecalreVariable(variable);
+}
+
 void PushAdd() {
 	source->m_scopes.top()->PushAdd();
 }

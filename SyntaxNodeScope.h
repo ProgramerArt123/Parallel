@@ -37,6 +37,7 @@ public:
 
 	void PushStatement();
 	void PushAssignmentStatement(const char *variable);
+	void DecalreVariable(const char *variable);
 	void PushReturn();
 
 	std::shared_ptr<SyntaxNodeScope> &PushLoopEnter();
@@ -72,10 +73,14 @@ public:
 	const size_t GetScopeStackTopOffset() const;
 protected:
 	bool IsProcExist(const char *name);
+	bool IsVariableParamExistInner(const char *name);
+	bool IsVariableExistInner(const char *name);
+	bool IsParamExistInner(const char *name);
+	bool IsVariableParamExist(const char *name);
 	bool IsVariableExist(const char *name);
+	bool IsParamExist(const char *name);
+	std::shared_ptr<SyntaxNodeVariable> GetVariableParam(const char *name);
 	size_t StatisticsAssginsCount();
-
-	//size_t GetNewVariablePos();
 
 protected:
 	std::stack<std::shared_ptr<SyntaxNode>> m_stack;

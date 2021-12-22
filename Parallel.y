@@ -5,6 +5,7 @@
 void PushStatement();
 void PushReturn();
 void PushAssignmentStatement(const char *variable);
+void DecalreVariable(const char *variable);
 void PushAdd();
 void PushSub();
 void PushMul();
@@ -49,7 +50,8 @@ statements:	statement SEPARATE
 statement:	loop			{ PushStatement();}
 	|	proc_def			{ PushStatement();}
 	|	RETURN expression	{ PushReturn();}
-	|	INT NAME '=' expression	{ PushAssignmentStatement($2);}
+	|	INT NAME '=' expression	{ DecalreVariable($2);PushAssignmentStatement($2);}
+	|	INT NAME			{ DecalreVariable($2);}
 	|	expression			{ PushStatement();}
 	;
 
