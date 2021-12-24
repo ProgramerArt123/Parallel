@@ -27,5 +27,6 @@ int main(){
         int t = finish - begin;
         printf("time:%d,%d\n", t, t);
 		int x;
+		x = 123;
 		return 0;
 };

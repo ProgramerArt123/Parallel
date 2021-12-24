@@ -3,7 +3,7 @@
 
 #include "Output.h"
 
-typedef struct _ParallelElement ParallelElement;
+class ParallelElement;
 
 class ParallelOutput : public Output {
 public:

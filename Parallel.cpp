@@ -5,6 +5,11 @@
 
 #include "Parallel.h"
 
+ParallelElement::ParallelElement(SyntaxNodeScope &scope):
+	m_scope(scope){
+
+}
+
 void ParallelElement::OutputInstructions(std::unique_ptr<Output>& output) {
 	ParallelOutput *parallel = static_cast<ParallelOutput *>(output.get());
 	switch (m_type)
@@ -47,6 +52,9 @@ void ParallelElement::OutputInstructions(std::unique_ptr<Output>& output) {
 	}
 }
 
+Parallel::Parallel(SyntaxNodeScope &scope):m_scope(scope) {
+}
+
 uint64_t Parallel::AddNode(const std::shared_ptr<SyntaxNode> &node) {
 	if (m_elements.empty()) {
 		AddElement();
@@ -59,7 +67,7 @@ uint64_t Parallel::AddNode(const std::shared_ptr<SyntaxNode> &node) {
 }
 
 void Parallel::AddElement() {
-	ParallelElement element;
+	ParallelElement element(m_scope);
 	m_elements.push_back(element);
 }
 

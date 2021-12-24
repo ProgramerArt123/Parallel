@@ -46,3 +46,11 @@ int SyntaxNodeCompute::GetRightChildStackTopOffset()const {
 const char *SyntaxNodeCompute::GetResultRegName() {
 	return "rax";
 }
+
+size_t SyntaxNodeCompute::CacheResultStackTopOffset(size_t pos) {
+	return ((m_cache_result_pos = pos) + 1) * 8;
+}
+
+size_t SyntaxNodeCompute::CacheResultStackTopOffset() {
+	return (m_cache_result_pos + 1) * 8;
+}

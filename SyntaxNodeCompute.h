@@ -13,6 +13,11 @@ public:
 	int GetRightChildStackTopOffset()const;
 
 	virtual const char *GetResultRegName();
+
+	size_t CacheResultStackTopOffset(size_t pos);
+	size_t CacheResultStackTopOffset();
+protected:
+	size_t m_cache_result_pos = 0;
 };
 
 #endif

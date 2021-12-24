@@ -12,14 +12,18 @@
 class SyntaxNode;
 class Output;
 
-typedef struct _ParallelElement {
+class ParallelElement {
+public:
+	explicit ParallelElement(SyntaxNodeScope &scope);
 	SYNTAX_NODE_TYPE m_type = SYNTAX_NODE_TYPE_NONE;
 	std::vector<std::shared_ptr<SyntaxNode>> m_nodes;
 	void OutputInstructions(std::unique_ptr<Output>& output);
-}ParallelElement;
+	SyntaxNodeScope &m_scope;
+};
 
 class Parallel {
 public:
+	explicit Parallel(SyntaxNodeScope &scope);
 	uint64_t AddNode(const std::shared_ptr<SyntaxNode> &node);
 	void AddElement();
 	void Truncation();
@@ -30,6 +34,8 @@ public:
 
 private:
 	std::vector<ParallelElement> m_elements;
+
+	SyntaxNodeScope &m_scope;
 };
 
 

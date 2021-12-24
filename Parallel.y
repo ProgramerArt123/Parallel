@@ -51,6 +51,7 @@ statement:	loop			{ PushStatement();}
 	|	proc_def			{ PushStatement();}
 	|	RETURN expression	{ PushReturn();}
 	|	INT NAME '=' expression	{ DecalreVariable($2);PushAssignmentStatement($2);}
+	|	NAME '=' expression	{ PushAssignmentStatement($1);}
 	|	INT NAME			{ DecalreVariable($2);}
 	|	expression			{ PushStatement();}
 	;

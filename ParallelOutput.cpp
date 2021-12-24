@@ -48,8 +48,8 @@ void ParallelOutput::Assignment(const SyntaxNodeAssignment &assign, std::unique_
 	else {
 		if (SYNTAX_NODE_TYPE_ADD <= value->GetType() && value->GetType() <= SYNTAX_NODE_TYPE_OR) {
 			SyntaxNodeCompute *compute = static_cast<SyntaxNodeCompute *>(value);
-			if (compute->GetRightChildStackTopOffset() + 32 != variable->GetScopeStackTopOffset()) {
-				m_output << '\t' << "movq	-" << compute->GetRightChildStackTopOffset() + 32 << "(%rbp), %rax" << std::endl;
+			if (compute->CacheResultStackTopOffset() != variable->GetScopeStackTopOffset()) {
+				m_output << '\t' << "movq	-" << compute->CacheResultStackTopOffset() << "(%rbp), %rax" << std::endl;
 				m_output << '\t' << "movq	%rax, -" << variable->GetScopeStackTopOffset() << "(%rbp)" << std::endl;
 			}
 		}
@@ -87,7 +87,8 @@ void ParallelOutput::ElementAdd(ParallelElement &element, std::unique_ptr<Output
 		GetStream() << '\t' << "vpaddq  %ymm1, %ymm0, %ymm0" << std::endl;
 		//cache result
 		SyntaxNodeAdd *add = static_cast<SyntaxNodeAdd *>(element.m_nodes[index].get());
-		GetStream() << '\t' << "vmovdqu  %ymm0, -" << add->GetRightChildStackTopOffset() + 56 << "(%rbp)" << std::endl;
+		GetStream() << '\t' << "vmovdqu  %ymm0, -" << 
+			add->CacheResultStackTopOffset(element.m_scope.GetCurrentPos()) << "(%rbp)" << std::endl;
 	}
 }
 
@@ -112,7 +113,8 @@ void ParallelOutput::ElementSub(ParallelElement &element, std::unique_ptr<Output
 		GetStream() << '\t' << "vpsubq  %ymm1, %ymm0, %ymm0" << std::endl;
 		//cache result
 		SyntaxNodeSub *sub = static_cast<SyntaxNodeSub *>(element.m_nodes[index].get());
-		GetStream() << '\t' << "vmovdqu  %ymm0, -" << sub->GetRightChildStackTopOffset() + 56 << "(%rbp)" << std::endl;
+		GetStream() << '\t' << "vmovdqu  %ymm0, -" << 
+			sub->CacheResultStackTopOffset(element.m_scope.GetCurrentPos()) << "(%rbp)" << std::endl;
 	}
 }
 
@@ -137,7 +139,8 @@ void ParallelOutput::ElementMul(ParallelElement &element, std::unique_ptr<Output
 		GetStream() << '\t' << "vpmuldq  %ymm1, %ymm0, %ymm0" << std::endl;
 		//cache result
 		SyntaxNodeMul *mul = static_cast<SyntaxNodeMul *>(element.m_nodes[index].get());
-		GetStream() << '\t' << "vmovdqu  %ymm0, -" << mul->GetRightChildStackTopOffset() + 56 << "(%rbp)" << std::endl;
+		GetStream() << '\t' << "vmovdqu  %ymm0, -" <<
+			mul->CacheResultStackTopOffset(element.m_scope.GetCurrentPos()) << "(%rbp)" << std::endl;
 	}
 }
 
@@ -147,7 +150,8 @@ void ParallelOutput::ElementDiv(ParallelElement &element, std::unique_ptr<Output
 		std::shared_ptr<SyntaxNode> &node = element.m_nodes[index];
 		node->OutputInstructions(output);
 		SyntaxNodeCompute *compute = static_cast<SyntaxNodeCompute *>(node.get());
-		GetStream() << '\t' << "movq  %"<< compute->GetResultRegName() <<", -" << compute->GetRightChildStackTopOffset() + 32 << "(%rbp)" << std::endl;
+		GetStream() << '\t' << "movq  %"<< compute->GetResultRegName() <<", -" << 
+			compute->CacheResultStackTopOffset(element.m_scope.GetCurrentPos()) << "(%rbp)" << std::endl;
 	}
 }
 
@@ -157,6 +161,7 @@ void ParallelOutput::ElementMod(ParallelElement &element, std::unique_ptr<Output
 		std::shared_ptr<SyntaxNode> &node = element.m_nodes[index];
 		node->OutputInstructions(output);
 		SyntaxNodeCompute *compute = static_cast<SyntaxNodeCompute *>(node.get());
-		GetStream() << '\t' << "movq  %" << compute->GetResultRegName() << ", -" << compute->GetRightChildStackTopOffset() + 32 << "(%rbp)" << std::endl;
+		GetStream() << '\t' << "movq  %" << compute->GetResultRegName() << ", -" << 
+			compute->CacheResultStackTopOffset(element.m_scope.GetCurrentPos()) << "(%rbp)" << std::endl;
 	}
 }

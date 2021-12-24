@@ -8,7 +8,7 @@
 
 int main() {
 	try {
-		source.reset(new SourceCodeFile("/root/projects/ConsoleApplication1/test.p"));
+		source.reset(new SourceCodeFile("test.p"));
 		source->Parse();
 		std::unique_ptr<Output> serial(new SerialOutput("test1.s"));
 		source->OutputFile(serial);

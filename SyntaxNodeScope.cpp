@@ -3,13 +3,14 @@
 #include "SyntaxNodeScope.h"
 #include "common.h"
 
-SyntaxNodeScope::SyntaxNodeScope(const char *content) :SyntaxNode(content) {
+SyntaxNodeScope::SyntaxNodeScope(const char *content) :
+	SyntaxNode(content),m_parallel(*this) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
 
 SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, const char *content) :
 	SyntaxNode(*static_cast<SyntaxNode *>(&outter), content),
-	m_base_pos(outter.GetCurrentPos()) {
+	m_base_pos(outter.GetCurrentPos()),m_parallel(*this) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
 
