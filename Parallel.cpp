@@ -95,7 +95,8 @@ bool Parallel::CheckLastElement(const SyntaxNode &node) {
 	}
 	ParallelElement &last = m_elements.back();
 	for (std::shared_ptr<SyntaxNode> &other : last.m_nodes) {
-		if (&node == other.get()) {
+		if ((node.IsOutermost() && &node == other.get()) ||
+			(!node.IsOutermost() && node.GetOuter() == other.get())) {
 			return false;
 		}
 	}

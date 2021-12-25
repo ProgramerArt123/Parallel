@@ -5,11 +5,11 @@
 extern int yylineno;
 
 SyntaxNode::SyntaxNode(const char *content, int priority) :
-	m_content(content), m_parent(*this) {
+	m_content(content){
 	m_line = yylineno;
 }
-SyntaxNode::SyntaxNode(SyntaxNode &parent, const char *content, int priority) :
-	m_content(content), m_parent(parent) {
+SyntaxNode::SyntaxNode(SyntaxNodeScope &outer, const char *content, int priority):
+	m_content(content), m_outer(&outer) {
 	m_line = yylineno;
 }
 SyntaxNode::~SyntaxNode() {
@@ -42,7 +42,7 @@ GENERATE_PARALLEL_RESULT SyntaxNode::GenerateParallel(const std::shared_ptr<Synt
 }
 
 GENERATE_PARALLEL_RESULT SyntaxNode::GenerateParallelSelf(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) {
-	if (parallel.CheckLastElement(m_parent) && parallel.CheckLastType(GetType())) {
+	if (parallel.CheckLastElement(*this) && parallel.CheckLastType(GetType())) {
 		m_parallel_index = parallel.AddNode(self);
 		return GENERATE_PARALLEL_RESULT_FINDED;
 	}
@@ -119,8 +119,12 @@ int SyntaxNode::GetLine() {
 	return m_line;
 }
 
-bool SyntaxNode::IsRoot() {
-	return this == &m_parent;
+bool SyntaxNode::IsOutermost() const {
+	return NULL == m_outer;
+}
+
+SyntaxNodeScope *SyntaxNode::GetOuter() const {
+	return m_outer;
 }
 
 void SyntaxNode::OutputInstructions(std::unique_ptr<Output>& output) {

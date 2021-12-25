@@ -13,11 +13,12 @@
 #include "Output.h"
 
 class Parallel;
+class SyntaxNodeScope;
 
 class SyntaxNode {
 public:
 	explicit SyntaxNode(const char *content = "", int priority = 0);
-	explicit SyntaxNode(SyntaxNode &parent, const char *content ="", int priority = 0);
+	explicit SyntaxNode(SyntaxNodeScope &outer, const char *content = "", int priority = 0);
 	virtual ~SyntaxNode();
 
 	virtual void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives);
@@ -41,6 +42,10 @@ public:
 	SYNTAX_NODE_TYPE GetType();
 
 	int GetLine();
+	
+	bool IsOutermost() const;
+	
+	SyntaxNodeScope *GetOuter() const;
 
 	virtual void OutputInstructions(std::unique_ptr<Output>& output);
 
@@ -58,14 +63,13 @@ protected:
 
 	void SetDeep(int deep);
 
-	bool IsRoot();
 public:
 	std::list<std::shared_ptr<SyntaxNode>> m_children;
 	int m_generate_line = 0;
 protected:
 	std::string m_content;
 	int m_deep = 0;
-	SyntaxNode &m_parent;
+	SyntaxNodeScope *m_outer = NULL;
 	
 	SYNTAX_NODE_TYPE m_type = SYNTAX_NODE_TYPE_NONE;
 

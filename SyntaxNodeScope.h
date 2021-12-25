@@ -73,19 +73,19 @@ public:
 	const size_t GetScopeStackTopOffset() const;
 protected:
 	bool IsProcExist(const char *name);
-	bool IsVariableParamExistInner(const char *name);
-	bool IsVariableExistInner(const char *name);
-	bool IsParamExistInner(const char *name);
-	bool IsVariableParamExist(const char *name);
-	bool IsVariableExist(const char *name);
-	bool IsParamExist(const char *name);
+	bool IsVariableParamExistInner(const char *name)const;
+	bool IsVariableExistInner(const char *name)const;
+	bool IsParamExistInner(const char *name)const;
+	bool IsVariableParamExist(const char *name)const;
+	bool IsVariableExist(const char *name) const;
+	bool IsParamExist(const char *name)const;
 	std::shared_ptr<SyntaxNodeVariable> GetVariableParam(const char *name);
 	size_t StatisticsAssginsCount();
 
 protected:
 	std::stack<std::shared_ptr<SyntaxNode>> m_stack;
 	std::map<std::string, std::shared_ptr<SyntaxNodeProcDef>> m_procs;
-	std::map<std::string, std::shared_ptr<SyntaxNodeVariable>> m_vars;
+	std::map<std::string, std::shared_ptr<SyntaxNodeVariable>> m_variables;
 	std::vector<std::shared_ptr<SyntaxNodeVariable>> m_parameters;
 	std::vector<std::shared_ptr<SyntaxNodeNumber>> m_argments;
 	std::shared_ptr<SyntaxNodeProcCall> m_proc_call;

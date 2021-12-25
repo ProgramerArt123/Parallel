@@ -9,7 +9,7 @@ SyntaxNodeScope::SyntaxNodeScope(const char *content) :
 }
 
 SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, const char *content) :
-	SyntaxNode(*static_cast<SyntaxNode *>(&outter), content),
+	SyntaxNode(outter, content),
 	m_base_pos(outter.GetCurrentPos()),m_parallel(*this) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
@@ -126,7 +126,7 @@ void SyntaxNodeScope::PushAssignmentStatement(const char *variable) {
 		throw "Error:" + std::string(variable) + " undefined";
 	}
 	std::shared_ptr<SyntaxNode> assign = std::shared_ptr<SyntaxNode>(new SyntaxNodeAssignment(*this));
-	std::shared_ptr<SyntaxNode> var = m_vars[variable];
+	std::shared_ptr<SyntaxNode> var = m_variables[variable];
 	assign->AddChild(var);
 	assign->AddChild(m_stack.top());
 	m_stack.pop();
@@ -143,7 +143,7 @@ void SyntaxNodeScope::DecalreVariable(const char *variable) {
 		throw "Error:" + std::string(variable) + " redefined";
 	}
 	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this, variable, GetCurrentPos()));
-	m_vars.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(variable, varv));
+	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(variable, varv));
 }
 
 void SyntaxNodeScope::PushReturn() {
@@ -185,12 +185,6 @@ void SyntaxNodeScope::OutputInstructions(std::unique_ptr<Output>& output) {
 }
 
 void SyntaxNodeScope::DefGenerate(std::unique_ptr<Output>& output) {
-	//1.参数赋值需要启用其他内存
-	//2.registers放在栈的最上面
-	//3.定义的变量逆序入栈
-	//4.取实参值时需要和外部调用采用一致的对应机制
-	//5.fast_call调用者依实参顺序依次将值写入registers
-	//6.registers的值会被都复制到内存再使用，其他的参数直接使用入参时的内存
 	uint32_t index = 0;
 	for (std::shared_ptr<SyntaxNodeVariable> &parameter : m_parameters) {
 		if (index < PLATFORM.registersCount) {
@@ -220,23 +214,20 @@ void SyntaxNodeScope::BeginCallGenerate(std::unique_ptr<Output>& output, std::li
 		else {
 			dst = "-" + std::to_string(PushArgument()) + "(%rbp)";
 		}
+		if (index < PLATFORM.registersCount && 0 == strcmp(PLATFORM.registers[index], "rcx")) {
+			output->GetStream() << '\t' << "movq	" << dst << ", -" << std::to_string(PushRegister(dst.c_str())) << "(%rbp)" << std::endl;
+		}
 		switch (argment->GetType())
 		{
 		case SYNTAX_NODE_TYPE_NUMBER:
 		{
 			SyntaxNodeNumber *number = static_cast<SyntaxNodeNumber *>(argment.get());
-			if (index < PLATFORM.registersCount) {
-				output->GetStream() << '\t' << "movq	" << dst << ", -" << std::to_string(PushRegister(dst.c_str())) << "(%rbp)" << std::endl;
-			}
 			output->GetStream() << '\t' << "movq	$" << number->GetValue() << ", " << dst << std::endl;
 		}
 		break;
 		case SYNTAX_NODE_TYPE_STRING:
 		{
 			SyntaxNodeString *string = static_cast<SyntaxNodeString *>(argment.get());
-			if (index < PLATFORM.registersCount) {
-				output->GetStream() << '\t' << "movq	" << dst << ", -" << std::to_string(PushRegister(dst.c_str())) << "(%rbp)" << std::endl;
-			}
 			string->OutputInstructions(output);
 			PLATFORM.ProcStringArgmentGenerateSerial(string->GetNO(), dst.c_str(), output->GetStream());
 		}
@@ -244,9 +235,6 @@ void SyntaxNodeScope::BeginCallGenerate(std::unique_ptr<Output>& output, std::li
 		case SYNTAX_NODE_TYPE_VARIABLE:
 		{
 			SyntaxNodeVariable *variable = static_cast<SyntaxNodeVariable *>(argment.get());
-			if (index < PLATFORM.registersCount) {
-				output->GetStream() << '\t' << "movq	" << dst << ", -" << std::to_string(PushRegister(dst.c_str())) << "(%rbp)" << std::endl;
-			}
 			output->GetStream() << '\t' << "movq	-" << variable->GetScopeStackTopOffset() << "(%rbp), " << dst << std::endl;
 		}
 		break;
@@ -269,14 +257,17 @@ void SyntaxNodeScope::EndCallGenerate(std::stringstream& output, std::list<std::
 	}
 	uint32_t index = argments.size() - 1;
 	for (std::shared_ptr<SyntaxNode> &argment : argments) {
-		if (index-- < PLATFORM.registersCount) {
-			std::string dst;
-			size_t offset = PopRegister(dst);
-			output << '\t' << "movq	" << "-" << std::to_string(offset) << "(%rbp)," << dst << std::endl;
+		if (index < PLATFORM.registersCount) {
+			if (0 == strcmp(PLATFORM.registers[index], "rcx")) {
+				std::string dst;
+				size_t offset = PopRegister(dst);
+				output << '\t' << "movq	" << "-" << std::to_string(offset) << "(%rbp)," << dst << std::endl;
+			}
 		}
 		else {
 			PopArgument();
 		}
+		index--;
 	}
 }
 
@@ -287,36 +278,24 @@ void SyntaxNodeScope::LoopGenerate(std::unique_ptr<Output>& output) {
 		",  %rcx" << std::endl;
 }
 
-//void SyntaxNodeScope::UpdateRuntimePos(size_t pos) {
-//	m_runtime_pos = pos;
-//}
-
 size_t SyntaxNodeScope::StatisticsAssginsCount() {
-	return m_vars.size();
+	return m_variables.size();
 }
-
-//size_t SyntaxNodeScope::GetNewVariablePos() {
-//	size_t pos = m_parameters.size() + m_vars.size();
-//	if (!IsRoot()) {
-//		pos += static_cast<SyntaxNodeScope *>(&m_parent)->GetNewVariablePos();
-//	}
-//	return pos;
-//}
 
 bool SyntaxNodeScope::IsProcExist(const char *name) {
 	return m_procs.find(name) != m_procs.end();
 }
 
-bool SyntaxNodeScope::IsVariableParamExistInner(const char *name) {
+bool SyntaxNodeScope::IsVariableParamExistInner(const char *name)const {
 	return IsVariableExistInner(name) || IsParamExistInner(name);
 }
 
-bool SyntaxNodeScope::IsVariableExistInner(const char *name) {
-	return m_vars.find(name) != m_vars.end();
+bool SyntaxNodeScope::IsVariableExistInner(const char *name) const {
+	return m_variables.find(name) != m_variables.end();
 }
 
-bool SyntaxNodeScope::IsParamExistInner(const char *name) {
-	for (std::shared_ptr<SyntaxNodeVariable> & parameter : m_parameters) {
+bool SyntaxNodeScope::IsParamExistInner(const char *name) const {
+	for (const std::shared_ptr<SyntaxNodeVariable> &parameter : m_parameters) {
 		if (0 == strcmp(parameter->GetContent(), name)) {
 			return true;
 		}
@@ -324,39 +303,37 @@ bool SyntaxNodeScope::IsParamExistInner(const char *name) {
 	return false;
 }
 
-bool SyntaxNodeScope::IsVariableParamExist(const char *name) {
+bool SyntaxNodeScope::IsVariableParamExist(const char *name) const {
 	return IsVariableExist(name) || IsParamExist(name);
 }
 
-bool SyntaxNodeScope::IsVariableExist(const char *name) {
+bool SyntaxNodeScope::IsVariableExist(const char *name) const {
 	if (IsVariableExistInner(name)) {
 		return true;
 	}
-	else if (IsRoot()) {
+	else if (IsOutermost()) {
 		return false;
 	}
 	else {
-		SyntaxNodeScope *outer = static_cast<SyntaxNodeScope *>(&m_parent);
-		return outer->IsVariableExist(name);
+		return m_outer->IsVariableExist(name);
 	}
 }
 
-bool SyntaxNodeScope::IsParamExist(const char *name) {
+bool SyntaxNodeScope::IsParamExist(const char *name)const {
 	if (IsParamExistInner(name)) {
 		return true;
 	}
-	else if (IsRoot()) {
+	else if (IsOutermost()) {
 		return false;
 	}
 	else {
-		SyntaxNodeScope *outer = static_cast<SyntaxNodeScope *>(&m_parent);
-		return outer->IsParamExist(name);
+		return m_outer->IsParamExist(name);
 	}
 }
 
 std::shared_ptr<SyntaxNodeVariable> SyntaxNodeScope::GetVariableParam(const char *name) {
 	if (IsVariableExistInner(name)) {
-		return m_vars[name];
+		return m_variables[name];
 	}
 	else if (IsParamExistInner(name)) {
 		for (std::shared_ptr<SyntaxNodeVariable> & parameter : m_parameters) {
@@ -365,12 +342,11 @@ std::shared_ptr<SyntaxNodeVariable> SyntaxNodeScope::GetVariableParam(const char
 			}
 		}
 	}
-	else if (IsRoot()) {
+	else if (IsOutermost()) {
 		return std::shared_ptr<SyntaxNodeVariable>();
 	}
 	else {
-		SyntaxNodeScope *outer = static_cast<SyntaxNodeScope *>(&m_parent);
-		return outer->GetVariableParam(name);
+		return m_outer->GetVariableParam(name);
 	}
 }
 
@@ -403,9 +379,8 @@ std::shared_ptr<SyntaxNodeAssignment> SyntaxNodeScope::GetLastAssign(const char 
 			}
 		}
 	}
-	if (!IsRoot()) {
-		SyntaxNodeScope &scope = *static_cast<SyntaxNodeScope *>(&m_parent);
-		return scope.GetLastAssign(name, line, true);
+	if (!IsOutermost()) {
+		return m_outer->GetLastAssign(name, line, true);
 	}
 	else {
 		return std::shared_ptr<SyntaxNodeAssignment>();
@@ -458,7 +433,7 @@ void SyntaxNodeScope::PopArgument() {
 
 const size_t SyntaxNodeScope::GetCurrentPos() const {
 	return m_base_pos + m_parameters.size() + m_arguments.size() +
-		m_vars.size() + m_registers.size();
+		m_variables.size() + m_registers.size();
 }
 
 const size_t SyntaxNodeScope::GetScopeStackTopOffset() const {
@@ -466,16 +441,18 @@ const size_t SyntaxNodeScope::GetScopeStackTopOffset() const {
 }
 
 const size_t SyntaxNodeScope::GetSubProcOffset() const {
-	if (GetCurrentPos()) {
-		return (GetCurrentPos() + 1) / 2 * 2 * 8;
-		//return (GetCurrentPos() >= 4 ? GetCurrentPos() : 4) * 8;
-	}
-	else {
-		return 0;
-	}
+	return (GetCurrentPos() + 1) / 2 * 2 * 8;
 }
 
 const size_t SyntaxNodeScope::GetParameterStackTopOffset(size_t index) const {
 	size_t parametersCount = m_parameters.size();
-	return 16 + 8 * (parametersCount - 1 - index);
+	size_t count = 0;
+	const size_t codePointer = 2;
+	if (0 == m_outer->GetCurrentPos() % 2){
+		count = parametersCount - index + codePointer;
+	}
+	else{
+		count = parametersCount - index + 1 + codePointer;
+	}
+	return count * 8;
 }

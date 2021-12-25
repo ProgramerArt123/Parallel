@@ -40,6 +40,5 @@ const size_t SyntaxNodeVariable::GetScopeStackTopOffset()const {
 }
 
 std::shared_ptr<SyntaxNodeAssignment> SyntaxNodeVariable::GetLastAssign() {
-	SyntaxNodeScope &scope = *static_cast<SyntaxNodeScope *>(&m_parent);
-	return scope.GetLastAssign(m_content.c_str(), m_generate_line);
+	return m_outer->GetLastAssign(m_content.c_str(), m_generate_line);
 }

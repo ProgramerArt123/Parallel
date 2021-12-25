@@ -2,7 +2,7 @@
 #include "common.h"
 
 SyntaxNodeLoop::SyntaxNodeLoop(SyntaxNodeScope &outter) :
-	SyntaxNode(*static_cast<SyntaxNode *>(&outter), "LOOP"),
+	SyntaxNode(outter, "LOOP"),
 	m_body(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(outter, "LOOP"))){
 	m_type = SYNTAX_NODE_TYPE_LOOP;
 }
