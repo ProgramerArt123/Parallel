@@ -127,9 +127,19 @@ SyntaxNodeScope *SyntaxNode::GetOuter() const {
 	return m_outer;
 }
 
+size_t SyntaxNode::SetResultPos(size_t pos){
+	m_result_pos = pos;
+	return GetResultPos();
+}
+	
+size_t SyntaxNode::GetResultPos() const{
+	return m_result_pos;
+}
+
 void SyntaxNode::OutputInstructions(std::unique_ptr<Output>& output) {
 	for (std::shared_ptr<SyntaxNode> &child : m_children) {
 		child->OutputInstructions(output);
+		SetResultPos(child->GetResultPos());
 	}
 }
 

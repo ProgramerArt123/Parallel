@@ -12,7 +12,7 @@ public:
 	void ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) override;
 private:
 
-	void ComputeOne(const SyntaxNodeCompute &one, const char *instructions) override;
+	void ComputeOne(const SyntaxNodeCompute &one, const char *instructions, std::unique_ptr<Output>& output) override;
 
 
 };

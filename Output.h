@@ -25,11 +25,11 @@ public:
 	std::stringstream &GetStream();
 	std::stringstream &GetConstStream();
 
-	void Add(const SyntaxNodeAdd &add);
-	void Sub(const SyntaxNodeSub &sub);
-	void Mul(const SyntaxNodeMul &mul);
-	void Div(const SyntaxNodeDiv &div);
-	void Mod(const SyntaxNodeMod &mod);
+	void Add(SyntaxNodeAdd &add, std::unique_ptr<Output>& output);
+	void Sub(SyntaxNodeSub &sub, std::unique_ptr<Output>& output);
+	void Mul(SyntaxNodeMul &mul, std::unique_ptr<Output>& output);
+	void Div(SyntaxNodeDiv &div, std::unique_ptr<Output>& output);
+	void Mod(SyntaxNodeMod &mod, std::unique_ptr<Output>& output);
 	virtual void Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) = 0;
 
 	virtual void ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) = 0;
@@ -44,8 +44,8 @@ protected:
 	std::stringstream m_consts;
 
 private:
-	virtual void ComputeOne(const SyntaxNodeCompute &one, const char *instructions) = 0;
-	void ComputeTwo(const SyntaxNodeCompute &two, const char *instructions);
+	virtual void ComputeOne(const SyntaxNodeCompute &one, const char *instructions, std::unique_ptr<Output>& output) = 0;
+	void ComputeTwo(const SyntaxNodeCompute &two, const char *instructions, std::unique_ptr<Output>& output);
 private:
 	unsigned int m_const_NO = 0;
 	unsigned int m_func_NO = 0;

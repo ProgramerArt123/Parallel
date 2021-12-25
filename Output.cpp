@@ -24,24 +24,34 @@ Output::~Output() {
 }
 
 
-void Output::Add(const SyntaxNodeAdd &add) {
-	ComputeOne(add, "addq");
+void Output::Add(SyntaxNodeAdd &add, std::unique_ptr<Output>& output) {
+	ComputeOne(add, "addq", output);
+	output->GetStream() << '\t' << "movq	%rax, -" << 
+		add.SetResultPos(add.GetOuter()->PushCache()) << "(%rbp)" << std::endl;
 }
 
-void Output::Sub(const SyntaxNodeSub &sub) {
-	ComputeOne(sub, "subq");
+void Output::Sub(SyntaxNodeSub &sub, std::unique_ptr<Output>& output) {
+	ComputeOne(sub, "subq", output);
+	output->GetStream() << '\t' << "movq	%rax, -" << 
+		sub.SetResultPos(sub.GetOuter()->PushCache()) << "(%rbp)" << std::endl;
 }
 
-void Output::Mul(const SyntaxNodeMul &mul) {
-	ComputeOne(mul, "imulq");
+void Output::Mul(SyntaxNodeMul &mul, std::unique_ptr<Output>& output) {
+	ComputeOne(mul, "imulq", output);
+	output->GetStream() << '\t' << "movq	%rax, -" << 
+		mul.SetResultPos(mul.GetOuter()->PushCache()) << "(%rbp)" << std::endl;
 }
 
-void Output::Div(const SyntaxNodeDiv &div) {
-	ComputeTwo(div, "divq");
+void Output::Div(SyntaxNodeDiv &div, std::unique_ptr<Output>& output) {
+	ComputeTwo(div, "divq", output);
+	output->GetStream() << '\t' << "movq	%rax, -" << 
+		div.SetResultPos(div.GetOuter()->PushCache()) << "(%rbp)" << std::endl;
 }
 
-void Output::Mod(const SyntaxNodeMod &mod) {
-	ComputeTwo(mod, "divq");
+void Output::Mod(SyntaxNodeMod &mod, std::unique_ptr<Output>& output) {
+	ComputeTwo(mod, "divq", output);
+	output->GetStream() << '\t' << "movq	%rdx, -" << 
+		mod.SetResultPos(mod.GetOuter()->PushCache()) << "(%rbp)" << std::endl;
 }
 
 std::stringstream &Output::GetStream() {
@@ -65,34 +75,14 @@ unsigned int Output::GetLabelNO() {
 }
 
 
-void Output::ComputeTwo(const SyntaxNodeCompute &two, const char *instructions) {
-	SYNTAX_NODE_TYPE leftType = two.m_children.front()->GetType();
-	SYNTAX_NODE_TYPE rightType = two.m_children.back()->GetType();
-	if (SYNTAX_NODE_TYPE_NUMBER == leftType &&
-		SYNTAX_NODE_TYPE_NUMBER == rightType) {
-		const int left = static_cast<SyntaxNodeNumber *>(two.m_children.front().get())->GetValue();
-		const int right = static_cast<SyntaxNodeNumber *>(two.m_children.back().get())->GetValue();
-		m_output << '\t' << "movq	$" << std::to_string(left + right) << ", %rax" << std::endl;
-	}
-	else {
-		if (SYNTAX_NODE_TYPE_NUMBER == leftType) {
-			const int rightOffset = static_cast<SyntaxNodeVariable *>(two.m_children.back().get())->GetScopeStackTopOffset();
-			m_output << '\t' << "movq	-" << rightOffset << "(%rbp), %rax" << std::endl;
-			const int left = static_cast<SyntaxNodeNumber *>(two.m_children.front().get())->GetValue();
-			m_output << '\t' << "addq	$" << std::to_string(left) << ", %rax" << std::endl;
-		}
-		else if (SYNTAX_NODE_TYPE_NUMBER == rightType) {
-			const int leftOffset = static_cast<SyntaxNodeVariable *>(two.m_children.front().get())->GetScopeStackTopOffset();
-			m_output << '\t' << "movq	-" << leftOffset << "(%rbp), %rax" << std::endl;
-			const int right = static_cast<SyntaxNodeNumber *>(two.m_children.back().get())->GetValue();
-			m_output << '\t' << "addq	$" << std::to_string(right) << ", %rax" << std::endl;
-		}
-		else {
-			const int leftOffset = static_cast<SyntaxNodeVariable *>(two.m_children.front().get())->GetScopeStackTopOffset();
-			m_output << '\t' << "movq	-" << leftOffset << "(%rbp), %rax" << std::endl;
-			m_output << '\t' << "xorl	%edx, %edx" << std::endl;
-			const int rightOffset = static_cast<SyntaxNodeVariable *>(two.m_children.back().get())->GetScopeStackTopOffset();
-			m_output << '\t' << instructions << "	-" << rightOffset << "(%rbp)" << std::endl;
-		}
-	}
+void Output::ComputeTwo(const SyntaxNodeCompute &two, const char *instructions, std::unique_ptr<Output>& output) {
+	two.m_children.front()->OutputInstructions(output);
+	two.m_children.back()->OutputInstructions(output);
+	m_output << '\t' << "xorl	%edx, %edx" << std::endl;
+	m_output << '\t' << "movq	-" << 
+		two.m_children.front()->GetResultPos() << "(%rbp), %rax" << std::endl;
+	two.GetOuter()->PopCache();
+	m_output << '\t' << instructions << "	-" << 
+		two.m_children.back()->GetResultPos() << "(%rbp)" << std::endl;
+	two.GetOuter()->PopCache();
 }

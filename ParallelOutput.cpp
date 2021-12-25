@@ -17,7 +17,7 @@ ParallelOutput::ParallelOutput(const char *filePath) :
 	source->m_scopes.top()->GenerateParallel();
 }
 
-void ParallelOutput::ComputeOne(const SyntaxNodeCompute &one, const char *instructions) {
+void ParallelOutput::ComputeOne(const SyntaxNodeCompute &one, const char *instructions, std::unique_ptr<Output>& output) {
 	SYNTAX_NODE_TYPE leftType = one.m_children.front()->GetType();
 	if (SYNTAX_NODE_TYPE_NUMBER == leftType) {
 		const int left = static_cast<SyntaxNodeNumber *>(one.m_children.front().get())->GetValue();

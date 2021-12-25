@@ -1,8 +1,8 @@
 #include "SyntaxNodeMod.h"
 #include "common.h"
 
-SyntaxNodeMod::SyntaxNodeMod():
-	SyntaxNodeCompute("%"){
+SyntaxNodeMod::SyntaxNodeMod(SyntaxNodeScope &outer):
+	SyntaxNodeCompute(outer, "%"){
 	m_type = SYNTAX_NODE_TYPE_MOD;
 }
 
@@ -11,7 +11,7 @@ SyntaxNodeMod::~SyntaxNodeMod() {
 }
 
 void SyntaxNodeMod::OutputInstructions(std::unique_ptr<Output>& output) {
-	output->Mod(*this);
+	output->Mod(*this, output);
 }
 
 const char *SyntaxNodeMod::GetResultRegName() {

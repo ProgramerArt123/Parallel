@@ -24,7 +24,7 @@ public:
 	void ElementMod(ParallelElement &element, std::unique_ptr<Output>& output);
 private:
 
-	void ComputeOne(const SyntaxNodeCompute &one, const char *instructions) override;
+	void ComputeOne(const SyntaxNodeCompute &one, const char *instructions, std::unique_ptr<Output>& output) override;
 
 };
 

@@ -46,6 +46,10 @@ public:
 	bool IsOutermost() const;
 	
 	SyntaxNodeScope *GetOuter() const;
+	
+	size_t SetResultPos(size_t pos);
+	
+	size_t GetResultPos() const;
 
 	virtual void OutputInstructions(std::unique_ptr<Output>& output);
 
@@ -76,6 +80,8 @@ protected:
 	uint64_t m_parallel_index = UINT64_MAX;
 
 	int m_line = 0;
+	
+	size_t m_result_pos = 0;
 
 protected:
 	friend class SerialOutput;

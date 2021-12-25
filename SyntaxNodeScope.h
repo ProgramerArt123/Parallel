@@ -70,6 +70,9 @@ public:
 	size_t PushArgument();
 	void PopArgument();
 	
+	size_t PushCache();
+	void PopCache();
+	
 	const size_t GetScopeStackTopOffset() const;
 protected:
 	bool IsProcExist(const char *name);
@@ -107,6 +110,7 @@ private:
 
 	std::stack<std::string> m_registers;
 	std::stack<std::string> m_arguments;
+	std::stack<std::string> m_caches;
 };
 
 #endif

@@ -12,8 +12,8 @@ int main() {
 		source->Parse();
 		std::unique_ptr<Output> serial(new SerialOutput("test1.s"));
 		source->OutputFile(serial);
-		std::unique_ptr<Output> parallel(new ParallelOutput("test2.s"));
-		source->OutputFile(parallel);
+		//std::unique_ptr<Output> parallel(new ParallelOutput("test2.s"));
+		//source->OutputFile(parallel);
 	}
 	catch (const std::string &e) {
 		std::cerr << e << std::endl;

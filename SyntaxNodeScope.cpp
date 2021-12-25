@@ -16,7 +16,7 @@ SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, const char *content) :
 
 void SyntaxNodeScope::PushAdd() {
 	printf("plus\n");
-	std::shared_ptr<SyntaxNode> current = std::shared_ptr<SyntaxNode>(new SyntaxNodeAdd());
+	std::shared_ptr<SyntaxNode> current(new SyntaxNodeAdd(*this));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -26,7 +26,7 @@ void SyntaxNodeScope::PushAdd() {
 
 void SyntaxNodeScope::PushSub() {
 	printf("sub\n");
-	std::shared_ptr<SyntaxNode> current = std::shared_ptr<SyntaxNode>(new SyntaxNodeSub());
+	std::shared_ptr<SyntaxNode> current(new SyntaxNodeSub(*this));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -35,7 +35,8 @@ void SyntaxNodeScope::PushSub() {
 }
 
 void SyntaxNodeScope::PushMul() {
-	printf("mul\n"); std::shared_ptr<SyntaxNode> current = std::shared_ptr<SyntaxNode>(new SyntaxNodeMul());
+	printf("mul\n"); 
+	std::shared_ptr<SyntaxNode> current(new SyntaxNodeMul(*this));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -44,7 +45,7 @@ void SyntaxNodeScope::PushMul() {
 }
 
 void SyntaxNodeScope::PushDiv() {
-	printf("div\n"); std::shared_ptr<SyntaxNode> current = std::shared_ptr<SyntaxNode>(new SyntaxNodeDiv());
+	printf("div\n"); std::shared_ptr<SyntaxNode> current(new SyntaxNodeDiv(*this));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -54,7 +55,7 @@ void SyntaxNodeScope::PushDiv() {
 
 void SyntaxNodeScope::PushMod() {
 	printf("mod\n");
-	std::shared_ptr<SyntaxNode> current = std::shared_ptr<SyntaxNode>(new SyntaxNodeMod());
+	std::shared_ptr<SyntaxNode> current(new SyntaxNodeMod(*this));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -64,7 +65,7 @@ void SyntaxNodeScope::PushMod() {
 
 void SyntaxNodeScope::PushBlock() {
 	printf("block\n");
-	std::shared_ptr<SyntaxNode> current = std::shared_ptr<SyntaxNode>(new SyntaxNode("()"));
+	std::shared_ptr<SyntaxNode> current(new SyntaxNode("()"));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	m_stack.push(current);
@@ -72,7 +73,7 @@ void SyntaxNodeScope::PushBlock() {
 
 void SyntaxNodeScope::PushNumber(int number) {
 	printf("+++%d\n", number);
-	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeNumber(number)));
+	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeNumber(*this, number)));
 }
 
 void SyntaxNodeScope::PushString(const char *itera) {
@@ -125,7 +126,7 @@ void SyntaxNodeScope::PushAssignmentStatement(const char *variable) {
 	if (!IsVariableParamExist(variable)) {
 		throw "Error:" + std::string(variable) + " undefined";
 	}
-	std::shared_ptr<SyntaxNode> assign = std::shared_ptr<SyntaxNode>(new SyntaxNodeAssignment(*this));
+	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this));
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
 	assign->AddChild(var);
 	assign->AddChild(m_stack.top());
@@ -166,7 +167,7 @@ void SyntaxNodeScope::PushLoopExit() {
 }
 
 void SyntaxNodeScope::AddArgment(uint64_t argment) {
-	std::shared_ptr<SyntaxNodeNumber> arg(new SyntaxNodeNumber(argment));
+	std::shared_ptr<SyntaxNodeNumber> arg(new SyntaxNodeNumber(*this, argment));
 	m_argments.push_back(arg);
 }
 
@@ -418,7 +419,8 @@ size_t SyntaxNodeScope::PushRegister(const char *reg) {
 size_t SyntaxNodeScope::PopRegister(std::string &reg) {
 	reg = m_registers.top();
 	m_registers.pop();
-	return GetScopeStackTopOffset();
+	size_t offset =  GetScopeStackTopOffset();
+	return offset;
 }
 
 size_t SyntaxNodeScope::PushArgument() {
@@ -431,9 +433,18 @@ void SyntaxNodeScope::PopArgument() {
 	m_arguments.pop();
 }
 
+size_t SyntaxNodeScope::PushCache() {
+	size_t offset = GetScopeStackTopOffset();
+	m_caches.push("");
+	return offset;
+}
+void SyntaxNodeScope::PopCache() {
+	m_caches.pop();
+}
+
 const size_t SyntaxNodeScope::GetCurrentPos() const {
 	return m_base_pos + m_parameters.size() + m_arguments.size() +
-		m_variables.size() + m_registers.size();
+		m_variables.size() + m_registers.size() + m_caches.size();
 }
 
 const size_t SyntaxNodeScope::GetScopeStackTopOffset() const {

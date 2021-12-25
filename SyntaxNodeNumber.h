@@ -5,11 +5,12 @@
 
 class SyntaxNodeNumber : public SyntaxNode {
 public:
-	explicit SyntaxNodeNumber(int value);
+	explicit SyntaxNodeNumber(SyntaxNodeScope &outer, int value);
 	virtual ~SyntaxNodeNumber();
-	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override {
-		return GENERATE_PARALLEL_RESULT_COMPLETED;
-	}
+	
+	void OutputInstructions(std::unique_ptr<Output>& output) override;
+	
+	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
 	const int GetValue();
 private:
 	int m_value;
