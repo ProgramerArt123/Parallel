@@ -1,8 +1,8 @@
-#include "SyntaxNodeProcCall.h"
 #include "common.h"
+#include "SyntaxNodeProcCall.h"
 
-SyntaxNodeProcCall::SyntaxNodeProcCall(const char *name, SyntaxNodeScope &scope):
-	SyntaxNode(name), m_scope(scope){
+SyntaxNodeProcCall::SyntaxNodeProcCall(SyntaxNodeScope &scope, const char *name):
+	SyntaxNode(scope, name){
 	m_type = SYNTAX_NODE_TYPE_PROC_CALL;
 }
 
@@ -38,7 +38,8 @@ GENERATE_PARALLEL_RESULT SyntaxNodeProcCall::GenerateParallel(const std::shared_
 }
 
 void SyntaxNodeProcCall::OutputInstructions(std::unique_ptr<Output>& output) {
-	m_scope.BeginCallGenerate(output, m_children);
+	GetOuter()->BeginCallGenerate(output, m_children);
 	PLATFORM.ProcCallGenerate(m_content.c_str(), output->GetStream());
-	m_scope.EndCallGenerate(output->GetStream(), m_children);
+	GetOuter()->EndCallGenerate(output->GetStream(), m_children);
+	output->GetStream() << '\t' << "movq	%rax, -" << SetResultPos(GetOuter()->PushCache()) << "(%rbp)" << std::endl;
 }

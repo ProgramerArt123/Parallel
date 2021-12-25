@@ -29,7 +29,7 @@ void SourceCodeFile::Parse() throw (std::string) {
 		fclose(in);
 	}
 	else {
-		throw "Error:" + m_file_name + "Open Failed!";
+		throw "Error:" + m_file_name + " Open Failed!";
 	}
 }
 

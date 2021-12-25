@@ -101,7 +101,7 @@ void SyntaxNodeScope::PushProcDefExit() {
 
 void SyntaxNodeScope::PushProcCallEnter(const char *name) {
 	printf("PushProcCallEnter\n");
-	m_proc_call = std::shared_ptr<SyntaxNodeProcCall>(new SyntaxNodeProcCall(name, *this));
+	m_proc_call = std::shared_ptr<SyntaxNodeProcCall>(new SyntaxNodeProcCall(*this, name));
 	m_stack.push(std::shared_ptr<SyntaxNode>(m_proc_call));
 }
 
@@ -148,7 +148,7 @@ void SyntaxNodeScope::DecalreVariable(const char *variable) {
 }
 
 void SyntaxNodeScope::PushReturn() {
-	std::shared_ptr<SyntaxNode> ret = std::shared_ptr<SyntaxNode>(new SyntaxNodeReturn());
+	std::shared_ptr<SyntaxNode> ret(new SyntaxNodeReturn(*this));
 	ret->AddChild(m_stack.top());
 	m_stack.pop();
 	AddChild(ret);

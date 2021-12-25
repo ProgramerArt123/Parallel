@@ -1,8 +1,8 @@
 #include "SyntaxNodeReturn.h"
 #include "common.h"
 
-SyntaxNodeReturn::SyntaxNodeReturn():
-	SyntaxNode("RETURN"){
+SyntaxNodeReturn::SyntaxNodeReturn(SyntaxNodeScope &outer):
+	SyntaxNode(outer, "RETURN"){
 	m_type = SYNTAX_NODE_TYPE_RETURN;
 }
 
@@ -15,12 +15,10 @@ void SyntaxNodeReturn::FindEffectives(std::shared_ptr<SyntaxNode> &self, std::se
 }
 
 void SyntaxNodeReturn::OutputInstructions(std::unique_ptr<Output>& output) {
-	SYNTAX_NODE_TYPE value = m_children.front()->GetType();
-	if (SYNTAX_NODE_TYPE_NUMBER == value) {
-		const int intValue = static_cast<SyntaxNodeNumber *>(m_children.front().get())->GetValue();
-		output->GetStream() << '\t' << "movq	$" << std::to_string(intValue) << ", %rax" << std::endl;
-	}
-	else {
-		
-	}
+	m_children.front()->OutputInstructions(output);
+	output->GetStream() << '\t' << "movq	-" << 
+		m_children.front()->GetResultPos() << "(%rbp), %rax" << std::endl;
+	GetOuter()->PopCache();
+	output->GetStream() << '\t' << "leave" << std::endl;
+	output->GetStream() << '\t' << "ret" << std::endl;
 }

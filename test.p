@@ -1,3 +1,11 @@
+int func1(){
+	return 99;
+};
+
+int func2(){
+	return 123;
+};
+
 int main(){
 		int x = 1 % 2 + 5 * 6 + 9 / 3;
 		int y = 1 % 2 + 5 * (6 + 9) / 3;
@@ -5,5 +13,7 @@ int main(){
         printf("x=%d, y=%d, z=%d\n", x, y, z);
 		z = 999;
 		printf("z=%d\n", z);
+		int w = func1();
+		printf("w=%d\n", w);
 		return 0;
 };
