@@ -7,7 +7,7 @@
 
 class SyntaxNodeString : public SyntaxNode {
 public:
-	explicit SyntaxNodeString(const char *litera);
+	explicit SyntaxNodeString(SyntaxNodeScope &outer, const char *litera);
 	virtual ~SyntaxNodeString();
 
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override {

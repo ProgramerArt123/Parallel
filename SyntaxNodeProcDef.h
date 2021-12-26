@@ -8,7 +8,7 @@ class SyntaxNodeVariable;
 
 class SyntaxNodeProcDef : public SyntaxNode {
 public:
-	explicit SyntaxNodeProcDef(const char *name, SyntaxNodeScope &outter);
+	explicit SyntaxNodeProcDef(SyntaxNodeScope &outter, const char *name);
 	virtual ~SyntaxNodeProcDef();
 
 	std::shared_ptr<SyntaxNodeScope> &GetBody();

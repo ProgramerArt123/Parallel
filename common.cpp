@@ -79,9 +79,9 @@ void AddParam(const char *param) {
 }
 
 void PushProcCallEnter(const char *name) {
-	source->m_scopes.top()->PushProcCallEnter(name);
+	source->m_scopes.push(source->m_scopes.top()->PushProcCallEnter(name));
 }
 
 void PushProcCallExit() {
-	source->m_scopes.top()->PushProcCallExit();
+	source->m_scopes.pop(); source->m_scopes.top()->PushProcCallExit();
 }

@@ -1,8 +1,8 @@
 #include "SyntaxNodeString.h"
 #include "common.h"
 
-SyntaxNodeString::SyntaxNodeString(const char *litera):
-	SyntaxNode(litera){
+SyntaxNodeString::SyntaxNodeString(SyntaxNodeScope &outer, const char *litera):
+	SyntaxNode(outer, litera){
 	m_type = SYNTAX_NODE_TYPE_STRING;
 }
 

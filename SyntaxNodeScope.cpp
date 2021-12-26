@@ -77,7 +77,7 @@ void SyntaxNodeScope::PushNumber(int number) {
 }
 
 void SyntaxNodeScope::PushString(const char *itera) {
-	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeString(itera)));
+	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeString(*this, itera)));
 }
 
 void SyntaxNodeScope::PushVariable(const char *name) {
@@ -89,8 +89,8 @@ void SyntaxNodeScope::PushVariable(const char *name) {
 
 std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcDefEnter(const char *name) {
 	printf("PushProcDefEnter\n");
-	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(name, *this);
-	std::shared_ptr<SyntaxNode> current = std::shared_ptr<SyntaxNode>(proc);
+	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(*this, name);
+	std::shared_ptr<SyntaxNode> current(proc);
 	m_stack.push(current);
 	return proc->GetBody();
 }
@@ -99,26 +99,22 @@ void SyntaxNodeScope::PushProcDefExit() {
 	printf("PushProcDefExit\n");
 }
 
-void SyntaxNodeScope::PushProcCallEnter(const char *name) {
+std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcCallEnter(const char *name) {
 	printf("PushProcCallEnter\n");
-	m_proc_call = std::shared_ptr<SyntaxNodeProcCall>(new SyntaxNodeProcCall(*this, name));
-	m_stack.push(std::shared_ptr<SyntaxNode>(m_proc_call));
+	SyntaxNodeProcCall *call = new SyntaxNodeProcCall(*this, name);
+	std::shared_ptr<SyntaxNode> current(call);
+	m_stack.push(current);
+	return call->GetArgments();
 }
 
 void SyntaxNodeScope::PushProcCallExit() {
-	m_proc_call.reset();
 	printf("PushProcCallExit\n");
 }
 
 void SyntaxNodeScope::PushStatement() {
 	SYNTAX_NODE_TYPE type = m_stack.top()->GetType();
 	const char *content = m_stack.top()->GetContent();
-	if (m_proc_call) {
-		m_proc_call->AddChild(m_stack.top());
-	}
-	else {
-		AddChild(m_stack.top());
-	}
+	AddChild(m_stack.top());
 	m_stack.pop();
 }
 
@@ -131,12 +127,7 @@ void SyntaxNodeScope::PushAssignmentStatement(const char *variable) {
 	assign->AddChild(var);
 	assign->AddChild(m_stack.top());
 	m_stack.pop();
-	if (m_proc_call) {
-		m_proc_call->AddChild(assign);
-	}
-	else {
-		AddChild(assign);
-	}
+	AddChild(assign);
 }
 
 void SyntaxNodeScope::DecalreVariable(const char *variable) {
@@ -202,74 +193,6 @@ void SyntaxNodeScope::DefGenerate(std::unique_ptr<Output>& output) {
 		index++;
 	}
 	OutputInstructions(output);
-}
-
-void SyntaxNodeScope::BeginCallGenerate(std::unique_ptr<Output>& output, std::list<std::shared_ptr<SyntaxNode>> &argments) {
-	uint32_t index = 0;
-
-	for (std::shared_ptr<SyntaxNode> &argment : argments) {
-		std::string dst;
-		if (index < PLATFORM.registersCount) {
-			dst = std::string("%") + PLATFORM.registers[index];
-		}
-		else {
-			dst = "-" + std::to_string(PushArgument()) + "(%rbp)";
-		}
-		if (index < PLATFORM.registersCount && 0 == strcmp(PLATFORM.registers[index], "rcx")) {
-			output->GetStream() << '\t' << "movq	" << dst << ", -" << std::to_string(PushRegister(dst.c_str())) << "(%rbp)" << std::endl;
-		}
-		switch (argment->GetType())
-		{
-		case SYNTAX_NODE_TYPE_NUMBER:
-		{
-			SyntaxNodeNumber *number = static_cast<SyntaxNodeNumber *>(argment.get());
-			output->GetStream() << '\t' << "movq	$" << number->GetValue() << ", " << dst << std::endl;
-		}
-		break;
-		case SYNTAX_NODE_TYPE_STRING:
-		{
-			SyntaxNodeString *string = static_cast<SyntaxNodeString *>(argment.get());
-			string->OutputInstructions(output);
-			PLATFORM.ProcStringArgmentGenerateSerial(string->GetNO(), dst.c_str(), output->GetStream());
-		}
-		break;
-		case SYNTAX_NODE_TYPE_VARIABLE:
-		{
-			SyntaxNodeVariable *variable = static_cast<SyntaxNodeVariable *>(argment.get());
-			output->GetStream() << '\t' << "movq	-" << variable->GetScopeStackTopOffset() << "(%rbp), " << dst << std::endl;
-		}
-		break;
-		default:
-			perror("Scope::BeginCallGenerate");
-			throw std::exception();
-			break;
-		}
-		index++;
-	}
-
-	if (GetSubProcOffset()) {
-		output->GetStream() << '\t' << "subq    $" << GetSubProcOffset() << ", %rsp" << std::endl;
-	}
-}
-
-void SyntaxNodeScope::EndCallGenerate(std::stringstream& output, std::list<std::shared_ptr<SyntaxNode>> &argments) {
-	if (GetSubProcOffset()) {
-		output << '\t' << "addq    $" << GetSubProcOffset() << ", %rsp" << std::endl;
-	}
-	uint32_t index = argments.size() - 1;
-	for (std::shared_ptr<SyntaxNode> &argment : argments) {
-		if (index < PLATFORM.registersCount) {
-			if (0 == strcmp(PLATFORM.registers[index], "rcx")) {
-				std::string dst;
-				size_t offset = PopRegister(dst);
-				output << '\t' << "movq	" << "-" << std::to_string(offset) << "(%rbp)," << dst << std::endl;
-			}
-		}
-		else {
-			PopArgument();
-		}
-		index--;
-	}
 }
 
 void SyntaxNodeScope::LoopGenerate(std::unique_ptr<Output>& output) {

@@ -3,7 +3,7 @@ int func1(){
 };
 
 int func2(){
-	return 123;
+	return 1234;
 };
 
 int main(){
@@ -15,5 +15,6 @@ int main(){
 		printf("z=%d\n", z);
 		int w = func1();
 		printf("w=%d\n", w);
+		printf("w2=%d,w=%d\n", func1() + func2() * 3, w);
 		return 0;
 };
