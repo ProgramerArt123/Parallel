@@ -4,7 +4,7 @@
 
 SyntaxNodeProcCall::SyntaxNodeProcCall(SyntaxNodeScope &scope, const char *name)
 	: SyntaxNode(scope, name)
-	, m_arguments(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(scope, name))) {
+	, m_arguments(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(scope, scope.GetProcDef(), name))) {
 	m_type = SYNTAX_NODE_TYPE_PROC_CALL;
 }
 

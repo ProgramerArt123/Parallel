@@ -24,3 +24,7 @@ GENERATE_PARALLEL_RESULT SyntaxNodeNumber::GenerateParallel(const std::shared_pt
 const int SyntaxNodeNumber::GetValue() {
 	return m_value;
 }
+
+bool SyntaxNodeNumber::IsSameDataType(DATA_TYPE_TYPE type) {
+	return DATA_TYPE_TYPE_INT == type;
+}

@@ -1,0 +1,10 @@
+#ifndef _DATA_TYPE_TYPE_H_
+#define _DATA_TYPE_TYPE_H_
+
+enum DATA_TYPE_TYPE {
+	DATA_TYPE_TYPE_NONE,
+	DATA_TYPE_TYPE_INT,
+	DATA_TYPE_TYPE_VOID,
+};
+
+#endif

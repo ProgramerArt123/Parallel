@@ -1,8 +1,8 @@
 #include "SyntaxNodeVariable.h"
 #include "common.h"
 
-SyntaxNodeVariable::SyntaxNodeVariable(SyntaxNodeScope &scope, const char *name, size_t pos):
-	SyntaxNode(scope, name), m_name(name), 
+SyntaxNodeVariable::SyntaxNodeVariable(SyntaxNodeScope &scope, const char *name, std::shared_ptr<DataType> &dataType, size_t pos):
+	SyntaxNode(scope, name), m_name(name), m_data_type(dataType),
 	m_scope_pos(pos){
 	m_type = SYNTAX_NODE_TYPE_VARIABLE;
 }

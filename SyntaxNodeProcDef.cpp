@@ -1,8 +1,8 @@
 #include "SyntaxNodeProcDef.h"
 #include "common.h"
 
-SyntaxNodeProcDef::SyntaxNodeProcDef(SyntaxNodeScope &outter, const char *name):
-	SyntaxNode(name),m_body(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(outter, name))) {
+SyntaxNodeProcDef::SyntaxNodeProcDef(SyntaxNodeScope &outter, const char *name, std::shared_ptr<DataType> &dataType):
+	SyntaxNode(name), m_body(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(outter, this, name))), m_data_type(dataType) {
 	m_type = SYNTAX_NODE_TYPE_PROC_DEF;
 }
 
@@ -59,6 +59,9 @@ void SyntaxNodeProcDef::OutputTail(std::stringstream& output) {
 
 }
 
+DATA_TYPE_TYPE SyntaxNodeProcDef::GetDataType() const {
+	return m_data_type->GetType();
+}
 std::ostream &operator<<(std::ostream &out, SyntaxNodeProcDef &def) {
 	out << *(SyntaxNode*)&def << std::endl;
 	out << def.m_body;

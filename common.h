@@ -19,10 +19,14 @@
 #include "SyntaxNodeLoop.h"
 #include "SyntaxNodeScope.h"
 #include "SourceCodeFile.h"
+#include "DataType.h"
+#include "DataTypeInt.h"
+#include "DataTypeVoid.h"
 #include "GCC_X86_64.h"
 #include "CLANG_X86_64.h"
-
 extern std::unique_ptr<SourceCodeFile> source;
+extern int yyget_lineno(void);
+extern char *yyget_text(void);
 
 #define PLATFORM CLANG_X86_64::GetInstance()
 

@@ -85,3 +85,7 @@ void PushProcCallEnter(const char *name) {
 void PushProcCallExit() {
 	source->m_scopes.pop(); source->m_scopes.top()->PushProcCallExit();
 }
+
+void PushType(const char *type){
+	source->m_scopes.top()->PushType(type);
+}

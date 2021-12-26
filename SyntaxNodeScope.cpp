@@ -8,8 +8,8 @@ SyntaxNodeScope::SyntaxNodeScope(const char *content) :
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
 
-SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, const char *content) :
-	SyntaxNode(outter, content),
+SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, const SyntaxNodeProcDef *proc, const char *content):
+	SyntaxNode(outter, content), m_proc(proc),
 	m_base_pos(outter.GetCurrentPos()),m_parallel(*this) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
@@ -89,7 +89,7 @@ void SyntaxNodeScope::PushVariable(const char *name) {
 
 std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcDefEnter(const char *name) {
 	printf("PushProcDefEnter\n");
-	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(*this, name);
+	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(*this, name, m_last_data_type);
 	std::shared_ptr<SyntaxNode> current(proc);
 	m_stack.push(current);
 	return proc->GetBody();
@@ -134,11 +134,13 @@ void SyntaxNodeScope::DecalreVariable(const char *variable) {
 	if (IsVariableParamExistInner(variable)) {
 		throw "Error:" + std::string(variable) + " redefined";
 	}
-	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this, variable, GetCurrentPos()));
+	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this, variable, m_last_data_type, GetCurrentPos()));
 	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(variable, varv));
 }
-
 void SyntaxNodeScope::PushReturn() {
+	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
+		throw std::string("Error:Type Error"); 
+	}
 	std::shared_ptr<SyntaxNode> ret(new SyntaxNodeReturn(*this));
 	ret->AddChild(m_stack.top());
 	m_stack.pop();
@@ -164,8 +166,20 @@ void SyntaxNodeScope::AddArgment(uint64_t argment) {
 
 void SyntaxNodeScope::AddParam(const char *param) {
 	std::shared_ptr<SyntaxNodeVariable> variable(
-		new SyntaxNodeVariable(*this, param, GetCurrentPos()));
+		new SyntaxNodeVariable(*this, param, m_last_data_type, GetCurrentPos()));
 	m_parameters.push_back(variable);
+}
+
+void SyntaxNodeScope::PushType(const char *type) {
+	if (0 == strcmp(type, "int")){		
+		m_last_data_type = std::shared_ptr<DataType>(new DataTypeInt());
+	}
+	else if (0 == strcmp(type, "void")) {		
+		m_last_data_type = std::shared_ptr<DataType>(new DataTypeVoid());
+	}
+	else{
+		throw "Error:" + std::string(type) + " undefined!";
+	}
 }
 
 void SyntaxNodeScope::OutputFile(std::unique_ptr<Output>& output) throw (std::exception) {
@@ -389,4 +403,16 @@ const size_t SyntaxNodeScope::GetParameterStackTopOffset(size_t index) const {
 		count = parametersCount - index + 1 + codePointer;
 	}
 	return count * 8;
+}
+
+const DATA_TYPE_TYPE SyntaxNodeScope::GetProcRetType()const{
+	return GetProcDef()->GetDataType();
+}
+
+const SyntaxNodeProcDef *SyntaxNodeScope::GetProcDef() const {
+	return m_proc;
+}
+
+bool SyntaxNodeScope::CheckDataType(DATA_TYPE_TYPE type, const std::shared_ptr<SyntaxNode> &node) {
+	return node->IsSameDataType(type);
 }

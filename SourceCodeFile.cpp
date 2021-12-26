@@ -3,12 +3,13 @@ void yyerror(char* e);
 #include "lex.yy.c"
 #include "y.tab.c"
 
+#include "common.h"
 #include "SyntaxNodeScope.h"
 #include "SourceCodeFile.h"
 
 void yyerror(char* e) {
-	throw std::string("Error=>line:") +
-		std::to_string(yyget_lineno()) + "," + e;
+	throw std::string("Error=>line:【") +
+		std::to_string(yyget_lineno()) + "】, near 【" + yyget_text() + "】 " + e;
 };
 
 SourceCodeFile::SourceCodeFile(const char *fileName):

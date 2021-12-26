@@ -1,16 +1,14 @@
-#include "SyntaxNode.h"
+#include "common.h"
 #include "Parallel.h"
 #include "SyntaxNodeProcDef.h"
-
-extern int yylineno;
-
+#include "SyntaxNode.h"
 SyntaxNode::SyntaxNode(const char *content, int priority) :
 	m_content(content){
-	m_line = yylineno;
+	m_line = yyget_lineno();
 }
 SyntaxNode::SyntaxNode(SyntaxNodeScope &outer, const char *content, int priority):
 	m_content(content), m_outer(&outer) {
-	m_line = yylineno;
+	m_line = yyget_lineno();
 }
 SyntaxNode::~SyntaxNode() {
 }
@@ -143,4 +141,7 @@ void SyntaxNode::OutputInstructions(std::unique_ptr<Output>& output) {
 	}
 }
 
+bool SyntaxNode::IsSameDataType(DATA_TYPE_TYPE type) {
+	return false;
+}
 

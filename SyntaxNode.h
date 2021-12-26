@@ -11,6 +11,7 @@
 #include "SyntaxNodeType.h"
 #include "GenerateParallelResult.h"
 #include "Output.h"
+#include "DataTypeType.h"
 
 class Parallel;
 class SyntaxNodeScope;
@@ -53,6 +54,8 @@ public:
 
 	virtual void OutputInstructions(std::unique_ptr<Output>& output);
 
+	virtual bool IsSameDataType(DATA_TYPE_TYPE type);
+	
 	friend std::ostream &operator<<(std::ostream &out, SyntaxNode &node);
 protected:
 

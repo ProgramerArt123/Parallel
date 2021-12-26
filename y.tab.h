@@ -1,11 +1,12 @@
 #define FOR 257
 #define INT 258
-#define RETURN 259
-#define STRING 260
-#define NAME 261
-#define NUMBER 262
-#define SEPARATE 263
-#define UMINUS 264
+#define VOID 259
+#define RETURN 260
+#define STRING 261
+#define NAME 262
+#define NUMBER 263
+#define SEPARATE 264
+#define UMINUS 265
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1

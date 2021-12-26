@@ -5,10 +5,11 @@
 #include "SyntaxNodeScope.h"
 
 class SyntaxNodeVariable;
+class DataType;
 
 class SyntaxNodeProcDef : public SyntaxNode {
 public:
-	explicit SyntaxNodeProcDef(SyntaxNodeScope &outter, const char *name);
+	explicit SyntaxNodeProcDef(SyntaxNodeScope &outter, const char *name, std::shared_ptr<DataType> &dataType);
 	virtual ~SyntaxNodeProcDef();
 
 	std::shared_ptr<SyntaxNodeScope> &GetBody();
@@ -18,16 +19,16 @@ public:
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 	friend std::ostream &operator<<(std::ostream &out, SyntaxNodeProcDef &def);
+	
+	DATA_TYPE_TYPE GetDataType()const;
 
 private:
 	void OutputHead(std::stringstream& output);
 	void OutputTail(std::stringstream& output);
-
 	unsigned int m_NO = 0;
 private:
 	std::shared_ptr<SyntaxNodeScope> m_body;
-	
+	const std::shared_ptr<DataType> m_data_type;
 };
-
 
 #endif

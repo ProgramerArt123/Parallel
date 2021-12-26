@@ -7,10 +7,9 @@ class SyntaxNodeAdd : public SyntaxNodeCompute {
 public:
 	explicit SyntaxNodeAdd(SyntaxNodeScope &outer);
 	virtual ~SyntaxNodeAdd();
-
+	
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
-
-
+	
 };
 
 

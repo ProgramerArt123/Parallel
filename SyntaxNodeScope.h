@@ -6,18 +6,19 @@
 #include <map>
 #include "SyntaxNode.h"
 #include "Parallel.h"
-
+#include "DataTypeType.h"
 class SyntaxNodeVariable ;
 class SyntaxNodeProcDef;
 class SyntaxNodeProcCall;
 class SyntaxNodeLoop;
 class SyntaxNodeNumber;
 class SyntaxNodeAssignment;
+class DataType;
 
 class SyntaxNodeScope : public SyntaxNode {
 public:
 	explicit SyntaxNodeScope(const char *content = "");
-	explicit SyntaxNodeScope(SyntaxNodeScope &outter, const char *content = "");
+	explicit SyntaxNodeScope(SyntaxNodeScope &outter, const SyntaxNodeProcDef *proc, const char *content = "");
 
 	void PushAdd();
 	void PushSub();
@@ -45,6 +46,8 @@ public:
 
 	void AddArgment(uint64_t argment);
 	void AddParam(const char *param);
+	
+	void PushType(const char *type);
 
 	void OutputFile(std::unique_ptr<Output>& output) throw (std::exception);
 
@@ -73,6 +76,10 @@ public:
 	const size_t GetScopeStackTopOffset() const;
 	
 	const size_t GetSubProcOffset() const;
+	
+	const SyntaxNodeProcDef *GetProcDef() const;
+	
+	bool CheckDataType(DATA_TYPE_TYPE type, const std::shared_ptr<SyntaxNode> &node);
 protected:
 	bool IsProcExist(const char *name);
 	bool IsVariableParamExistInner(const char *name)const;
@@ -83,7 +90,8 @@ protected:
 	bool IsParamExist(const char *name)const;
 	std::shared_ptr<SyntaxNodeVariable> GetVariableParam(const char *name);
 	size_t StatisticsAssginsCount();
-
+	
+	
 protected:
 	std::stack<std::shared_ptr<SyntaxNode>> m_stack;
 	std::map<std::string, std::shared_ptr<SyntaxNodeProcDef>> m_procs;
@@ -104,10 +112,15 @@ private:
 
 	const size_t GetCurrentPos() const;
 
-
+	const DATA_TYPE_TYPE GetProcRetType()const;
+	
 	std::stack<std::string> m_registers;
 	std::stack<std::string> m_arguments;
 	std::stack<std::string> m_caches;
+	
+	std::shared_ptr<DataType> m_last_data_type;
+	
+	const SyntaxNodeProcDef *m_proc = NULL;
 };
 
 #endif

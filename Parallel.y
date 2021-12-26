@@ -23,6 +23,7 @@ void PushProcDefExit();
 void AddParam(const char *param);
 void PushProcCallEnter(const char *name);
 void PushProcCallExit();
+void PushType(const char *type);
 %}
 
 %union {
@@ -31,6 +32,7 @@ void PushProcCallExit();
 }
 %token <strv> FOR
 %token <strv> INT
+%token <strv> VOID
 %token <strv> RETURN
 %token <strv> STRING
 %token <strv> NAME
@@ -50,9 +52,9 @@ statements:	statement SEPARATE
 statement:	loop			{ PushStatement();}
 	|	proc_def			{ PushStatement();}
 	|	RETURN expression	{ PushReturn();}
-	|	INT NAME '=' expression	{ DecalreVariable($2);PushAssignmentStatement($2);}
+	|	type NAME '=' expression	{ DecalreVariable($2);PushAssignmentStatement($2);}
 	|	NAME '=' expression	{ PushAssignmentStatement($1);}
-	|	INT NAME			{ DecalreVariable($2);}
+	|	type NAME			{ DecalreVariable($2);}
 	|	expression			{ PushStatement();}
 	;
 
@@ -91,7 +93,7 @@ loop_scope_exit: '}'		{ PushLoopExit(); }
 proc_def:  proc_def_block_enter parameters proc_def_block_exit proc_def_scope_enter statements proc_def_scope_exit	
 	;
 
-proc_def_block_enter: INT NAME '(' { PushProcDefEnter($2); }
+proc_def_block_enter: type NAME '(' { PushProcDefEnter($2); }
 	;
 
 proc_def_block_exit: ')'
@@ -103,8 +105,8 @@ proc_def_scope_enter: '{'
 proc_def_scope_exit: '}'		{ PushProcDefExit(); }
 	;
 
-parameters:	INT NAME					{ AddParam($2); }							
-	|	parameters SEPARATE INT NAME	{ AddParam($4); }							
+parameters:	type NAME					{ AddParam($2); }							
+	|	parameters SEPARATE type NAME	{ AddParam($4); }							
 	|													
 	;
 
@@ -120,6 +122,10 @@ proc_call_block_exit: ')'		{ PushProcCallExit();  }
 arguments:	statement
 	|	arguments SEPARATE statement
 	|
+	;
+
+type:	INT		{ PushType("int");}
+	|	VOID	{ PushType("void");}
 	;
 
 %%
