@@ -1,7 +1,10 @@
 #include "common.h"
 
 std::unique_ptr<SourceCodeFile> source;
-
+std::string error_info(const char *info){
+	return std::string("Error=>line:【") +
+		std::to_string(yyget_lineno()) + "】, near 【" + yyget_text() + "】 " + info;
+}
 void PushStatement() {
 	source->m_scopes.top()->PushStatement();
 }
@@ -17,7 +20,9 @@ void PushAssignmentStatement(const char *variable) {
 void DecalreVariable(const char *variable) {
 	source->m_scopes.top()->DecalreVariable(variable);
 }
-
+void PushAddAssign(const char *variable) {
+	source->m_scopes.top()->PushAddAssign(variable);
+}
 void PushAdd() {
 	source->m_scopes.top()->PushAdd();
 }

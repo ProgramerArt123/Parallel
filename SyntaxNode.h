@@ -56,6 +56,8 @@ public:
 
 	virtual bool IsSameDataType(DATA_TYPE_TYPE type);
 	
+	virtual void ArgmentCache(uint32_t index, std::unique_ptr<Output>& output);	
+	
 	friend std::ostream &operator<<(std::ostream &out, SyntaxNode &node);
 protected:
 
@@ -69,6 +71,7 @@ protected:
 		std::list<std::shared_ptr<SyntaxNode>>::iterator childItor);
 
 	void SetDeep(int deep);
+	
 
 public:
 	std::list<std::shared_ptr<SyntaxNode>> m_children;

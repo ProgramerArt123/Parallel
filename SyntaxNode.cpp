@@ -1,3 +1,4 @@
+#include <string.h>
 #include "common.h"
 #include "Parallel.h"
 #include "SyntaxNodeProcDef.h"
@@ -99,6 +100,22 @@ void SyntaxNode::SetDeep(int deep) {
 	for (std::shared_ptr<SyntaxNode> &child : m_children) {
 		child->SetDeep(m_deep + 1);
 	}
+}
+
+void SyntaxNode::ArgmentCache(uint32_t index, std::unique_ptr<Output>& output) {
+	std::string dst;
+	if (index < PLATFORM.registersCount) {
+		dst = std::string("%") + PLATFORM.registers[index];
+	}
+	else {
+		dst = "-" + std::to_string(GetOuter()->PushArgument()) + "(%rbp)";
+	}
+	if (index < PLATFORM.registersCount && 0 == strcmp(PLATFORM.registers[index], "rcx")) {
+		output->GetStream() << '\t' << "movq	" << dst << ", -" << 
+			GetOuter()->PushRegister(dst.c_str()) << "(%rbp)" << std::endl;
+	}
+	output->GetStream() << '\t' << "movq	-" <<  GetResultPos() << "(%rbp), " << dst << std::endl;
+	GetOuter()->PopCache();
 }
 
 const char* SyntaxNode::GetContent() {

@@ -1,7 +1,7 @@
 #include <fstream>
 #include <string.h>
-#include "SyntaxNodeScope.h"
 #include "common.h"
+#include "SyntaxNodeScope.h"
 
 SyntaxNodeScope::SyntaxNodeScope(const char *content) :
 	SyntaxNode(content),m_parallel(*this) {
@@ -13,7 +13,24 @@ SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, const SyntaxNodeProcDe
 	m_base_pos(outter.GetCurrentPos()),m_parallel(*this) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
-
+void SyntaxNodeScope::PushAddAssign(const char *variable) {
+	if (!IsVariableParamExist(variable)) {
+		throw "Error:" + std::string(variable) + " undefined";
+	}
+	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this));
+	std::shared_ptr<SyntaxNode> var = m_variables[variable];
+	assign->AddChild(var);
+	
+	std::shared_ptr<SyntaxNode> add(new SyntaxNodeAdd(*this));
+	add->AddChildFront(var);
+	add->AddChildFront(m_stack.top());
+	m_stack.pop();
+	
+	assign->AddChild(add);
+	
+	AddChild(assign);
+	
+}
 void SyntaxNodeScope::PushAdd() {
 	printf("plus\n");
 	std::shared_ptr<SyntaxNode> current(new SyntaxNodeAdd(*this));
@@ -139,7 +156,7 @@ void SyntaxNodeScope::DecalreVariable(const char *variable) {
 }
 void SyntaxNodeScope::PushReturn() {
 	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
-		throw std::string("Error:Type Error"); 
+		throw error_info("Type Error"); 
 	}
 	std::shared_ptr<SyntaxNode> ret(new SyntaxNodeReturn(*this));
 	ret->AddChild(m_stack.top());

@@ -8,8 +8,7 @@ void yyerror(char* e);
 #include "SourceCodeFile.h"
 
 void yyerror(char* e) {
-	throw std::string("Error=>line:【") +
-		std::to_string(yyget_lineno()) + "】, near 【" + yyget_text() + "】 " + e;
+	throw error_info(e);
 };
 
 SourceCodeFile::SourceCodeFile(const char *fileName):

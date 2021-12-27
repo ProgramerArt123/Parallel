@@ -59,25 +59,7 @@ void SyntaxNodeProcCall::BeginCallGenerate(std::unique_ptr<Output>& output) {
 	
 	uint32_t index = 0;
 	for (std::shared_ptr<SyntaxNode> &argment : GetArgments()->m_children) {
-		std::string dst;
-		if (index < PLATFORM.registersCount) {
-			dst = std::string("%") + PLATFORM.registers[index];
-		}
-		else {
-			dst = "-" + std::to_string(GetOuter()->PushArgument()) + "(%rbp)";
-		}
-		if (index < PLATFORM.registersCount && 0 == strcmp(PLATFORM.registers[index], "rcx")) {
-			output->GetStream() << '\t' << "movq	" << dst << ", -" << 
-				GetOuter()->PushRegister(dst.c_str()) << "(%rbp)" << std::endl;
-		}
-		if (SYNTAX_NODE_TYPE_STRING != argment->GetType()) {		
-			output->GetStream() << '\t' << "movq	-" <<  argment->GetResultPos() << "(%rbp), " << dst << std::endl;
-			argment->GetOuter()->PopCache();
-		}
-		else {
-			SyntaxNodeString *string = static_cast<SyntaxNodeString *>(argment.get());
-			PLATFORM.ProcStringArgmentGenerateSerial(string->GetNO(), dst.c_str(), output->GetStream());
-		}
+		argment->ArgmentCache(index, output);
 		index++;
 	}
 

@@ -17,6 +17,9 @@ public:
 	int GetNO();
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
+
+	void ArgmentCache(uint32_t index, std::unique_ptr<Output>& output) override;	
+
 private:
 	int m_NO;
 };

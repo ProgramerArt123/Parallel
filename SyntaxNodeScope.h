@@ -19,7 +19,7 @@ class SyntaxNodeScope : public SyntaxNode {
 public:
 	explicit SyntaxNodeScope(const char *content = "");
 	explicit SyntaxNodeScope(SyntaxNodeScope &outter, const SyntaxNodeProcDef *proc, const char *content = "");
-
+	void PushAddAssign(const char *variable);
 	void PushAdd();
 	void PushSub();
 	void PushMul();

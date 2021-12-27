@@ -6,6 +6,7 @@ void PushStatement();
 void PushReturn();
 void PushAssignmentStatement(const char *variable);
 void DecalreVariable(const char *variable);
+void PushAddAssign(const char *variable);
 void PushAdd();
 void PushSub();
 void PushMul();
@@ -34,10 +35,12 @@ void PushType(const char *type);
 %token <strv> INT
 %token <strv> VOID
 %token <strv> RETURN
+%token <strv> ADD_ASSIGN
 %token <strv> STRING
 %token <strv> NAME
 %token <intv> NUMBER
 %token SEPARATE
+%right ADD_ASSIGN
 %left '-' '+'
 %left '*' '/' '%'
 %nonassoc UMINUS
@@ -54,6 +57,7 @@ statement:	loop			{ PushStatement();}
 	|	RETURN expression	{ PushReturn();}
 	|	type NAME '=' expression	{ DecalreVariable($2);PushAssignmentStatement($2);}
 	|	NAME '=' expression	{ PushAssignmentStatement($1);}
+	|	NAME ADD_ASSIGN expression	{ PushAddAssign($1);}
 	|	type NAME			{ DecalreVariable($2);}
 	|	expression			{ PushStatement();}
 	;
