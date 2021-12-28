@@ -9,7 +9,7 @@ class ParallelOutput : public Output {
 public:
 	explicit ParallelOutput(const char *filePath);
 
-	void Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) override;
+	void Assignment(SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) override;
 
 	void ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) override;
 

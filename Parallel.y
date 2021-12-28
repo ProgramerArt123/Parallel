@@ -40,6 +40,7 @@ void PushType(const char *type);
 %token <strv> NAME
 %token <intv> NUMBER
 %token SEPARATE
+%right '='
 %right ADD_ASSIGN
 %left '-' '+'
 %left '*' '/' '%'
@@ -55,14 +56,14 @@ statements:	statement SEPARATE
 statement:	loop			{ PushStatement();}
 	|	proc_def			{ PushStatement();}
 	|	RETURN expression	{ PushReturn();}
-	|	type NAME '=' expression	{ DecalreVariable($2);PushAssignmentStatement($2);}
-	|	NAME '=' expression	{ PushAssignmentStatement($1);}
-	|	NAME ADD_ASSIGN expression	{ PushAddAssign($1);}
+	|	type NAME '=' expression	{ DecalreVariable($2);PushAssignmentStatement($2); PushStatement();}
 	|	type NAME			{ DecalreVariable($2);}
 	|	expression			{ PushStatement();}
 	;
 
-expression:	expression '+' expression 	{ $$ = $1 + $3; PushAdd();}
+expression: NAME '=' expression			{ PushAssignmentStatement($1);} 
+	|	NAME ADD_ASSIGN expression		{ PushAddAssign($1);}	
+	|	expression '+' expression		{ $$ = $1 + $3; PushAdd();}
 	|	expression '-' expression 		{ $$ = $1 - $3; PushSub();}
 	|	expression '*' expression 		{ $$ = $1 * $3; PushMul();}
 	|	expression '/' expression 		{ $$ = $1 / $3; PushDiv();}

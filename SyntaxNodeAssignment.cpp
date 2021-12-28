@@ -3,7 +3,7 @@
 #include "common.h"
 
 SyntaxNodeAssignment::SyntaxNodeAssignment(SyntaxNodeScope &scope):
-	SyntaxNode("="), m_scope(scope){
+	SyntaxNode(scope, "="){
 	m_type = SYNTAX_NODE_TYPE_ASSIGNMENT;
 }
 

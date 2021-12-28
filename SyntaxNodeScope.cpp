@@ -28,7 +28,7 @@ void SyntaxNodeScope::PushAddAssign(const char *variable) {
 	
 	assign->AddChild(add);
 	
-	AddChild(assign);
+	m_stack.push(assign);
 	
 }
 void SyntaxNodeScope::PushAdd() {
@@ -144,7 +144,8 @@ void SyntaxNodeScope::PushAssignmentStatement(const char *variable) {
 	assign->AddChild(var);
 	assign->AddChild(m_stack.top());
 	m_stack.pop();
-	AddChild(assign);
+	
+	m_stack.push(assign);
 }
 
 void SyntaxNodeScope::DecalreVariable(const char *variable) {

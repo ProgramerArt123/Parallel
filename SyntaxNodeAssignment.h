@@ -14,8 +14,6 @@ public:
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 	
-private:
-	SyntaxNodeScope &m_scope;
 };
 
 

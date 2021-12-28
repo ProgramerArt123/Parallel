@@ -38,7 +38,7 @@ void ParallelOutput::ComputeOne(const SyntaxNodeCompute &one, const char *instru
 	}
 }
 
-void ParallelOutput::Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) {
+void ParallelOutput::Assignment(SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) {
 	SyntaxNodeVariable *variable = static_cast<SyntaxNodeVariable *>(assign.m_children.front().get());
 	SyntaxNode *value = assign.m_children.back().get();
 	if (SYNTAX_NODE_TYPE_NUMBER == value->GetType()) {

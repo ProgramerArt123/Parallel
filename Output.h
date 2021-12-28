@@ -30,7 +30,7 @@ public:
 	void Mul(SyntaxNodeMul &mul, std::unique_ptr<Output>& output);
 	void Div(SyntaxNodeDiv &div, std::unique_ptr<Output>& output);
 	void Mod(SyntaxNodeMod &mod, std::unique_ptr<Output>& output);
-	virtual void Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) = 0;
+	virtual void Assignment(SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) = 0;
 
 	virtual void ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) = 0;
 

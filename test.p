@@ -20,8 +20,10 @@ int main(){
 		int w = func1();
 		printf("w=%d\n", w);
 		printf("w2=%d,w=%d\n", func1() + func2() * 3, w);
-		w += 99;
-		printf("w3=%d\n", w);
+		int a = w += 99;
+		printf("a=%d, w3=%d\n", a, w);
+		int c = a = 100;
+		printf("a=%d, c=%d\n", a, c);
 		func3();
 		return 0;
 };

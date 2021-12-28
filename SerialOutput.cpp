@@ -27,12 +27,14 @@ void SerialOutput::ComputeOne(const SyntaxNodeCompute &one, const char *instruct
 	m_output << '\t' << instructions << "	%rdx, %rax" << std::endl;
 }
 
-void SerialOutput::Assignment(const SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) {
+void SerialOutput::Assignment(SyntaxNodeAssignment &assign, std::unique_ptr<Output>& output) {
 	SyntaxNodeVariable *variable = static_cast<SyntaxNodeVariable *>(assign.m_children.front().get());
 	assign.m_children.back()->OutputInstructions(output);
 	output->GetStream() << '\t' << "movq	-" << 
 		assign.m_children.back()->GetResultPos() << "(%rbp), %rax" << std::endl;
 	m_output << '\t' << "movq	%rax, -" << variable->GetScopeStackTopOffset() << "(%rbp)" << std::endl;
+	output->GetStream() << '\t' << "movq	%rax, -" << 
+		assign.SetResultPos(assign.GetOuter()->PushCache()) << "(%rbp)" << std::endl;
 }
 
 void SerialOutput::ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) {
