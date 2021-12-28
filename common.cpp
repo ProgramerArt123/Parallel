@@ -42,7 +42,9 @@ void PushDiv() {
 void PushMod() {
 	source->m_scopes.top()->PushMod();
 }
-
+void PushInc(const char *variable, bool isRight) {
+	source->m_scopes.top()->PushInc(variable, isRight);
+}
 void PushBlock() {
 	source->m_scopes.top()->PushBlock();
 }

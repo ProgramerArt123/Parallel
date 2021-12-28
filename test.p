@@ -24,6 +24,8 @@ int main(){
 		printf("a=%d, w3=%d\n", a, w);
 		int c = a = 100;
 		printf("a=%d, c=%d\n", a, c);
+		c ++;
+		printf("c=%d\n", c);
 		func3();
 		return 0;
 };

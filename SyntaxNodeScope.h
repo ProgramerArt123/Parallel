@@ -25,6 +25,7 @@ public:
 	void PushMul();
 	void PushDiv();
 	void PushMod();
+	void PushInc(const char *variable, bool isRight);
 	void PushBlock();
 	void PushNumber(int number);
 	void PushString(const char *itera);

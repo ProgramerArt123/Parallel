@@ -12,6 +12,7 @@ void PushSub();
 void PushMul();
 void PushDiv();
 void PushMod();
+void PushInc(const char *variable, bool isRight);
 void PushBlock();
 void PushString(const char *itera);
 void PushNumber(int number);
@@ -25,6 +26,7 @@ void AddParam(const char *param);
 void PushProcCallEnter(const char *name);
 void PushProcCallExit();
 void PushType(const char *type);
+
 %}
 
 %union {
@@ -36,6 +38,7 @@ void PushType(const char *type);
 %token <strv> VOID
 %token <strv> RETURN
 %token <strv> ADD_ASSIGN
+%token <strv> INC
 %token <strv> STRING
 %token <strv> NAME
 %token <intv> NUMBER
@@ -45,6 +48,7 @@ void PushType(const char *type);
 %left '-' '+'
 %left '*' '/' '%'
 %nonassoc UMINUS
+%right INC
 
 %type <intv> expression
 
@@ -68,6 +72,7 @@ expression: NAME '=' expression			{ PushAssignmentStatement($1);}
 	|	expression '*' expression 		{ $$ = $1 * $3; PushMul();}
 	|	expression '/' expression 		{ $$ = $1 / $3; PushDiv();}
 	|	expression '%' expression 		{ $$ = $1 % $3; PushMod();}
+	|	NAME INC						{ PushInc($1, true);}
 	|   '-' expression %prec UMINUS  	{ $$ = -$2; printf("---%d\n", $$);} 
 	|	'(' expression ')'				{ $$ = $2; PushBlock();}
 	|	STRING							{ PushString($1);}

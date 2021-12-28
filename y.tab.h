@@ -3,11 +3,12 @@
 #define VOID 259
 #define RETURN 260
 #define ADD_ASSIGN 261
-#define STRING 262
-#define NAME 263
-#define NUMBER 264
-#define SEPARATE 265
-#define UMINUS 266
+#define INC 262
+#define STRING 263
+#define NAME 264
+#define NUMBER 265
+#define SEPARATE 266
+#define UMINUS 267
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
