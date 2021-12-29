@@ -11,6 +11,7 @@
 #include "SyntaxNodeMul.h"
 #include "SyntaxNodeDiv.h"
 #include "SyntaxNodeMod.h"
+#include "SyntaxNodeInc.h"
 #include "SyntaxNodeProcDef.h"
 #include "SyntaxNodeProcCall.h"
 #include "SyntaxNodeAssignment.h"

@@ -48,7 +48,7 @@ void PushType(const char *type);
 %left '-' '+'
 %left '*' '/' '%'
 %nonassoc UMINUS
-%right INC
+%nonassoc INC
 
 %type <intv> expression
 
@@ -72,6 +72,7 @@ expression: NAME '=' expression			{ PushAssignmentStatement($1);}
 	|	expression '*' expression 		{ $$ = $1 * $3; PushMul();}
 	|	expression '/' expression 		{ $$ = $1 / $3; PushDiv();}
 	|	expression '%' expression 		{ $$ = $1 % $3; PushMod();}
+	|	INC NAME %prec UMINUS 			{ PushInc($2, false);}
 	|	NAME INC						{ PushInc($1, true);}
 	|   '-' expression %prec UMINUS  	{ $$ = -$2; printf("---%d\n", $$);} 
 	|	'(' expression ')'				{ $$ = $2; PushBlock();}

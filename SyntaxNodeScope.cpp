@@ -82,21 +82,12 @@ void SyntaxNodeScope::PushMod() {
 
 void SyntaxNodeScope::PushInc(const char *variable, bool isRight) {
 	if (!IsVariableParamExist(variable)) {
-		throw "Error:" + std::string(variable) + " undefined";
-	}
-	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this));
+		throw error_info((std::string(variable) + " undefined").c_str());
+	}	
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
-	assign->AddChild(var);
-	
-	std::shared_ptr<SyntaxNode> add(new SyntaxNodeAdd(*this));
-	add->AddChildFront(var);
-	
-	std::shared_ptr<SyntaxNode> one(new SyntaxNodeNumber(*this, 1));
-	add->AddChildFront(one);
-		
-	assign->AddChild(add);
-	
-	m_stack.push(assign);
+	std::shared_ptr<SyntaxNode> inc(new SyntaxNodeInc(*this, isRight));
+	inc->AddChild(var);
+	m_stack.push(inc);
 }
 
 void SyntaxNodeScope::PushBlock() {

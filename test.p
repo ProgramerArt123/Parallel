@@ -26,6 +26,10 @@ int main(){
 		printf("a=%d, c=%d\n", a, c);
 		c ++;
 		printf("c=%d\n", c);
+		int d = 123;
+		int e = d ++;
+		int f = ++ d;
+		printf("e=%d,f=%d\n", e, f);
 		func3();
 		return 0;
 };
