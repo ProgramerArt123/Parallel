@@ -25,13 +25,13 @@ public:
 	void PushMul();
 	void PushDiv();
 	void PushMod();
-	void PushInc(const char *variable, bool isRight);
+	void PushInc(const char *variable, bool isBack);
 	void PushBlock();
 	void PushNumber(int number);
 	void PushString(const char *itera);
 	void PushVariable(const char *name);
 	
-	std::shared_ptr<SyntaxNodeScope> &PushProcDefEnter(const char *name);
+	std::shared_ptr<SyntaxNodeScope> &PushProcDefEnter(const char *name, bool isConst);
 	void PushProcDefExit();
 
 	std::shared_ptr<SyntaxNodeScope> &PushProcCallEnter(const char *name);
@@ -39,14 +39,15 @@ public:
 
 	void PushStatement();
 	void PushAssignmentStatement(const char *variable);
-	void DecalreVariable(const char *variable);
+	void PushInitStatement(const char *variable);
+	void DecalreVariable(const char *variable, bool isConst);
 	void PushReturn();
 
 	std::shared_ptr<SyntaxNodeScope> &PushLoopEnter();
 	void PushLoopExit();
 
 	void AddArgment(uint64_t argment);
-	void AddParam(const char *param);
+	void AddParam(const char *param, bool isConst);
 	
 	void PushType(const char *type);
 

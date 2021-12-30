@@ -30,6 +30,9 @@ int main(){
 		int e = d ++;
 		int f = ++ d;
 		printf("e=%d,f=%d\n", e, f);
+		const int i = 0;
+		int const j = 0;
+		printf("i=%d,j=%d\n", i, j);
 		func3();
 		return 0;
 };

@@ -28,7 +28,7 @@
 extern std::unique_ptr<SourceCodeFile> source;
 extern int yyget_lineno(void);
 extern char *yyget_text(void);
-std::string error_info(const char *info);
+std::string error_info(std::string info);
 
 #define PLATFORM CLANG_X86_64::GetInstance()
 

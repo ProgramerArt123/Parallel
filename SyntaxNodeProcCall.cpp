@@ -59,8 +59,7 @@ void SyntaxNodeProcCall::BeginCallGenerate(std::unique_ptr<Output>& output) {
 	
 	uint32_t index = 0;
 	for (std::shared_ptr<SyntaxNode> &argment : GetArgments()->m_children) {
-		argment->ArgmentCache(index, output);
-		index++;
+		argment->ArgmentCache(index++, output);
 	}
 
 	if (GetOuter()->GetSubProcOffset()) {

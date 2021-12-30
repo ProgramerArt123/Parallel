@@ -9,9 +9,10 @@ class DataType;
 
 class SyntaxNodeProcDef : public SyntaxNode {
 public:
-	explicit SyntaxNodeProcDef(SyntaxNodeScope &outter, const char *name, std::shared_ptr<DataType> &dataType);
+	explicit SyntaxNodeProcDef(SyntaxNodeScope &outter, const char *name, 
+		std::shared_ptr<DataType> dataType, bool isConst);
 	virtual ~SyntaxNodeProcDef();
-
+	
 	std::shared_ptr<SyntaxNodeScope> &GetBody();
 	
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;
@@ -29,6 +30,7 @@ private:
 private:
 	std::shared_ptr<SyntaxNodeScope> m_body;
 	const std::shared_ptr<DataType> m_data_type;
+	const bool m_is_const = false;
 };
 
 #endif

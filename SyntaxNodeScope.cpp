@@ -80,12 +80,12 @@ void SyntaxNodeScope::PushMod() {
 	m_stack.push(current);
 }
 
-void SyntaxNodeScope::PushInc(const char *variable, bool isRight) {
+void SyntaxNodeScope::PushInc(const char *variable, bool isBack) {
 	if (!IsVariableParamExist(variable)) {
-		throw error_info((std::string(variable) + " undefined").c_str());
+		throw error_info(std::string(variable) + " undefined");
 	}	
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
-	std::shared_ptr<SyntaxNode> inc(new SyntaxNodeInc(*this, isRight));
+	std::shared_ptr<SyntaxNode> inc(new SyntaxNodeInc(*this, isBack));
 	inc->AddChild(var);
 	m_stack.push(inc);
 }
@@ -114,9 +114,9 @@ void SyntaxNodeScope::PushVariable(const char *name) {
 	m_stack.push(GetVariableParam(name));
 }
 
-std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcDefEnter(const char *name) {
+std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcDefEnter(const char *name, bool isConst) {
 	printf("PushProcDefEnter\n");
-	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(*this, name, m_last_data_type);
+	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(*this, name, m_last_data_type, isConst);
 	std::shared_ptr<SyntaxNode> current(proc);
 	m_stack.push(current);
 	return proc->GetBody();
@@ -147,10 +147,25 @@ void SyntaxNodeScope::PushStatement() {
 
 void SyntaxNodeScope::PushAssignmentStatement(const char *variable) {
 	if (!IsVariableParamExist(variable)) {
-		throw "Error:" + std::string(variable) + " undefined";
+		throw error_info(std::string(variable) + " undefined");
+	}
+	std::shared_ptr<SyntaxNode> var = GetVariableParam(variable);
+	if (static_cast<SyntaxNodeVariable *>(var.get())->IsConst()) {
+		throw error_info(std::string(variable) + " is const, can not be assgin");
 	}
 	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this));
-	std::shared_ptr<SyntaxNode> var = m_variables[variable];
+	assign->AddChild(var);
+	assign->AddChild(m_stack.top());
+	m_stack.pop();
+	
+	m_stack.push(assign);
+}
+void SyntaxNodeScope::PushInitStatement(const char *variable) {
+	if (!IsVariableParamExist(variable)) {
+		throw error_info(std::string(variable) + " undefined");
+	}
+	std::shared_ptr<SyntaxNode> var = GetVariableParam(variable);
+	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this));
 	assign->AddChild(var);
 	assign->AddChild(m_stack.top());
 	m_stack.pop();
@@ -158,11 +173,12 @@ void SyntaxNodeScope::PushAssignmentStatement(const char *variable) {
 	m_stack.push(assign);
 }
 
-void SyntaxNodeScope::DecalreVariable(const char *variable) {
+void SyntaxNodeScope::DecalreVariable(const char *variable, bool isConst) {
 	if (IsVariableParamExistInner(variable)) {
 		throw "Error:" + std::string(variable) + " redefined";
 	}
-	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this, variable, m_last_data_type, GetCurrentPos()));
+	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this, variable, 
+		m_last_data_type, isConst, GetCurrentPos()));
 	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(variable, varv));
 }
 void SyntaxNodeScope::PushReturn() {
@@ -192,9 +208,9 @@ void SyntaxNodeScope::AddArgment(uint64_t argment) {
 	m_argments.push_back(arg);
 }
 
-void SyntaxNodeScope::AddParam(const char *param) {
+void SyntaxNodeScope::AddParam(const char *param, bool isConst) {
 	std::shared_ptr<SyntaxNodeVariable> variable(
-		new SyntaxNodeVariable(*this, param, m_last_data_type, GetCurrentPos()));
+		new SyntaxNodeVariable(*this, param, m_last_data_type, isConst, GetCurrentPos()));
 	m_parameters.push_back(variable);
 }
 
@@ -205,8 +221,8 @@ void SyntaxNodeScope::PushType(const char *type) {
 	else if (0 == strcmp(type, "void")) {		
 		m_last_data_type = std::shared_ptr<DataType>(new DataTypeVoid());
 	}
-	else{
-		throw "Error:" + std::string(type) + " undefined!";
+	else {
+		throw error_info(std::string(type) + " undefined");
 	}
 }
 
@@ -436,6 +452,7 @@ const size_t SyntaxNodeScope::GetParameterStackTopOffset(size_t index) const {
 const DATA_TYPE_TYPE SyntaxNodeScope::GetProcRetType()const{
 	return GetProcDef()->GetDataType();
 }
+
 
 const SyntaxNodeProcDef *SyntaxNodeScope::GetProcDef() const {
 	return m_proc;

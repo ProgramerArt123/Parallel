@@ -2,8 +2,9 @@
 
 #include "SyntaxNodeInc.h"
 
-SyntaxNodeInc::SyntaxNodeInc(SyntaxNodeScope &outer, bool isRight):
-	SyntaxNodeCompute(outer, "++"), m_is_right(isRight){
+SyntaxNodeInc::SyntaxNodeInc(SyntaxNodeScope &outer, bool isBack)
+	: SyntaxNodeCompute(outer, "++")
+	, m_is_back(isBack) {
 	m_type = SYNTAX_NODE_TYPE_INC;
 }
 
@@ -17,7 +18,7 @@ void SyntaxNodeInc::OutputInstructions(std::unique_ptr<Output>& output) {
 	output->GetStream() << '\t' << "movq	-" << 
 		m_children.front()->GetResultPos() << "(%rbp), %rax" << std::endl;
 	GetOuter()->PopCache();
-	if (m_is_right){		
+	if (m_is_back){		
 		output->GetStream() << '\t' << "movq	%rax, -" << 
 			SetResultPos(GetOuter()->PushCache()) << "(%rbp)" << std::endl;
 		output->GetStream() << "\taddq	$1, %rax" << std::endl;

@@ -5,14 +5,15 @@
 void PushStatement();
 void PushReturn();
 void PushAssignmentStatement(const char *variable);
-void DecalreVariable(const char *variable);
+void PushInitStatement(const char *variable);
+void DecalreVariable(const char *variable, bool isConst);
 void PushAddAssign(const char *variable);
 void PushAdd();
 void PushSub();
 void PushMul();
 void PushDiv();
 void PushMod();
-void PushInc(const char *variable, bool isRight);
+void PushInc(const char *variable, bool isBack);
 void PushBlock();
 void PushString(const char *itera);
 void PushNumber(int number);
@@ -20,9 +21,9 @@ void PushVariable(const char *name);
 void AddArgment(uint64_t argment);
 void PushLoopEnter();
 void PushLoopExit();
-void PushProcDefEnter(const char *name);
+void PushProcDefEnter(const char *name, bool isConst);
 void PushProcDefExit();
-void AddParam(const char *param);
+void AddParam(const char *param, bool isConst);
 void PushProcCallEnter(const char *name);
 void PushProcCallExit();
 void PushType(const char *type);
@@ -37,6 +38,7 @@ void PushType(const char *type);
 %token <strv> INT
 %token <strv> VOID
 %token <strv> RETURN
+%token <strv> CONST
 %token <strv> ADD_ASSIGN
 %token <strv> INC
 %token <strv> STRING
@@ -60,8 +62,10 @@ statements:	statement SEPARATE
 statement:	loop			{ PushStatement();}
 	|	proc_def			{ PushStatement();}
 	|	RETURN expression	{ PushReturn();}
-	|	type NAME '=' expression	{ DecalreVariable($2);PushAssignmentStatement($2); PushStatement();}
-	|	type NAME			{ DecalreVariable($2);}
+	|	CONST type NAME '=' expression	{ DecalreVariable($3, true);PushInitStatement($3); PushStatement();}
+	|	type CONST NAME '=' expression	{ DecalreVariable($3, true);PushInitStatement($3); PushStatement();}
+	|	type NAME '=' expression	{ DecalreVariable($2, false);PushInitStatement($2); PushStatement();}
+	|	type NAME			{ DecalreVariable($2, false);}
 	|	expression			{ PushStatement();}
 	;
 
@@ -104,7 +108,8 @@ loop_scope_exit: '}'		{ PushLoopExit(); }
 proc_def:  proc_def_block_enter parameters proc_def_block_exit proc_def_scope_enter statements proc_def_scope_exit	
 	;
 
-proc_def_block_enter: type NAME '(' { PushProcDefEnter($2); }
+proc_def_block_enter: CONST type NAME '(' { PushProcDefEnter($3, true); }
+	|	type NAME '(' { PushProcDefEnter($2, false); }
 	;
 
 proc_def_block_exit: ')'
@@ -116,8 +121,12 @@ proc_def_scope_enter: '{'
 proc_def_scope_exit: '}'		{ PushProcDefExit(); }
 	;
 
-parameters:	type NAME					{ AddParam($2); }							
-	|	parameters SEPARATE type NAME	{ AddParam($4); }							
+parameters:	CONST type NAME				{ AddParam($3, true); }
+	|	type CONST NAME					{ AddParam($3, true); }
+	|	type NAME						{ AddParam($2, false); }
+	|	parameters SEPARATE CONST type NAME	{ AddParam($5, true); }	
+	|	parameters SEPARATE type CONST NAME	{ AddParam($5, true); }	
+	|	parameters SEPARATE type NAME	{ AddParam($4, false); }							
 	|													
 	;
 
@@ -138,5 +147,6 @@ arguments:	statement
 type:	INT		{ PushType("int");}
 	|	VOID	{ PushType("void");}
 	;
+
 
 %%

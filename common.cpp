@@ -1,9 +1,8 @@
 #include "common.h"
 
 std::unique_ptr<SourceCodeFile> source;
-std::string error_info(const char *info){
-	return std::string("Error=>line:【") +
-		std::to_string(yyget_lineno()) + "】, near 【" + yyget_text() + "】 " + info;
+std::string error_info(std::string info) {
+	return "Error=>line:【" + std::to_string(yyget_lineno()) + "】, near 【" + yyget_text() + "】 " + info;
 }
 void PushStatement() {
 	source->m_scopes.top()->PushStatement();
@@ -16,9 +15,11 @@ void PushReturn() {
 void PushAssignmentStatement(const char *variable) {
 	source->m_scopes.top()->PushAssignmentStatement(variable);
 }
-
-void DecalreVariable(const char *variable) {
-	source->m_scopes.top()->DecalreVariable(variable);
+void PushInitStatement(const char *variable) {
+	source->m_scopes.top()->PushInitStatement(variable);
+}
+void DecalreVariable(const char *variable, bool isConst) {
+	source->m_scopes.top()->DecalreVariable(variable, isConst);
 }
 void PushAddAssign(const char *variable) {
 	source->m_scopes.top()->PushAddAssign(variable);
@@ -42,8 +43,8 @@ void PushDiv() {
 void PushMod() {
 	source->m_scopes.top()->PushMod();
 }
-void PushInc(const char *variable, bool isRight) {
-	source->m_scopes.top()->PushInc(variable, isRight);
+void PushInc(const char *variable, bool isBack) {
+	source->m_scopes.top()->PushInc(variable, isBack);
 }
 void PushBlock() {
 	source->m_scopes.top()->PushBlock();
@@ -73,16 +74,16 @@ void PushLoopExit() {
 	source->m_scopes.pop(); source->m_scopes.top()->PushLoopExit();
 }
 
-void PushProcDefEnter(const char *name) {
-	source->m_scopes.push(source->m_scopes.top()->PushProcDefEnter(name));
+void PushProcDefEnter(const char *name, bool isConst) {
+	source->m_scopes.push(source->m_scopes.top()->PushProcDefEnter(name, isConst));
 }
 
 void PushProcDefExit() {
 	source->m_scopes.pop(); source->m_scopes.top()->PushProcDefExit();
 }
 
-void AddParam(const char *param) {
-	source->m_scopes.top()->AddParam(param);
+void AddParam(const char *param, bool isConst) {
+	source->m_scopes.top()->AddParam(param, isConst);
 }
 
 void PushProcCallEnter(const char *name) {

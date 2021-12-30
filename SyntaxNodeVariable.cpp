@@ -1,9 +1,10 @@
 #include "SyntaxNodeVariable.h"
 #include "common.h"
 
-SyntaxNodeVariable::SyntaxNodeVariable(SyntaxNodeScope &scope, const char *name, std::shared_ptr<DataType> &dataType, size_t pos):
+SyntaxNodeVariable::SyntaxNodeVariable(SyntaxNodeScope &scope, const char *name, 
+	std::shared_ptr<DataType> dataType, bool isConst, size_t pos):
 	SyntaxNode(scope, name), m_name(name), m_data_type(dataType),
-	m_scope_pos(pos){
+	m_scope_pos(pos), m_is_const(isConst){
 	m_type = SYNTAX_NODE_TYPE_VARIABLE;
 }
 
@@ -44,4 +45,8 @@ const size_t SyntaxNodeVariable::GetScopeStackTopOffset()const {
 
 std::shared_ptr<SyntaxNodeAssignment> SyntaxNodeVariable::GetLastAssign() {
 	return m_outer->GetLastAssign(m_content.c_str(), m_generate_line);
+}
+
+bool SyntaxNodeVariable::IsConst() const{
+	return m_is_const;
 }

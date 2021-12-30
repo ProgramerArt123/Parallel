@@ -2,13 +2,14 @@
 #define INT 258
 #define VOID 259
 #define RETURN 260
-#define ADD_ASSIGN 261
-#define INC 262
-#define STRING 263
-#define NAME 264
-#define NUMBER 265
-#define SEPARATE 266
-#define UMINUS 267
+#define CONST 261
+#define ADD_ASSIGN 262
+#define INC 263
+#define STRING 264
+#define NAME 265
+#define NUMBER 266
+#define SEPARATE 267
+#define UMINUS 268
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1

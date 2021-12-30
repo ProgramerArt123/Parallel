@@ -7,6 +7,7 @@ for						{ return FOR; }
 int						{ return INT; }
 void					{ return VOID; }
 return					{ return RETURN; }
+const					{ return CONST; }
 \+=						{ return ADD_ASSIGN; }
 \+\+					{ return INC; }
 \"[^\"]*\"				{ yylval.strv = strdup(yytext); return STRING; }
