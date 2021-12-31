@@ -13,8 +13,8 @@
 
 ParallelOutput::ParallelOutput(const char *filePath) :
 	Output(filePath) {
-	source->m_scopes.top()->FindEffectives();
-	source->m_scopes.top()->GenerateParallel();
+	//source->m_scopes.top()->FindEffectives();
+	//source->m_scopes.top()->GenerateParallel();
 }
 
 void ParallelOutput::ComputeOne(const SyntaxNodeCompute &one, const char *instructions, std::unique_ptr<Output>& output) {

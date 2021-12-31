@@ -27,7 +27,7 @@ std::shared_ptr<SyntaxNode> SyntaxNode::AddChild(SyntaxNode *child) {
 	return childPtr;
 }
 
-void SyntaxNode::AddChild(std::shared_ptr<SyntaxNode> &child) {
+void SyntaxNode::AddChild(std::shared_ptr<SyntaxNode> child) {
 	AddChildBack(child);
 }
 
@@ -72,11 +72,11 @@ void SyntaxNode::InsertChild(std::shared_ptr<SyntaxNode> &child,
 	m_children.insert(childItor, child);
 }
 
-void SyntaxNode::AddChildFront(std::shared_ptr<SyntaxNode> &child) {
+void SyntaxNode::AddChildFront(std::shared_ptr<SyntaxNode> child) {
 	m_children.push_front(child);
 }
 
-void SyntaxNode::AddChildBack(std::shared_ptr<SyntaxNode> &child) {
+void SyntaxNode::AddChildBack(std::shared_ptr<SyntaxNode> child) {
 	m_children.push_back(child);
 }
 

@@ -1,5 +1,6 @@
 #include <fstream>
 #include <string.h>
+#include "Scanner.h"
 #include "common.h"
 #include "SyntaxNodeScope.h"
 
@@ -163,14 +164,49 @@ void SyntaxNodeScope::PushInitStatement() {
 //	m_stack.push(assign);
 }
 
-void SyntaxNodeScope::DecalreVariable(const char *name, std::shared_ptr<DataType> type) {
-	if (IsVariableParamExistInner(name)) {
-		Error(std::string(name) + " redefined");
+void SyntaxNodeScope::DefineVariable(const Lexical &lexical) {
+	const std::string &varName = lexical.GetChild(1)->GetContent();
+	if (IsVariableParamExistInner(varName.c_str())) {
+		Error(varName + " redefined");
 	}
-	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this,0,
-		name, type, GetCurrentPos()));
-	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(name, varv));
-	
+	std::shared_ptr<SyntaxNodeVariable> variable(new SyntaxNodeVariable(*this,
+		lexical.GetLineNO(),varName.c_str(),
+		SourceCodeFile::ProduceDataType(*lexical.GetChild(0)), GetCurrentPos()));
+	m_variables.insert(std::make_pair(varName.c_str(), variable));	
+}
+
+const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineProc(const Lexical &lexical) {
+	const std::string &procName = lexical.GetChild(1)->GetContent();
+	if (IsProcExist(procName.c_str())) {
+		Error(procName + " redefined");
+	}
+	std::shared_ptr<SyntaxNodeProcDef> procDef(new SyntaxNodeProcDef(*this,
+		lexical.GetLineNO(), procName.c_str(),
+		SourceCodeFile::ProduceDataType(*lexical.GetChild(0))));
+	AddChild(procDef);
+	return procDef->GetBody();
+}
+
+void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {
+	const std::string &enumName = lexical.GetChild(1)->GetContent();
+	if (IsEnumExistInner(enumName.c_str())) {
+		Error(enumName + " redefined");
+	}
+	std::shared_ptr<SyntaxNodeEnum> variable(new SyntaxNodeEnum(*this,
+		lexical.GetLineNO(),
+		enumName.c_str(),
+		GetCurrentPos()));
+	const Lexical &values = *lexical.GetChild(3);
+	int64_t value = 0;
+	for (size_t index = 0; index < values.GetChildrenCount(); index += 2) {
+		std::string name = values.GetChild(index)->GetContent();
+		if (!values.GetChild(index)->GetChild(1)->GetContent().empty()) {
+			name = values.GetChild(index)->GetChild(0)->GetContent();
+			value = atoll(values.GetChild(index)->GetChild(1)->GetChild(1)->GetContent().c_str());
+		}
+		variable->SetEnumValue(name.c_str(), value++);
+	}
+	m_enums.insert(std::make_pair(enumName.c_str(), variable));	
 }
 
 void SyntaxNodeScope::PushReturn() {
@@ -295,6 +331,9 @@ bool SyntaxNodeScope::IsParamExist(const char *name)const {
 	else {
 		return m_outer->IsParamExist(name);
 	}
+}
+bool SyntaxNodeScope::IsEnumExistInner(const char *name)const {
+	return m_enums.find(name) != m_enums.end();
 }
 
 std::shared_ptr<SyntaxNodeVariable> SyntaxNodeScope::GetVariableParam(const char *name) {

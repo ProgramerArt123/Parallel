@@ -25,11 +25,11 @@ public:
 
 	std::shared_ptr<SyntaxNode> AddChild(SyntaxNode *child);
 
-	void AddChild(std::shared_ptr<SyntaxNode> &child);
+	void AddChild(std::shared_ptr<SyntaxNode> child);
 
-	void AddChildFront(std::shared_ptr<SyntaxNode> &child);
+	void AddChildFront(std::shared_ptr<SyntaxNode> child);
 
-	void AddChildBack(std::shared_ptr<SyntaxNode> &child);
+	void AddChildBack(std::shared_ptr<SyntaxNode> child);
 
 	virtual GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception);
 

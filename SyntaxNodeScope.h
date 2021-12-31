@@ -7,6 +7,7 @@
 #include "SyntaxNode.h"
 #include "Parallel.h"
 #include "DataTypeType.h"
+class SyntaxNodeEnum;
 class SyntaxNodeVariable ;
 class SyntaxNodeProcDef;
 class SyntaxNodeProcCall;
@@ -14,6 +15,7 @@ class SyntaxNodeLoop;
 class SyntaxNodeNumber;
 class SyntaxNodeAssignment;
 class DataType;
+class Lexical;
 
 class SyntaxNodeScope : public SyntaxNode {
 public:
@@ -37,7 +39,9 @@ public:
 	void PushStatement();
 	void PushAssignmentStatement();
 	void PushInitStatement();
-	void DecalreVariable(const char *name, std::shared_ptr<DataType> type);
+	void DefineVariable(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> &DefineProc(const Lexical &lexical);
+	void DefineEnum(const Lexical &lexical);
 	void PushReturn();
 
 	std::shared_ptr<SyntaxNodeScope> &PushLoopEnter();
@@ -87,6 +91,7 @@ protected:
 	bool IsVariableParamExist(const char *name)const;
 	bool IsVariableExist(const char *name) const;
 	bool IsParamExist(const char *name)const;
+	bool IsEnumExistInner(const char *name)const;
 	std::shared_ptr<SyntaxNodeVariable> GetVariableParam(const char *name);
 	size_t StatisticsAssginsCount();
 	
@@ -97,6 +102,7 @@ protected:
 	std::map<std::string, std::shared_ptr<SyntaxNodeVariable>> m_variables;
 	std::vector<std::shared_ptr<SyntaxNodeVariable>> m_parameters;
 	std::vector<std::shared_ptr<SyntaxNodeNumber>> m_argments;
+	std::map<std::string, std::shared_ptr<SyntaxNodeEnum>> m_enums;
 	const size_t m_base_pos = 0;
 
 	std::set<std::shared_ptr<SyntaxNode>> m_effectives;
