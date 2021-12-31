@@ -42,26 +42,8 @@ void SourceCodeFile::OutputFile(std::unique_ptr<Output>& output) throw (std::exc
 	//m_scopes.top()->OutputFile(output);
 	m_content->GetCurrentScope()->OutputFile(output);
 }
-bool SourceCodeFile::SearchKeyWord(const std::string keyWord, const Lexical &lexical) {
-	return lexical.ForeachTopLeftRigthInterrupt([&](const Lexical &current){return keyWord == current.GetContent();});
-}
-std::shared_ptr<DataType> SourceCodeFile::ProduceDataType(const Lexical &lexical) {
-	bool isConst = SearchKeyWord("const", lexical);
-	bool isStatic = SearchKeyWord("static", lexical);
-	bool isVolatile = SearchKeyWord("volatile", lexical);
-	if (SearchKeyWord("int", lexical)) {		
-		return std::shared_ptr<DataType>(new DataTypeInt(isConst, isStatic, isVolatile));
-	}
-	else if (SearchKeyWord("void", lexical)) {		
-		return std::shared_ptr<DataType>(new DataTypeVoid(isConst, isStatic, isVolatile));
-	}
-	else if (SearchKeyWord("double", lexical)) {		
-		return std::shared_ptr<DataType>(new DataTypeDouble(isConst, isStatic, isVolatile));
-	}
-	else {
-		lexical.Error(" undefined");
-	}
-}
+
+
 
 void ProcDefEnter(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
@@ -90,7 +72,7 @@ void EnumDef(const Lexical &lexical, Content &content) {
 
 void StructDefEnter(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
-	const std::string &structName = lexical.GetChild(1)->GetContent();
+	const std::string &structName = lexical.GetChild(1)->GetChild(0)->GetContent();
 	std::cout << "StructDef:" << structName << std::endl;
 	syntax.PushScope(syntax.GetCurrentScope()->DefineStruct(lexical));
 } 
@@ -100,6 +82,12 @@ void StructDefExit(const Lexical &lexical, Content &content) {
 }
 
 void UnionDefEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	const std::string &uinonName = lexical.GetChild(1)->GetChild(0)->GetContent();
+	std::cout << "UnionDef:" << uinonName << std::endl;
+	syntax.PushScope(syntax.GetCurrentScope()->DefineUnion(lexical));
 }
 void UnionDefExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
 }

@@ -171,7 +171,7 @@ void SyntaxNodeScope::DefineVariable(const Lexical &lexical) {
 	}
 	std::shared_ptr<SyntaxNodeVariable> variable(new SyntaxNodeVariable(*this,
 		lexical.GetLineNO(),varName.c_str(),
-		SourceCodeFile::ProduceDataType(*lexical.GetChild(0)), GetCurrentPos()));
+		ProduceDataType(*lexical.GetChild(0)), GetCurrentPos()));
 	m_variables.insert(std::make_pair(varName.c_str(), variable));	
 }
 
@@ -182,7 +182,7 @@ const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineProc(const Lexica
 	}
 	std::shared_ptr<SyntaxNodeProcDef> procDef(new SyntaxNodeProcDef(*this,
 		lexical.GetLineNO(), procName.c_str(),
-		SourceCodeFile::ProduceDataType(*lexical.GetChild(0))));
+		ProduceDataType(*lexical.GetChild(0))));
 	AddChild(procDef);
 	return procDef->GetBody();
 }
@@ -197,6 +197,18 @@ const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineStruct(const Lexi
 		structName.c_str()));
 	AddChild(structDef);
 	return structDef->GetBody();
+}
+
+const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineUnion(const Lexical &lexical) {
+	const std::string &uinonName = lexical.GetChild(1)->GetChild(0)->GetContent();
+	if (IsStructExist(uinonName.c_str())) {
+		Error(uinonName + " redefined");
+	}
+	std::shared_ptr<SyntaxNodeUnionDef> unionDef(new SyntaxNodeUnionDef(*this,
+		lexical.GetLineNO(),
+		uinonName.c_str()));
+	AddChild(unionDef);
+	return unionDef->GetBody();
 }
 
 void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {

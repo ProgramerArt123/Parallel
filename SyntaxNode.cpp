@@ -1,4 +1,5 @@
 #include <string.h>
+#include "Scanner.h"
 #include "common.h"
 #include "Parallel.h"
 #include "SyntaxNodeProcDef.h"
@@ -161,7 +162,26 @@ void SyntaxNode::OutputInstructions(std::unique_ptr<Output>& output) {
 bool SyntaxNode::IsSameDataType(DATA_TYPE_TYPE type) {
 	return false;
 }
-
+std::shared_ptr<DataType> SyntaxNode::ProduceDataType(const Lexical &lexical) {
+	bool isConst = SearchKeyWord("const", lexical);
+	bool isStatic = SearchKeyWord("static", lexical);
+	bool isVolatile = SearchKeyWord("volatile", lexical);
+	if (SearchKeyWord("int", lexical)) {		
+		return std::shared_ptr<DataType>(new DataTypeInt(isConst, isStatic, isVolatile));
+	}
+	else if (SearchKeyWord("void", lexical)) {		
+		return std::shared_ptr<DataType>(new DataTypeVoid(isConst, isStatic, isVolatile));
+	}
+	else if (SearchKeyWord("double", lexical)) {		
+		return std::shared_ptr<DataType>(new DataTypeDouble(isConst, isStatic, isVolatile));
+	}
+	else {
+		lexical.Error(" undefined");
+	}
+}
+bool SyntaxNode::SearchKeyWord(const std::string keyWord, const Lexical &lexical) {
+	return lexical.ForeachTopLeftRigthInterrupt([&](const Lexical &current){return keyWord == current.GetContent();});
+}
 void SyntaxNode::Error(const std::string &info)const throw (std::string) {
 	throw "Syntax_Error=>line:【"  + std::to_string(m_line) + 
 	"】, content 【" + GetContent() + "】 " + info;

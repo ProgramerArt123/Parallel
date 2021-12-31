@@ -43,6 +43,7 @@ public:
 	void DefineVariable(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &DefineProc(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &DefineStruct(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> &DefineUnion(const Lexical &lexical);
 	void DefineEnum(const Lexical &lexical);
 	void PushReturn();
 

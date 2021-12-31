@@ -13,8 +13,10 @@
 #include "Output.h"
 #include "DataTypeType.h"
 
+class Lexical;
 class Parallel;
 class SyntaxNodeScope;
+class DataType;
 
 class SyntaxNode {
 public:
@@ -71,6 +73,8 @@ protected:
 
 	void SetDeep(int deep);
 	
+	static std::shared_ptr<DataType> ProduceDataType(const Lexical &lexical);
+	
 	void Error(const std::string &info)const throw (std::string);
 public:
 	std::list<std::shared_ptr<SyntaxNode>> m_children;
@@ -91,6 +95,9 @@ protected:
 protected:
 	friend class SerialOutput;
 	friend class ParallelOutput;
+private:
+	
+	static bool SearchKeyWord(const std::string keyWord, const Lexical &lexical);
 };
 
 

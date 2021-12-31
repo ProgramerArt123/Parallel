@@ -18,9 +18,7 @@ public:
 
 	void OutputFile(std::unique_ptr<Output>& output) throw (std::exception);
 
-	static std::shared_ptr<DataType> ProduceDataType(const Lexical &lexical);
 private:
-	static bool SearchKeyWord(const std::string keyWord, const Lexical &lexical);
 	const std::string m_file_name;
 	std::shared_ptr<Config> m_config;
 	std::unique_ptr<SyntaxContent> m_content;
