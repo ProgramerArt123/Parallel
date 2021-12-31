@@ -89,8 +89,14 @@ void EnumDef(const Lexical &lexical, Content &content) {
 }
 
 void StructDefEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	const std::string &structName = lexical.GetChild(1)->GetContent();
+	std::cout << "StructDef:" << structName << std::endl;
+	syntax.PushScope(syntax.GetCurrentScope()->DefineStruct(lexical));
 } 
 void StructDefExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
 }
 
 void UnionDefEnter(const Lexical &lexical, Content &content) {

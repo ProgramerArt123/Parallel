@@ -7,6 +7,7 @@
 #include "SyntaxNode.h"
 #include "Parallel.h"
 #include "DataTypeType.h"
+class SyntaxNodeStruct;
 class SyntaxNodeEnum;
 class SyntaxNodeVariable ;
 class SyntaxNodeProcDef;
@@ -41,6 +42,7 @@ public:
 	void PushInitStatement();
 	void DefineVariable(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &DefineProc(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> &DefineStruct(const Lexical &lexical);
 	void DefineEnum(const Lexical &lexical);
 	void PushReturn();
 
@@ -92,6 +94,7 @@ protected:
 	bool IsVariableExist(const char *name) const;
 	bool IsParamExist(const char *name)const;
 	bool IsEnumExistInner(const char *name)const;
+	bool IsStructExist(const char *name)const;
 	std::shared_ptr<SyntaxNodeVariable> GetVariableParam(const char *name);
 	size_t StatisticsAssginsCount();
 	
@@ -103,6 +106,7 @@ protected:
 	std::vector<std::shared_ptr<SyntaxNodeVariable>> m_parameters;
 	std::vector<std::shared_ptr<SyntaxNodeNumber>> m_argments;
 	std::map<std::string, std::shared_ptr<SyntaxNodeEnum>> m_enums;
+	std::map<std::string, std::shared_ptr<SyntaxNodeStruct>> m_structs;
 	const size_t m_base_pos = 0;
 
 	std::set<std::shared_ptr<SyntaxNode>> m_effectives;

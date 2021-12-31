@@ -187,6 +187,18 @@ const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineProc(const Lexica
 	return procDef->GetBody();
 }
 
+const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineStruct(const Lexical &lexical) {
+	const std::string &structName = lexical.GetChild(1)->GetChild(0)->GetContent();
+	if (IsStructExist(structName.c_str())) {
+		Error(structName + " redefined");
+	}
+	std::shared_ptr<SyntaxNodeStructDef> structDef(new SyntaxNodeStructDef(*this,
+		lexical.GetLineNO(),
+		structName.c_str()));
+	AddChild(structDef);
+	return structDef->GetBody();
+}
+
 void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {
 	const std::string &enumName = lexical.GetChild(1)->GetContent();
 	if (IsEnumExistInner(enumName.c_str())) {
@@ -335,7 +347,9 @@ bool SyntaxNodeScope::IsParamExist(const char *name)const {
 bool SyntaxNodeScope::IsEnumExistInner(const char *name)const {
 	return m_enums.find(name) != m_enums.end();
 }
-
+bool SyntaxNodeScope::IsStructExist(const char *name)const {
+	return m_structs.find(name) != m_structs.end();
+}
 std::shared_ptr<SyntaxNodeVariable> SyntaxNodeScope::GetVariableParam(const char *name) {
 	if (IsVariableExistInner(name)) {
 		return m_variables[name];

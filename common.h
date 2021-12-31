@@ -25,6 +25,7 @@
 #include "DataTypeDouble.h"
 #include "DataTypeVoid.h"
 #include "SyntaxNodeEnum.h"
+#include "SyntaxNodeStructDef.h"
 #include "GCC_X86_64.h"
 #include "CLANG_X86_64.h"
 extern std::unique_ptr<SourceCodeFile> source;
