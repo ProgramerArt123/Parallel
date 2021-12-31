@@ -9,16 +9,15 @@ SyntaxNodeScope::SyntaxNodeScope(int line, const char *content) :
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
 
-SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, int line, const SyntaxNodeProcDef *proc, const char *content)
-	:
-	SyntaxNode(outter, line, content), m_proc(proc),
+SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, int line, const char *content):
+	SyntaxNode(outter, line, content),
 	m_base_pos(outter.GetCurrentPos()),m_parallel(*this) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
 void SyntaxNodeScope::PushAddAssign(const char *variable) {
-	if (!IsVariableParamExist(variable)) {
-		Error(std::string(variable) + " undefined");
-	}
+//	if (!IsVariableParamExist(variable)) {
+//		Error(std::string(variable) + " undefined");
+//	}
 	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this,0));
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
 	assign->AddChild(var);
@@ -83,9 +82,9 @@ void SyntaxNodeScope::PushMod() {
 }
 
 void SyntaxNodeScope::PushInc(const char *variable, bool isBack) {
-	if (!IsVariableParamExist(variable)) {
-		Error(std::string(variable) + " undefined");
-	}	
+//	if (!IsVariableParamExist(variable)) {
+//		Error(std::string(variable) + " undefined");
+//	}	
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
 	std::shared_ptr<SyntaxNode> inc(new SyntaxNodeInc(*this, 0, isBack));
 	inc->AddChild(var);
@@ -110,10 +109,10 @@ void SyntaxNodeScope::PushString(const char *itera) {
 }
 
 void SyntaxNodeScope::PushVariable(const char *name) {
-	if (!IsVariableParamExist(name)) {
-		Error(std::string(name) + " undefined");
-	}
-	m_stack.push(GetVariableParam(name));
+//	if (!IsVariableParamExist(name)) {
+//		Error(std::string(name) + " undefined");
+//	}
+//	m_stack.push(GetVariableParam(name));
 }
 
 
@@ -166,16 +165,16 @@ void SyntaxNodeScope::PushInitStatement() {
 
 void SyntaxNodeScope::DefineVariable(const Lexical &lexical) {
 	const std::string &varName = lexical.GetChild(1)->GetContent();
-	if (IsVariableParamExistInner(varName.c_str())) {
+	if (IsVariableExistInner(varName.c_str())) {
 		Error(varName + " redefined");
 	}
 	std::shared_ptr<SyntaxNodeVariable> variable(new SyntaxNodeVariable(*this,
 		lexical.GetLineNO(),varName.c_str(),
 		ProduceDataType(*lexical.GetChild(0)), GetCurrentPos()));
-	m_variables.insert(std::make_pair(varName.c_str(), variable));	
+	m_variables.insert(std::make_pair(varName, variable));	
 }
 
-const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineProc(const Lexical &lexical) {
+const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::DefineProc(const Lexical &lexical) {
 	const std::string &procName = lexical.GetChild(1)->GetContent();
 	if (IsProcExist(procName.c_str())) {
 		Error(procName + " redefined");
@@ -184,6 +183,7 @@ const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineProc(const Lexica
 		lexical.GetLineNO(), procName.c_str(),
 		ProduceDataType(*lexical.GetChild(0))));
 	AddChild(procDef);
+	m_procs.insert(std::make_pair(procName, procDef));	
 	return procDef->GetBody();
 }
 
@@ -196,18 +196,20 @@ const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineStruct(const Lexi
 		lexical.GetLineNO(),
 		structName.c_str()));
 	AddChild(structDef);
+	m_structs.insert(std::make_pair(structName, structDef));	
 	return structDef->GetBody();
 }
 
 const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineUnion(const Lexical &lexical) {
 	const std::string &uinonName = lexical.GetChild(1)->GetChild(0)->GetContent();
-	if (IsStructExist(uinonName.c_str())) {
+	if (IsUnionExist(uinonName.c_str())) {
 		Error(uinonName + " redefined");
 	}
 	std::shared_ptr<SyntaxNodeUnionDef> unionDef(new SyntaxNodeUnionDef(*this,
 		lexical.GetLineNO(),
 		uinonName.c_str()));
 	AddChild(unionDef);
+	m_unions.insert(std::make_pair(uinonName, unionDef));	
 	return unionDef->GetBody();
 }
 
@@ -216,7 +218,7 @@ void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {
 	if (IsEnumExistInner(enumName.c_str())) {
 		Error(enumName + " redefined");
 	}
-	std::shared_ptr<SyntaxNodeEnum> variable(new SyntaxNodeEnum(*this,
+	std::shared_ptr<SyntaxNodeEnumDef> variable(new SyntaxNodeEnumDef(*this,
 		lexical.GetLineNO(),
 		enumName.c_str(),
 		GetCurrentPos()));
@@ -230,17 +232,17 @@ void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {
 		}
 		variable->SetEnumValue(name.c_str(), value++);
 	}
-	m_enums.insert(std::make_pair(enumName.c_str(), variable));	
+	m_enums.insert(std::make_pair(enumName, variable));	
 }
 
 void SyntaxNodeScope::PushReturn() {
-	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
-		Error("Type Error"); 
-	}
-	std::shared_ptr<SyntaxNode> ret(new SyntaxNodeReturn(*this, 0));
-	ret->AddChild(m_stack.top());
-	m_stack.pop();
-	AddChild(ret);
+//	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
+//		Error("Type Error"); 
+//	}
+//	std::shared_ptr<SyntaxNode> ret(new SyntaxNodeReturn(*this, 0));
+//	ret->AddChild(m_stack.top());
+//	m_stack.pop();
+//	AddChild(ret);
 }
 
 std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushLoopEnter() {
@@ -278,24 +280,7 @@ void SyntaxNodeScope::OutputInstructions(std::unique_ptr<Output>& output) {
 	output->ProcessScope(*this, output);
 }
 
-void SyntaxNodeScope::DefGenerate(std::unique_ptr<Output>& output) {
-	uint32_t index = 0;
-	for (std::shared_ptr<SyntaxNodeVariable> &parameter : m_parameters) {
-		if (index < PLATFORM.registersCount) {
-			output->GetStream() << '\t' << "movq	%" << PLATFORM.registers[index] << ", -"
-				<< std::to_string(parameter->GetScopeStackTopOffset()) <<
-				"(%rbp)" << std::endl;
-		}
-		else {
-			output->GetStream() << '\t' << "movq	" << GetParameterStackTopOffset(index) <<
-				"(%rbp), %rax" << std::endl;
-			output->GetStream() << '\t' << "movq	%rax, -" << std::to_string(parameter->GetScopeStackTopOffset())
-				<< "(%rbp)" << std::endl;
-		}
-		index++;
-	}
-	OutputInstructions(output);
-}
+
 
 void SyntaxNodeScope::LoopGenerate(std::unique_ptr<Output>& output) {
 	OutputInstructions(output);
@@ -312,25 +297,8 @@ bool SyntaxNodeScope::IsProcExist(const char *name) {
 	return m_procs.find(name) != m_procs.end();
 }
 
-bool SyntaxNodeScope::IsVariableParamExistInner(const char *name)const {
-	return IsVariableExistInner(name) || IsParamExistInner(name);
-}
-
 bool SyntaxNodeScope::IsVariableExistInner(const char *name) const {
 	return m_variables.find(name) != m_variables.end();
-}
-
-bool SyntaxNodeScope::IsParamExistInner(const char *name) const {
-	for (const std::shared_ptr<SyntaxNodeVariable> &parameter : m_parameters) {
-		if (0 == strcmp(parameter->GetContent(), name)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-bool SyntaxNodeScope::IsVariableParamExist(const char *name) const {
-	return IsVariableExist(name) || IsParamExist(name);
 }
 
 bool SyntaxNodeScope::IsVariableExist(const char *name) const {
@@ -345,39 +313,25 @@ bool SyntaxNodeScope::IsVariableExist(const char *name) const {
 	}
 }
 
-bool SyntaxNodeScope::IsParamExist(const char *name)const {
-	if (IsParamExistInner(name)) {
-		return true;
-	}
-	else if (IsOutermost()) {
-		return false;
-	}
-	else {
-		return m_outer->IsParamExist(name);
-	}
-}
+
 bool SyntaxNodeScope::IsEnumExistInner(const char *name)const {
 	return m_enums.find(name) != m_enums.end();
 }
 bool SyntaxNodeScope::IsStructExist(const char *name)const {
 	return m_structs.find(name) != m_structs.end();
 }
-std::shared_ptr<SyntaxNodeVariable> SyntaxNodeScope::GetVariableParam(const char *name) {
+bool SyntaxNodeScope::IsUnionExist(const char *name)const {
+	return m_unions.find(name) != m_unions.end();
+}
+std::shared_ptr<SyntaxNodeVariable> SyntaxNodeScope::GetVariable(const char *name) {
 	if (IsVariableExistInner(name)) {
 		return m_variables[name];
-	}
-	else if (IsParamExistInner(name)) {
-		for (std::shared_ptr<SyntaxNodeVariable> & parameter : m_parameters) {
-			if (0 == strcmp(parameter->GetContent(), name)) {
-				return parameter;
-			}
-		}
 	}
 	else if (IsOutermost()) {
 		return std::shared_ptr<SyntaxNodeVariable>();
 	}
 	else {
-		return m_outer->GetVariableParam(name);
+		return m_outer->GetVariable(name);
 	}
 }
 
@@ -473,7 +427,7 @@ void SyntaxNodeScope::PopCache() {
 }
 
 const size_t SyntaxNodeScope::GetCurrentPos() const {
-	return m_base_pos + m_parameters.size() + m_arguments.size() +
+	return m_base_pos + m_arguments.size() +
 		m_variables.size() + m_registers.size() + m_caches.size();
 }
 
@@ -485,27 +439,6 @@ const size_t SyntaxNodeScope::GetSubProcOffset() const {
 	return (GetCurrentPos() + 1) / 2 * 2 * 8;
 }
 
-const size_t SyntaxNodeScope::GetParameterStackTopOffset(size_t index) const {
-	size_t parametersCount = m_parameters.size();
-	size_t count = 0;
-	const size_t codePointer = 2;
-	if (0 == m_outer->GetCurrentPos() % 2){
-		count = parametersCount - index + codePointer;
-	}
-	else{
-		count = parametersCount - index + 1 + codePointer;
-	}
-	return count * 8;
-}
-
-const DATA_TYPE_TYPE SyntaxNodeScope::GetProcRetType()const{
-	return GetProcDef()->GetDataType();
-}
-
-
-const SyntaxNodeProcDef *SyntaxNodeScope::GetProcDef() const {
-	return m_proc;
-}
 
 bool SyntaxNodeScope::CheckDataType(DATA_TYPE_TYPE type, const std::shared_ptr<SyntaxNode> &node) {
 	return node->IsSameDataType(type);

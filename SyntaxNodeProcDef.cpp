@@ -1,11 +1,13 @@
-#include "SyntaxNodeProcDef.h"
 #include "common.h"
+#include "SyntaxNodeProcDef.h"
+
 
 SyntaxNodeProcDef::SyntaxNodeProcDef(SyntaxNodeScope &outter,
 	int line,
 	const char *name,
 	std::shared_ptr<DataType> dataType):
-	SyntaxNode(line, name), m_body(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(outter, line, this, name))),
+	SyntaxNode(line, name), m_body(std::shared_ptr<SyntaxNodeProcDefScope>(
+	new SyntaxNodeProcDefScope(outter, line, *this, name))),
 	m_data_type(dataType) {
 	m_type = SYNTAX_NODE_TYPE_PROC_DEF;
 }
@@ -14,7 +16,7 @@ SyntaxNodeProcDef::~SyntaxNodeProcDef() {
 
 }
 
-std::shared_ptr<SyntaxNodeScope> &SyntaxNodeProcDef::GetBody() {
+std::shared_ptr<SyntaxNodeProcDefScope> SyntaxNodeProcDef::GetBody() {
 	return m_body;
 }
 

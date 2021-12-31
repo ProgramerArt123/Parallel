@@ -7,8 +7,9 @@
 #include "SyntaxNode.h"
 #include "Parallel.h"
 #include "DataTypeType.h"
-class SyntaxNodeStruct;
-class SyntaxNodeEnum;
+class SyntaxNodeUnionDef;
+class SyntaxNodeStructDef;
+class SyntaxNodeEnumDef;
 class SyntaxNodeVariable ;
 class SyntaxNodeProcDef;
 class SyntaxNodeProcCall;
@@ -21,7 +22,8 @@ class Lexical;
 class SyntaxNodeScope : public SyntaxNode {
 public:
 	explicit SyntaxNodeScope(int line, const char *content = "");
-	explicit SyntaxNodeScope(SyntaxNodeScope &outter, int line, const SyntaxNodeProcDef *proc, const char *content = "");
+	explicit SyntaxNodeScope(SyntaxNodeScope &outter, int line, const char *content = "");
+	virtual ~SyntaxNodeScope() {}
 	void PushAddAssign(const char *variable);
 	void PushAdd();
 	void PushSub();
@@ -40,11 +42,14 @@ public:
 	void PushStatement();
 	void PushAssignmentStatement();
 	void PushInitStatement();
+	
 	void DefineVariable(const Lexical &lexical);
-	const std::shared_ptr<SyntaxNodeScope> &DefineProc(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> DefineProc(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &DefineStruct(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &DefineUnion(const Lexical &lexical);
 	void DefineEnum(const Lexical &lexical);
+	
+	
 	void PushReturn();
 
 	std::shared_ptr<SyntaxNodeScope> &PushLoopEnter();
@@ -59,7 +64,6 @@ public:
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;
 
-	void DefGenerate(std::unique_ptr<Output>& output);
 	void LoopGenerate(std::unique_ptr<Output>& output);
 	
 	void FindEffectives();
@@ -82,21 +86,18 @@ public:
 	const size_t GetScopeStackTopOffset() const;
 	
 	const size_t GetSubProcOffset() const;
-	
-	const SyntaxNodeProcDef *GetProcDef() const;
-	
 	bool CheckDataType(DATA_TYPE_TYPE type, const std::shared_ptr<SyntaxNode> &node);
+	
+	virtual const size_t GetCurrentPos() const;
+
+	virtual bool IsVariableExist(const char *name) const;
 protected:
 	bool IsProcExist(const char *name);
-	bool IsVariableParamExistInner(const char *name)const;
-	bool IsVariableExistInner(const char *name)const;
-	bool IsParamExistInner(const char *name)const;
-	bool IsVariableParamExist(const char *name)const;
-	bool IsVariableExist(const char *name) const;
-	bool IsParamExist(const char *name)const;
+	virtual bool IsVariableExistInner(const char *name)const;
 	bool IsEnumExistInner(const char *name)const;
 	bool IsStructExist(const char *name)const;
-	std::shared_ptr<SyntaxNodeVariable> GetVariableParam(const char *name);
+	bool IsUnionExist(const char *name)const;
+	virtual std::shared_ptr<SyntaxNodeVariable> GetVariable(const char *name);
 	size_t StatisticsAssginsCount();
 	
 	
@@ -104,10 +105,10 @@ protected:
 	std::stack<std::shared_ptr<SyntaxNode>> m_stack;
 	std::map<std::string, std::shared_ptr<SyntaxNodeProcDef>> m_procs;
 	std::map<std::string, std::shared_ptr<SyntaxNodeVariable>> m_variables;
-	std::vector<std::shared_ptr<SyntaxNodeVariable>> m_parameters;
 	std::vector<std::shared_ptr<SyntaxNodeNumber>> m_argments;
-	std::map<std::string, std::shared_ptr<SyntaxNodeEnum>> m_enums;
-	std::map<std::string, std::shared_ptr<SyntaxNodeStruct>> m_structs;
+	std::map<std::string, std::shared_ptr<SyntaxNodeEnumDef>> m_enums;
+	std::map<std::string, std::shared_ptr<SyntaxNodeStructDef>> m_structs;
+	std::map<std::string, std::shared_ptr<SyntaxNodeUnionDef>> m_unions;
 	const size_t m_base_pos = 0;
 
 	std::set<std::shared_ptr<SyntaxNode>> m_effectives;
@@ -116,20 +117,10 @@ protected:
 protected:
 	friend class SerialOutput;
 	friend class ParallelOutput;
-
-private:
-	const size_t GetParameterStackTopOffset(size_t index) const;
-
-	const size_t GetCurrentPos() const;
-
-	const DATA_TYPE_TYPE GetProcRetType()const;
-	
 	std::stack<std::string> m_registers;
 	std::stack<std::string> m_arguments;
 	std::stack<std::string> m_caches;
 	
-	
-	const SyntaxNodeProcDef *m_proc = NULL;
 };
 
 #endif

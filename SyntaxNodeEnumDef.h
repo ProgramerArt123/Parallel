@@ -1,18 +1,18 @@
-#ifndef _SYNTAX_NODE_ENUM_H_
-#define _SYNTAX_NODE_ENUM_H_
+#ifndef _SYNTAX_NODE_ENUM_DEF_H_
+#define _SYNTAX_NODE_ENUM_DEF_H_
 
 #include <string>
 #include <map>
 #include <stdint.h>
 #include "SyntaxNode.h"
 
-class SyntaxNodeEnum : public SyntaxNode {
+class SyntaxNodeEnumDef : public SyntaxNode {
 public:
-	explicit SyntaxNodeEnum(SyntaxNodeScope &scope,
+	explicit SyntaxNodeEnumDef(SyntaxNodeScope &scope,
 		int line,
 		const char *name,
 		size_t pos);
-	virtual ~SyntaxNodeEnum();
+	virtual ~SyntaxNodeEnumDef();
 
 	void SetEnumValue(const char *name, int64_t value);
 private:

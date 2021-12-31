@@ -8,9 +8,8 @@ class SyntaxNodeLoop : public SyntaxNode {
 public:
 	explicit SyntaxNodeLoop(SyntaxNodeScope &outter, int line);
 	virtual ~SyntaxNodeLoop();
-
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;
-
+	
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
 
 	std::shared_ptr<SyntaxNodeScope> &GetBody();

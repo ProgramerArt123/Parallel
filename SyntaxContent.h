@@ -10,7 +10,7 @@ public:
 	explicit SyntaxContent(const std::string fileName, const Config &config);
 	virtual ~SyntaxContent();
 	std::shared_ptr<SyntaxNodeScope> &GetCurrentScope() ;
-	void PushScope(const std::shared_ptr<SyntaxNodeScope> &scope);
+	void PushScope(const std::shared_ptr<SyntaxNodeScope> scope);
 	std::shared_ptr<SyntaxNodeScope> PopScope();
 private:
 	std::stack<std::shared_ptr<SyntaxNodeScope>> m_scopes;

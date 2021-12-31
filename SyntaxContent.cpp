@@ -17,7 +17,7 @@ std::shared_ptr<SyntaxNodeScope> &SyntaxContent::GetCurrentScope()  {
 	}
 	return m_scopes.top();
 }
-void SyntaxContent::PushScope(const std::shared_ptr<SyntaxNodeScope> &scope) {
+void SyntaxContent::PushScope(const std::shared_ptr<SyntaxNodeScope> scope) {
 	m_scopes.push(scope);
 }
 std::shared_ptr<SyntaxNodeScope> SyntaxContent::PopScope() {
