@@ -56,7 +56,38 @@ union TIME{
 
 int main(){
 		int x = 1 % 2 + 5 * 6 + 9 / 3;
+		if(0 == x){
+			printf("x == 0\n");
+		}
+		else if(1 == x){
+			printf("x == 1\n");
+		}
+		else{
+			printf("x != 0 && x != 1\n");
+		}
+		
+		do{
+			printf("do while\n");
+			break;
+		}while(b);
+		
+		while(c){
+			printf("while\n");
+		}
 		int y = 1 % 2 + 5 * (6 + 9) / 3;
+		
+		switch(y){
+			case 0:
+				printf("0\n");
+				break;
+			default:
+				printf("1\n");
+				break;
+		}
+		
+		for(int a = 0; a < 100; a ++){
+			printf("a=%d\n",a);
+		}
 		int z = x + y;
         printf("x=%d, y=%d\\\", z=%d\n", x, y, z);
 		z = 999;

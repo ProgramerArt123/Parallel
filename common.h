@@ -17,7 +17,7 @@
 #include "SyntaxNodeAssignment.h"
 #include "SyntaxNodeVariable.h"
 #include "SyntaxNodeReturn.h"
-#include "SyntaxNodeLoop.h"
+#include "SyntaxNodeFor.h"
 #include "SyntaxNodeScope.h"
 #include "SourceCodeFile.h"
 #include "DataType.h"

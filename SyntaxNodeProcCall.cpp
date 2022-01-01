@@ -3,8 +3,7 @@
 #include "SyntaxNodeProcCall.h"
 
 SyntaxNodeProcCall::SyntaxNodeProcCall(SyntaxNodeScope &scope, int line, const char *name)
-	: SyntaxNode(scope, line, name)
-	, m_arguments(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(scope, line, name))) {
+	: SyntaxNode(scope, line, name) {
 	m_type = SYNTAX_NODE_TYPE_PROC_CALL;
 }
 
@@ -12,9 +11,9 @@ SyntaxNodeProcCall::~SyntaxNodeProcCall() {
 
 }
 
-std::shared_ptr<SyntaxNodeScope> &SyntaxNodeProcCall::GetArgments() {
-	return m_arguments;
-}
+//std::shared_ptr<SyntaxNodeScope> &SyntaxNodeProcCall::GetArgments() {
+//	return m_arguments;
+//}
 
 void SyntaxNodeProcCall::FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) {
 	effectives.insert(self);
@@ -25,7 +24,7 @@ GENERATE_PARALLEL_RESULT SyntaxNodeProcCall::GenerateParallel(const std::shared_
 		return GENERATE_PARALLEL_RESULT_COMPLETED;
 	}
 	bool isHaveNoFind = false;
-	for (std::shared_ptr<SyntaxNode> &argment : GetArgments()->m_children) {
+	for (std::shared_ptr<SyntaxNode> argment : m_arguments) {
 		argment->m_generate_line = m_line;
 		GENERATE_PARALLEL_RESULT result = argment->GenerateParallel(argment, parallel);
 		if (GENERATE_PARALLEL_RESULT_FINDED == result) {
@@ -53,12 +52,12 @@ void SyntaxNodeProcCall::OutputInstructions(std::unique_ptr<Output>& output) {
 
 void SyntaxNodeProcCall::BeginCallGenerate(std::unique_ptr<Output>& output) {
 	
-	for (std::shared_ptr<SyntaxNode> &argment : GetArgments()->m_children) {	
+	for (std::shared_ptr<SyntaxNode> argment : m_arguments) {	
 		argment->OutputInstructions(output);
 	}
 	
 	uint32_t index = 0;
-	for (std::shared_ptr<SyntaxNode> &argment : GetArgments()->m_children) {
+	for (std::shared_ptr<SyntaxNode> argment : m_arguments) {
 		argment->ArgmentCache(index++, output);
 	}
 
@@ -71,8 +70,8 @@ void SyntaxNodeProcCall::EndCallGenerate(std::stringstream& output) {
 	if (GetOuter()->GetSubProcOffset()) {
 		output << '\t' << "addq    $" << GetOuter()->GetSubProcOffset() << ", %rsp" << std::endl;
 	}
-	uint32_t index = GetArgments()->m_children.size() - 1;
-	for (std::shared_ptr<SyntaxNode> &argment : GetArgments()->m_children) {
+	uint32_t index = m_arguments.size() - 1;
+	for (std::shared_ptr<SyntaxNode> argment : m_arguments) {
 		if (index < PLATFORM.registersCount) {
 			if (0 == strcmp(PLATFORM.registers[index], "rcx")) {
 				std::string dst;

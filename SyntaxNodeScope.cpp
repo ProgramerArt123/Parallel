@@ -117,11 +117,11 @@ void SyntaxNodeScope::PushVariable(const char *name) {
 
 
 std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcCallEnter(const char *name) {
-	printf("PushProcCallEnter\n");
-	SyntaxNodeProcCall *call = new SyntaxNodeProcCall(*this, 0, name);
-	std::shared_ptr<SyntaxNode> current(call);
-	m_stack.push(current);
-	return call->GetArgments();
+//	printf("PushProcCallEnter\n");
+//	SyntaxNodeProcCall *call = new SyntaxNodeProcCall(*this, 0, name);
+//	std::shared_ptr<SyntaxNode> current(call);
+//	m_stack.push(current);
+//	return call->GetArgments();
 }
 
 void SyntaxNodeScope::PushProcCallExit() {
@@ -166,7 +166,7 @@ void SyntaxNodeScope::PushInitStatement() {
 void SyntaxNodeScope::DefineVariable(const Lexical &lexical) {
 	const std::string &varName = lexical.GetChild(1)->GetContent();
 	if (IsVariableExistInner(varName.c_str())) {
-		Error(varName + " redefined");
+		Error(lexical.GetLineNO(), varName + " redefined");
 	}
 	std::shared_ptr<SyntaxNodeVariable> variable(new SyntaxNodeVariable(*this,
 		lexical.GetLineNO(),varName.c_str(),
@@ -177,7 +177,7 @@ void SyntaxNodeScope::DefineVariable(const Lexical &lexical) {
 const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::DefineProc(const Lexical &lexical) {
 	const std::string &procName = lexical.GetChild(1)->GetContent();
 	if (IsProcExist(procName.c_str())) {
-		Error(procName + " redefined");
+		Error(lexical.GetLineNO(), procName + " redefined");
 	}
 	std::shared_ptr<SyntaxNodeProcDef> procDef(new SyntaxNodeProcDef(*this,
 		lexical.GetLineNO(), procName.c_str(),
@@ -190,7 +190,7 @@ const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::DefineProc(const Lexical
 const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineStruct(const Lexical &lexical) {
 	const std::string &structName = lexical.GetChild(1)->GetChild(0)->GetContent();
 	if (IsStructExist(structName.c_str())) {
-		Error(structName + " redefined");
+		Error(lexical.GetLineNO(), structName + " redefined");
 	}
 	std::shared_ptr<SyntaxNodeStructDef> structDef(new SyntaxNodeStructDef(*this,
 		lexical.GetLineNO(),
@@ -203,7 +203,7 @@ const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineStruct(const Lexi
 const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineUnion(const Lexical &lexical) {
 	const std::string &uinonName = lexical.GetChild(1)->GetChild(0)->GetContent();
 	if (IsUnionExist(uinonName.c_str())) {
-		Error(uinonName + " redefined");
+		Error(lexical.GetLineNO(), uinonName + " redefined");
 	}
 	std::shared_ptr<SyntaxNodeUnionDef> unionDef(new SyntaxNodeUnionDef(*this,
 		lexical.GetLineNO(),
@@ -216,7 +216,7 @@ const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::DefineUnion(const Lexic
 void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {
 	const std::string &enumName = lexical.GetChild(1)->GetContent();
 	if (IsEnumExistInner(enumName.c_str())) {
-		Error(enumName + " redefined");
+		Error(lexical.GetLineNO(), enumName + " redefined");
 	}
 	std::shared_ptr<SyntaxNodeEnumDef> variable(new SyntaxNodeEnumDef(*this,
 		lexical.GetLineNO(),
@@ -245,21 +245,17 @@ void SyntaxNodeScope::PushReturn() {
 //	AddChild(ret);
 }
 
-std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushLoopEnter() {
-	printf("PushLoopEnter\n");
-	SyntaxNodeLoop *loop = new SyntaxNodeLoop(*this, 0);
-	std::shared_ptr<SyntaxNodeLoop> current = std::shared_ptr<SyntaxNodeLoop>(loop);
+const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::AppendFor(const Lexical &lexical) {
+	printf("AppendFor\n");
+	SyntaxNodeFor *loop = new SyntaxNodeFor(*this, lexical.GetLineNO());
+	std::shared_ptr<SyntaxNodeFor> current = std::shared_ptr<SyntaxNodeFor>(loop);
 	m_stack.push(current);
-	return current->GetBody();
-}
-
-void SyntaxNodeScope::PushLoopExit() {
-	printf("PushLoopExit\n");
+	return current->GetWhole();
 }
 
 void SyntaxNodeScope::AddArgment(uint64_t argment) {
-	std::shared_ptr<SyntaxNodeNumber> arg(new SyntaxNodeNumber(*this, 0, argment));
-	m_argments.push_back(arg);
+	//std::shared_ptr<SyntaxNodeNumber> arg(new SyntaxNodeNumber(*this, 0, argment));
+	//m_argments.push_back(arg);
 }
 
 void SyntaxNodeScope::AddParam(const char *param) {
@@ -284,9 +280,9 @@ void SyntaxNodeScope::OutputInstructions(std::unique_ptr<Output>& output) {
 
 void SyntaxNodeScope::LoopGenerate(std::unique_ptr<Output>& output) {
 	OutputInstructions(output);
-	int times = m_argments.front()->GetValue();
-	output->GetStream() << '\t' << "cmpq    $" << std::to_string(times) <<
-		",  %rcx" << std::endl;
+	//int times = m_argments.front()->GetValue();
+	//output->GetStream() << '\t' << "cmpq    $" << std::to_string(times) <<
+	//	",  %rcx" << std::endl;
 }
 
 size_t SyntaxNodeScope::StatisticsAssginsCount() {

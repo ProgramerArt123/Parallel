@@ -15,7 +15,7 @@ SyntaxNodeEnumDef::~SyntaxNodeEnumDef() {
 
 void SyntaxNodeEnumDef::SetEnumValue(const char *name, int64_t value) {
 	if(m_enums.find(name) != m_enums.end()) {
-		Error(std::string(name) + " redefined!");
+		Error(GetLine(), std::string(name) + " redefined!");
 	}
 	m_enums.insert(std::make_pair(name, value));
 }

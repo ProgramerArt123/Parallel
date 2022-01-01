@@ -8,7 +8,7 @@ public:
 	explicit SyntaxNodeProcCall(SyntaxNodeScope &scope, int line, const char *name);
 	virtual ~SyntaxNodeProcCall();
 	
-	std::shared_ptr<SyntaxNodeScope> &GetArgments();
+	//std::shared_ptr<SyntaxNodeScope> &GetArgments();
 
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;
 
@@ -22,7 +22,7 @@ private:
 	void EndCallGenerate(std::stringstream& output);
 	
 private:
-	std::shared_ptr<SyntaxNodeScope> m_arguments;
+	std::vector<std::shared_ptr<SyntaxNodeScope>> m_arguments;
 };
 
 

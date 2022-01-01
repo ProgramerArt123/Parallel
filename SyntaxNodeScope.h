@@ -13,7 +13,7 @@ class SyntaxNodeEnumDef;
 class SyntaxNodeVariable ;
 class SyntaxNodeProcDef;
 class SyntaxNodeProcCall;
-class SyntaxNodeLoop;
+class SyntaxNodeFor;
 class SyntaxNodeNumber;
 class SyntaxNodeAssignment;
 class DataType;
@@ -47,13 +47,11 @@ public:
 	const std::shared_ptr<SyntaxNodeScope> DefineProc(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &DefineStruct(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &DefineUnion(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> &AppendFor(const Lexical &lexical);
 	void DefineEnum(const Lexical &lexical);
 	
 	
 	void PushReturn();
-
-	std::shared_ptr<SyntaxNodeScope> &PushLoopEnter();
-	void PushLoopExit();
 
 	void AddArgment(uint64_t argment);
 	void AddParam(const char *param);
@@ -105,7 +103,6 @@ protected:
 	std::stack<std::shared_ptr<SyntaxNode>> m_stack;
 	std::map<std::string, std::shared_ptr<SyntaxNodeProcDef>> m_procs;
 	std::map<std::string, std::shared_ptr<SyntaxNodeVariable>> m_variables;
-	std::vector<std::shared_ptr<SyntaxNodeNumber>> m_argments;
 	std::map<std::string, std::shared_ptr<SyntaxNodeEnumDef>> m_enums;
 	std::map<std::string, std::shared_ptr<SyntaxNodeStructDef>> m_structs;
 	std::map<std::string, std::shared_ptr<SyntaxNodeUnionDef>> m_unions;

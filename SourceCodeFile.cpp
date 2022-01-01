@@ -16,6 +16,9 @@ void StructDefExit(const Lexical &lexical, Content &content);
 void UnionDefEnter(const Lexical &lexical, Content &content); 
 void UnionDefExit(const Lexical &lexical, Content &content);
 
+void ForStateEnter(const Lexical &lexical, Content &content); 
+void ForStateExit(const Lexical &lexical, Content &content);
+
 void VariableDef(const Lexical &lexical, Content &content);
 SourceCodeFile::SourceCodeFile(const char *fileName):
 	m_file_name(fileName){
@@ -26,6 +29,9 @@ SourceCodeFile::SourceCodeFile(const char *fileName):
 		m_config->BindActionFunction("EnumDef", &EnumDef);
 		m_config->BindActionFunction("StructDef", &StructDefEnter, &StructDefExit);
 		m_config->BindActionFunction("UnionDef", &UnionDefEnter, &UnionDefExit);
+		
+		m_config->BindActionFunction("ForState", &ForStateEnter, &ForStateExit);
+		
 	m_content.reset(new SyntaxContent(m_file_name, *m_config));
 }
 
@@ -88,6 +94,15 @@ void UnionDefEnter(const Lexical &lexical, Content &content) {
 	syntax.PushScope(syntax.GetCurrentScope()->DefineUnion(lexical));
 }
 void UnionDefExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
+}
+
+void ForStateEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PushScope(syntax.GetCurrentScope()->AppendFor(lexical));
+}
+void ForStateExit(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
 	syntax.PopScope();
 }

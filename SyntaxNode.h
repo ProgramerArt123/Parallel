@@ -75,7 +75,7 @@ protected:
 	
 	static std::shared_ptr<DataType> ProduceDataType(const Lexical &lexical);
 	
-	void Error(const std::string &info)const throw (std::string);
+	void Error(uint64_t line, const std::string &info)const throw (std::string);
 public:
 	std::list<std::shared_ptr<SyntaxNode>> m_children;
 	int m_generate_line = 0;

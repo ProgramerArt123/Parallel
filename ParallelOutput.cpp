@@ -59,7 +59,7 @@ void ParallelOutput::Assignment(SyntaxNodeAssignment &assign, std::unique_ptr<Ou
 void ParallelOutput::ProcessScope(SyntaxNodeScope &scope, std::unique_ptr<Output>& output) {	//for (std::shared_ptr<SyntaxNode> &child : m_children) {
 	for (std::shared_ptr<SyntaxNode> &child : scope.m_children) {
 		SYNTAX_NODE_TYPE type = child->GetType();
-		if (SYNTAX_NODE_TYPE_PROC_DEF == type || SYNTAX_NODE_TYPE_LOOP == type) {
+		if (SYNTAX_NODE_TYPE_PROC_DEF == type || SYNTAX_NODE_TYPE_FOR == type) {
 			child->OutputInstructions(output);
 		}
 	}
