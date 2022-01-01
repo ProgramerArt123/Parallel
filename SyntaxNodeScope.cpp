@@ -156,7 +156,7 @@ void SyntaxNodeScope::PushInitStatement() {
 }
 
 void SyntaxNodeScope::DefineVariable(const Lexical &lexical) {
-	const std::string &varName = lexical.GetChild(1)->GetContent();
+	const std::string &varName = lexical.GetChild(1)->GetChild(1)->GetContent();
 	if (IsVariableExistInner(varName.c_str())) {
 		Error(lexical.GetLineNO(), varName + " redefined");
 	}
@@ -440,27 +440,28 @@ bool SyntaxNodeScope::CheckDataType(DATA_TYPE_TYPE type, const std::shared_ptr<S
 
 void SyntaxNodeScope::Generate(const Lexical &lexical, std::vector<std::shared_ptr<SyntaxNode>> &syntaxs) {
 	const std::string &name = lexical.GetPattern().GetRule().GetName();
-	if ("variable" == name) {
+	if ("proc_call" == name) {
+		syntaxs.push_back(std::shared_ptr<SyntaxNode>(
+			new SyntaxNodeProcCall(*this, lexical.GetLineNO(), 
+			lexical.GetChild(0)->GetChild(0)->GetContent().c_str())));
+	}	
+	else if ("variable" == name) {
 		if (!IsVariableExist(lexical.GetContent().c_str())) {
 			Error(lexical.GetLineNO(), lexical.GetContent() + " undefined");
 		}
 		syntaxs.push_back(GetVariable(lexical.GetContent().c_str()));
-		return;
 	}
 	else if ("string" == name) {
 		syntaxs.push_back(std::shared_ptr<SyntaxNode>(
 			new SyntaxNodeString(*this, lexical.GetLineNO(), 
 			lexical.GetContent().c_str())));
-		return;
 	}
 	else if ("numeric" == name) {
-		return;
 	}
 	else if ("integer" == name) {
 		syntaxs.push_back(std::shared_ptr<SyntaxNode>(
 			new SyntaxNodeNumber(*this, lexical.GetLineNO(), 
 			atoi(lexical.GetContent().c_str()))));
-		return;
 	}
 	else {
 		for (size_t index = 0; index < lexical.GetChildrenCount(); index++) {

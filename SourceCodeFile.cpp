@@ -69,7 +69,7 @@ void ProcDefExit(const Lexical &lexical, Content &content) {
 
 void VariableDef(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
-	const std::string &varName = lexical.GetChild(1)->GetContent();
+	const std::string &varName = lexical.GetChild(1)->GetChild(1)->GetContent();
 	syntax.GetCurrentScope()->DefineVariable(lexical);
 }
 
