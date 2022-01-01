@@ -20,6 +20,8 @@ void ForStateEnter(const Lexical &lexical, Content &content);
 void ForStateExit(const Lexical &lexical, Content &content);
 
 void VariableDef(const Lexical &lexical, Content &content);
+
+void ProcCall(const Lexical &lexical, Content &content);
 SourceCodeFile::SourceCodeFile(const char *fileName):
 	m_file_name(fileName){
 	m_config = GenerateConfig0();
@@ -31,6 +33,8 @@ SourceCodeFile::SourceCodeFile(const char *fileName):
 		m_config->BindActionFunction("UnionDef", &UnionDefEnter, &UnionDefExit);
 		
 		m_config->BindActionFunction("ForState", &ForStateEnter, &ForStateExit);
+		
+		m_config->BindActionFunction("ProcCall", &ProcCall);
 		
 	m_content.reset(new SyntaxContent(m_file_name, *m_config));
 }
@@ -105,4 +109,11 @@ void ForStateEnter(const Lexical &lexical, Content &content) {
 void ForStateExit(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
 	syntax.PopScope();
+}
+
+void ProcCall(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	const std::string &callName = lexical.GetChild(0)->GetContent();
+	std::cout << "ProcCall:" << callName << std::endl;
+	syntax.GetCurrentScope()->ProcCall(lexical);
 }

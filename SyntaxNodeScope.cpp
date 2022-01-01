@@ -99,14 +99,6 @@ void SyntaxNodeScope::PushBlock() {
 	m_stack.push(current);
 }
 
-void SyntaxNodeScope::PushNumber(int number) {
-	printf("+++%d\n", number);
-	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeNumber(*this,0, number)));
-}
-
-void SyntaxNodeScope::PushString(const char *itera) {
-	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeString(*this, 0,itera)));
-}
 
 void SyntaxNodeScope::PushVariable(const char *name) {
 //	if (!IsVariableParamExist(name)) {
@@ -219,10 +211,11 @@ void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {
 	if (IsEnumExistInner(enumName.c_str())) {
 		Error(lexical.GetLineNO(), enumName + " redefined");
 	}
-	std::shared_ptr<SyntaxNodeEnumDef> variable(new SyntaxNodeEnumDef(*this,
+	std::shared_ptr<SyntaxNodeEnumDef> enumDef(new SyntaxNodeEnumDef(*this,
 		lexical.GetLineNO(),
 		enumName.c_str(),
 		GetCurrentPos()));
+	AddChild(enumDef);
 	const Lexical &values = *lexical.GetChild(3);
 	int64_t value = 0;
 	for (size_t index = 0; index < values.GetChildrenCount(); index += 2) {
@@ -231,11 +224,19 @@ void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {
 			name = values.GetChild(index)->GetChild(0)->GetContent();
 			value = atoll(values.GetChild(index)->GetChild(1)->GetChild(1)->GetContent().c_str());
 		}
-		variable->SetEnumValue(name.c_str(), value++);
+		enumDef->SetEnumValue(name.c_str(), value++);
 	}
-	m_enums.insert(std::make_pair(enumName, variable));	
+	m_enums.insert(std::make_pair(enumName, enumDef));	
 }
 
+void SyntaxNodeScope::ProcCall(const Lexical &lexical) {
+	const std::string &callName = lexical.GetChild(0)->GetContent();
+	std::shared_ptr<SyntaxNodeProcCall> procCall(new SyntaxNodeProcCall(*this,
+		lexical.GetLineNO(),
+		callName.c_str()));
+	AddChild(procCall);
+	procCall->GenerateArgments(*lexical.GetChild(2));
+}
 void SyntaxNodeScope::PushReturn() {
 //	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
 //		Error("Type Error"); 
@@ -254,10 +255,6 @@ const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::AppendFor(const Lexical
 	return current->GetWhole();
 }
 
-void SyntaxNodeScope::AddArgment(uint64_t argment) {
-	//std::shared_ptr<SyntaxNodeNumber> arg(new SyntaxNodeNumber(*this, 0, argment));
-	//m_argments.push_back(arg);
-}
 
 void SyntaxNodeScope::AddParam(const char *param) {
 //	std::shared_ptr<SyntaxNodeVariable> variable(
@@ -439,4 +436,35 @@ const size_t SyntaxNodeScope::GetSubProcOffset() const {
 
 bool SyntaxNodeScope::CheckDataType(DATA_TYPE_TYPE type, const std::shared_ptr<SyntaxNode> &node) {
 	return node->IsSameDataType(type);
+}
+
+void SyntaxNodeScope::Generate(const Lexical &lexical, std::vector<std::shared_ptr<SyntaxNode>> &syntaxs) {
+	const std::string &name = lexical.GetPattern().GetRule().GetName();
+	if ("variable" == name) {
+		if (!IsVariableExist(lexical.GetContent().c_str())) {
+			Error(lexical.GetLineNO(), lexical.GetContent() + " undefined");
+		}
+		syntaxs.push_back(GetVariable(lexical.GetContent().c_str()));
+		return;
+	}
+	else if ("string" == name) {
+		syntaxs.push_back(std::shared_ptr<SyntaxNode>(
+			new SyntaxNodeString(*this, lexical.GetLineNO(), 
+			lexical.GetContent().c_str())));
+		return;
+	}
+	else if ("numeric" == name) {
+		return;
+	}
+	else if ("integer" == name) {
+		syntaxs.push_back(std::shared_ptr<SyntaxNode>(
+			new SyntaxNodeNumber(*this, lexical.GetLineNO(), 
+			atoi(lexical.GetContent().c_str()))));
+		return;
+	}
+	else {
+		for (size_t index = 0; index < lexical.GetChildrenCount(); index++) {
+			Generate(*lexical.GetChild(index), syntaxs);
+		}
+	}
 }

@@ -11,9 +11,9 @@ SyntaxNodeProcCall::~SyntaxNodeProcCall() {
 
 }
 
-//std::shared_ptr<SyntaxNodeScope> &SyntaxNodeProcCall::GetArgments() {
-//	return m_arguments;
-//}
+void SyntaxNodeProcCall::GenerateArgments(const Lexical &argments){
+	m_outer->Generate(argments, m_arguments);
+}
 
 void SyntaxNodeProcCall::FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) {
 	effectives.insert(self);

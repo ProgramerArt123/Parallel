@@ -61,7 +61,6 @@ public:
 	
 	friend std::ostream &operator<<(std::ostream &out, SyntaxNode &node);
 protected:
-
 	static uint64_t StatisticsKeyWord(const std::string keyWord, const Lexical &lexical);
 	void InsertChild(std::shared_ptr<SyntaxNode> &child,
 		std::list<std::shared_ptr<SyntaxNode>>::iterator childItor);

@@ -32,8 +32,6 @@ public:
 	void PushMod();
 	void PushInc(const char *variable, bool isBack);
 	void PushBlock();
-	void PushNumber(int number);
-	void PushString(const char *itera);
 	void PushVariable(const char *name);
 	
 	std::shared_ptr<SyntaxNodeScope> &PushProcCallEnter(const char *name);
@@ -49,11 +47,11 @@ public:
 	const std::shared_ptr<SyntaxNodeScope> &DefineUnion(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &AppendFor(const Lexical &lexical);
 	void DefineEnum(const Lexical &lexical);
+	void ProcCall(const Lexical &lexical);
 	
 	
 	void PushReturn();
 
-	void AddArgment(uint64_t argment);
 	void AddParam(const char *param);
 	
 	void PushType(const char *type, bool isConst);
@@ -89,6 +87,8 @@ public:
 	virtual const size_t GetCurrentPos() const;
 
 	virtual bool IsVariableExist(const char *name) const;
+	
+	void Generate(const Lexical &lexical, std::vector<std::shared_ptr<SyntaxNode>> &syntaxs);
 protected:
 	bool IsProcExist(const char *name);
 	virtual bool IsVariableExistInner(const char *name)const;
@@ -97,7 +97,6 @@ protected:
 	bool IsUnionExist(const char *name)const;
 	virtual std::shared_ptr<SyntaxNodeVariable> GetVariable(const char *name);
 	size_t StatisticsAssginsCount();
-	
 	
 protected:
 	std::stack<std::shared_ptr<SyntaxNode>> m_stack;
