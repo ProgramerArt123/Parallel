@@ -249,6 +249,27 @@ const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendDoWhile(const Lexi
 	return current->GetBody();
 }
 
+const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendIf(const Lexical &lexical) {
+	printf("AppendIf\n");
+	std::shared_ptr<SyntaxNodeIfElse> current(new SyntaxNodeIfElse(*this, lexical.GetLineNO()));
+	m_stack.push(current);
+	current->GenerateCondtionSyntaxNode(*lexical.GetChild(1));
+	return current->GetBody();
+}
+const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendElseIf(const Lexical &lexical) {
+	printf("AppendElseIf\n");
+	std::shared_ptr<SyntaxNodeIfElse> current(new SyntaxNodeIfElse(*this, lexical.GetLineNO()));
+	m_stack.push(current);
+	current->GenerateCondtionSyntaxNode(*lexical.GetChild(2));
+	return current->GetBody();
+}
+const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendElse(const Lexical &lexical) {
+	printf("AppendElse\n");
+	std::shared_ptr<SyntaxNodeIfElse> current(new SyntaxNodeIfElse(*this, lexical.GetLineNO()));
+	m_stack.push(current);
+	return current->GetBody();
+}
+
 void SyntaxNodeScope::AddParam(const char *param) {
 //	std::shared_ptr<SyntaxNodeVariable> variable(
 //		new SyntaxNodeVariable(*this, 0, param, m_last_data_type, GetCurrentPos()));

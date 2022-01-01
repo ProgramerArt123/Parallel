@@ -45,6 +45,9 @@ public:
 	const std::shared_ptr<SyntaxNodeScope> &AppendFor(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> AppendWhile(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> AppendDoWhile(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> AppendIf(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> AppendElseIf(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> AppendElse(const Lexical &lexical);
 	void DefineEnum(const Lexical &lexical);
 	void AppendProcCall(const Lexical &lexical);
 	

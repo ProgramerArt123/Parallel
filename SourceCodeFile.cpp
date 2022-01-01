@@ -25,6 +25,13 @@ void WhileStateExit(const Lexical &lexical, Content &content);
 void DoWhileStateEnter(const Lexical &lexical, Content &content); 
 void DoWhileStateExit(const Lexical &lexical, Content &content);
 
+void IfStateEnter(const Lexical &lexical, Content &content);
+void IfStateExit(const Lexical &lexical, Content &content);
+void ElseIfStateEnter(const Lexical &lexical, Content &content);
+void ElseIfStateExit(const Lexical &lexical, Content &content);
+void ElseStateEnter(const Lexical &lexical, Content &content);
+void ElseStateExit(const Lexical &lexical, Content &content);
+
 void VariableDef(const Lexical &lexical, Content &content);
 
 void ProcCall(const Lexical &lexical, Content &content);
@@ -41,6 +48,10 @@ SourceCodeFile::SourceCodeFile(const char *fileName):
 		m_config->BindActionFunction("ForState", &ForStateEnter, &ForStateExit);
 		m_config->BindActionFunction("WhileState", &WhileStateEnter, &WhileStateExit);
 		m_config->BindActionFunction("DoWhileState", &DoWhileStateEnter, &DoWhileStateExit);
+		
+		m_config->BindActionFunction("IfState", &IfStateEnter, &IfStateExit);
+		m_config->BindActionFunction("ElseIfState", &ElseIfStateEnter, &ElseIfStateExit);
+		m_config->BindActionFunction("ElseState", &ElseStateEnter, ElseStateExit);
 		
 		m_config->BindActionFunction("ProcCall", &ProcCall);
 		
@@ -134,6 +145,33 @@ void DoWhileStateEnter(const Lexical &lexical, Content &content) {
 	syntax.PushScope(syntax.GetCurrentScope()->AppendDoWhile(lexical));
 }
 void DoWhileStateExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
+}
+
+void IfStateEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PushScope(syntax.GetCurrentScope()->AppendIf(lexical));
+}
+void IfStateExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
+}
+
+void ElseIfStateEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PushScope(syntax.GetCurrentScope()->AppendElseIf(lexical));
+}
+void ElseIfStateExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
+}
+
+void ElseStateEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PushScope(syntax.GetCurrentScope()->AppendElse(lexical));
+}
+void ElseStateExit(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
 	syntax.PopScope();
 }
