@@ -44,7 +44,7 @@ std::shared_ptr<DataType> SourceCodeFile::ProduceDataType(const Lexical &lexical
 		return std::shared_ptr<DataType>(new DataTypeVoid(isConst, isStatic, isVolatile));
 	}
 	else {
-		throw error_info(" undefined");
+		lexical.Error(" undefined");
 	}
 }
 

@@ -35,7 +35,7 @@ public:
 
 	GENERATE_PARALLEL_RESULT GenerateParallelSelf(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel);
 
-	const char* GetContent();
+	const char* GetContent()const;
 
 	size_t GetChildrenCount();
 
@@ -71,7 +71,7 @@ protected:
 
 	void SetDeep(int deep);
 	
-
+	void Error(const std::string &info)const throw (std::string);
 public:
 	std::list<std::shared_ptr<SyntaxNode>> m_children;
 	int m_generate_line = 0;

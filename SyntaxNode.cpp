@@ -118,7 +118,7 @@ void SyntaxNode::ArgmentCache(uint32_t index, std::unique_ptr<Output>& output) {
 	GetOuter()->PopCache();
 }
 
-const char* SyntaxNode::GetContent() {
+const char* SyntaxNode::GetContent()const {
 	return m_content.c_str();
 }
 
@@ -162,3 +162,7 @@ bool SyntaxNode::IsSameDataType(DATA_TYPE_TYPE type) {
 	return false;
 }
 
+void SyntaxNode::Error(const std::string &info)const throw (std::string) {
+	throw "Syntax_Error=>line:【"  + std::to_string(m_line) + 
+	"】, content 【" + GetContent() + "】 " + info;
+}

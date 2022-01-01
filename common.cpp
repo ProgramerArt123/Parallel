@@ -1,9 +1,7 @@
 #include "common.h"
 
 std::unique_ptr<SourceCodeFile> source;
-std::string error_info(std::string info) {
-	return "Error=>line:【"  + std::string("】, near 【")  + "】 " + info;
-}
+
 void PushStatement() {
 	source->m_scopes.top()->PushStatement();
 }

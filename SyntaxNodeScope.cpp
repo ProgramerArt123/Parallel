@@ -16,7 +16,7 @@ SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, int line, const Syntax
 }
 void SyntaxNodeScope::PushAddAssign(const char *variable) {
 	if (!IsVariableParamExist(variable)) {
-		throw error_info(std::string(variable) + " undefined");
+		Error(std::string(variable) + " undefined");
 	}
 	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this,0));
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
@@ -83,7 +83,7 @@ void SyntaxNodeScope::PushMod() {
 
 void SyntaxNodeScope::PushInc(const char *variable, bool isBack) {
 	if (!IsVariableParamExist(variable)) {
-		throw error_info(std::string(variable) + " undefined");
+		Error(std::string(variable) + " undefined");
 	}	
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
 	std::shared_ptr<SyntaxNode> inc(new SyntaxNodeInc(*this, 0, isBack));
@@ -110,7 +110,7 @@ void SyntaxNodeScope::PushString(const char *itera) {
 
 void SyntaxNodeScope::PushVariable(const char *name) {
 	if (!IsVariableParamExist(name)) {
-		throw error_info(std::string(name) + " undefined");
+		Error(std::string(name) + " undefined");
 	}
 	m_stack.push(GetVariableParam(name));
 }
@@ -165,7 +165,7 @@ void SyntaxNodeScope::PushInitStatement() {
 
 void SyntaxNodeScope::DecalreVariable(const char *name, std::shared_ptr<DataType> type) {
 	if (IsVariableParamExistInner(name)) {
-		throw error_info(std::string(name) + " redefined");
+		Error(std::string(name) + " redefined");
 	}
 	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this,0,
 		name, type, GetCurrentPos()));
@@ -175,7 +175,7 @@ void SyntaxNodeScope::DecalreVariable(const char *name, std::shared_ptr<DataType
 
 void SyntaxNodeScope::PushReturn() {
 	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
-		throw error_info("Type Error"); 
+		Error("Type Error"); 
 	}
 	std::shared_ptr<SyntaxNode> ret(new SyntaxNodeReturn(*this, 0));
 	ret->AddChild(m_stack.top());

@@ -112,7 +112,7 @@ void Parallel::OutputInstructions(std::unique_ptr<Output>& output) {
 std::ostream &operator<<(std::ostream &out, Parallel &parallel) {
 	out << "==============================================================================" << std::endl;
 	for (ParallelElement &element : parallel.m_elements) {
-		for (std::shared_ptr<SyntaxNode> &node : element.m_nodes) {
+		for (const std::shared_ptr<SyntaxNode> &node : element.m_nodes) {
 			out << node->GetContent() << '|';
 		}
 		out <<  std::endl;
