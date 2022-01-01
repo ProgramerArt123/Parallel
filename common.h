@@ -20,6 +20,7 @@
 #include "SyntaxNodeFor.h"
 #include "SyntaxNodeWhile.h"
 #include "SyntaxNodeIfElse.h"
+#include "SyntaxNodeSwitchCase.h"
 #include "SyntaxNodeScope.h"
 #include "SourceCodeFile.h"
 #include "DataType.h"

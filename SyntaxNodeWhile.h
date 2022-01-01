@@ -6,7 +6,7 @@
 
 class SyntaxNodeWhile : public SyntaxNode {
 public:
-	explicit SyntaxNodeWhile(SyntaxNodeScope &outter, int line, bool ifsDo = false);
+	explicit SyntaxNodeWhile(SyntaxNodeScope &outter, int line, bool isDo = false);
 	virtual ~SyntaxNodeWhile();
 	void GenerateCondtionSyntaxNode(const Lexical &condition);
 	std::shared_ptr<SyntaxNodeScope> GetBody();

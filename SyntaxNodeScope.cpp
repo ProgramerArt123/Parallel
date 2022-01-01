@@ -270,6 +270,21 @@ const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendElse(const Lexical
 	return current->GetBody();
 }
 
+const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendSwitch(const Lexical &lexical) {
+	printf("AppendSwitch\n");
+	std::shared_ptr<SyntaxNodeSwitchCase> current(new SyntaxNodeSwitchCase(*this, lexical.GetLineNO()));
+	m_stack.push(current);
+	current->GenerateValueSyntaxNode(*lexical.GetChild(1));
+	return current->GetBody();
+}
+const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendCase(const Lexical &lexical) {
+	printf("AppendCase\n");
+	std::shared_ptr<SyntaxNodeSwitchCase> current(new SyntaxNodeSwitchCase(*this, lexical.GetLineNO(), false));
+	m_stack.push(current);
+	current->GenerateValueSyntaxNode(*lexical.GetChild(1));
+	return current->GetBody();
+}
+
 void SyntaxNodeScope::AddParam(const char *param) {
 //	std::shared_ptr<SyntaxNodeVariable> variable(
 //		new SyntaxNodeVariable(*this, 0, param, m_last_data_type, GetCurrentPos()));

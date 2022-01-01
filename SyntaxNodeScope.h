@@ -48,6 +48,8 @@ public:
 	const std::shared_ptr<SyntaxNodeScope> AppendIf(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> AppendElseIf(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> AppendElse(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> AppendSwitch(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> AppendCase(const Lexical &lexical);
 	void DefineEnum(const Lexical &lexical);
 	void AppendProcCall(const Lexical &lexical);
 	

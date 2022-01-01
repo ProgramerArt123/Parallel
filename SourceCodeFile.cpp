@@ -32,6 +32,12 @@ void ElseIfStateExit(const Lexical &lexical, Content &content);
 void ElseStateEnter(const Lexical &lexical, Content &content);
 void ElseStateExit(const Lexical &lexical, Content &content);
 
+
+void SwitchStateEnter(const Lexical &lexical, Content &content);
+void SwitchStateExit(const Lexical &lexical, Content &content);
+void CaseStateEnter(const Lexical &lexical, Content &content);
+void CaseStateExit(const Lexical &lexical, Content &content);
+
 void VariableDef(const Lexical &lexical, Content &content);
 
 void ProcCall(const Lexical &lexical, Content &content);
@@ -52,6 +58,9 @@ SourceCodeFile::SourceCodeFile(const char *fileName):
 		m_config->BindActionFunction("IfState", &IfStateEnter, &IfStateExit);
 		m_config->BindActionFunction("ElseIfState", &ElseIfStateEnter, &ElseIfStateExit);
 		m_config->BindActionFunction("ElseState", &ElseStateEnter, ElseStateExit);
+		
+		m_config->BindActionFunction("Switch", &SwitchStateEnter, &SwitchStateExit);
+		m_config->BindActionFunction("Case", &CaseStateEnter, CaseStateExit);
 		
 		m_config->BindActionFunction("ProcCall", &ProcCall);
 		
@@ -172,6 +181,24 @@ void ElseStateEnter(const Lexical &lexical, Content &content) {
 	syntax.PushScope(syntax.GetCurrentScope()->AppendElse(lexical));
 }
 void ElseStateExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
+}
+
+void SwitchStateEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PushScope(syntax.GetCurrentScope()->AppendSwitch(lexical));
+}
+void SwitchStateExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
+}
+
+void CaseStateEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PushScope(syntax.GetCurrentScope()->AppendCase(lexical));
+}
+void CaseStateExit(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
 	syntax.PopScope();
 }
