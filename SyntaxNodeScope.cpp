@@ -99,27 +99,6 @@ void SyntaxNodeScope::PushBlock() {
 	m_stack.push(current);
 }
 
-
-void SyntaxNodeScope::PushVariable(const char *name) {
-//	if (!IsVariableParamExist(name)) {
-//		Error(std::string(name) + " undefined");
-//	}
-//	m_stack.push(GetVariableParam(name));
-}
-
-
-std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcCallEnter(const char *name) {
-//	printf("PushProcCallEnter\n");
-//	SyntaxNodeProcCall *call = new SyntaxNodeProcCall(*this, 0, name);
-//	std::shared_ptr<SyntaxNode> current(call);
-//	m_stack.push(current);
-//	return call->GetArgments();
-}
-
-void SyntaxNodeScope::PushProcCallExit() {
-	printf("PushProcCallExit\n");
-}
-
 void SyntaxNodeScope::PushStatement() {
 	SYNTAX_NODE_TYPE type = m_stack.top()->GetType();
 	const char *content = m_stack.top()->GetContent();
@@ -229,13 +208,13 @@ void SyntaxNodeScope::DefineEnum(const Lexical &lexical) {
 	m_enums.insert(std::make_pair(enumName, enumDef));	
 }
 
-void SyntaxNodeScope::ProcCall(const Lexical &lexical) {
+void SyntaxNodeScope::AppendProcCall(const Lexical &lexical) {
 	const std::string &callName = lexical.GetChild(0)->GetContent();
 	std::shared_ptr<SyntaxNodeProcCall> procCall(new SyntaxNodeProcCall(*this,
 		lexical.GetLineNO(),
 		callName.c_str()));
 	AddChild(procCall);
-	procCall->GenerateArgments(*lexical.GetChild(2));
+	procCall->GenerateArgmentsSyntaxNode(*lexical.GetChild(2));
 }
 void SyntaxNodeScope::PushReturn() {
 //	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
@@ -249,12 +228,26 @@ void SyntaxNodeScope::PushReturn() {
 
 const std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::AppendFor(const Lexical &lexical) {
 	printf("AppendFor\n");
-	SyntaxNodeFor *loop = new SyntaxNodeFor(*this, lexical.GetLineNO());
-	std::shared_ptr<SyntaxNodeFor> current = std::shared_ptr<SyntaxNodeFor>(loop);
+	std::shared_ptr<SyntaxNodeFor> current(new SyntaxNodeFor(*this, lexical.GetLineNO()));
 	m_stack.push(current);
 	return current->GetWhole();
 }
 
+const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendWhile(const Lexical &lexical) {
+	printf("AppendWhile\n");
+	std::shared_ptr<SyntaxNodeWhile> current(new SyntaxNodeWhile(*this, lexical.GetLineNO()));
+	m_stack.push(current);
+	current->GenerateCondtionSyntaxNode(*lexical.GetChild(1));
+	return current->GetBody();
+}
+
+const std::shared_ptr<SyntaxNodeScope> SyntaxNodeScope::AppendDoWhile(const Lexical &lexical) {
+	printf("AppendDoWhile\n");
+	std::shared_ptr<SyntaxNodeWhile> current(new SyntaxNodeWhile(*this, lexical.GetLineNO(), true));
+	m_stack.push(current);
+	current->GenerateCondtionSyntaxNode(*lexical.GetChild(3));
+	return current->GetBody();
+}
 
 void SyntaxNodeScope::AddParam(const char *param) {
 //	std::shared_ptr<SyntaxNodeVariable> variable(
@@ -438,7 +431,7 @@ bool SyntaxNodeScope::CheckDataType(DATA_TYPE_TYPE type, const std::shared_ptr<S
 	return node->IsSameDataType(type);
 }
 
-void SyntaxNodeScope::Generate(const Lexical &lexical, std::vector<std::shared_ptr<SyntaxNode>> &syntaxs) {
+void SyntaxNodeScope::GenerateSyntaxNode(const Lexical &lexical, std::vector<std::shared_ptr<SyntaxNode>> &syntaxs) {
 	const std::string &name = lexical.GetPattern().GetRule().GetName();
 	if ("proc_call" == name) {
 		syntaxs.push_back(std::shared_ptr<SyntaxNode>(
@@ -465,7 +458,7 @@ void SyntaxNodeScope::Generate(const Lexical &lexical, std::vector<std::shared_p
 	}
 	else {
 		for (size_t index = 0; index < lexical.GetChildrenCount(); index++) {
-			Generate(*lexical.GetChild(index), syntaxs);
+			GenerateSyntaxNode(*lexical.GetChild(index), syntaxs);
 		}
 	}
 }

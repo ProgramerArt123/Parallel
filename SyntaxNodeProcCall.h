@@ -8,7 +8,7 @@ public:
 	explicit SyntaxNodeProcCall(SyntaxNodeScope &scope, int line, const char *name);
 	virtual ~SyntaxNodeProcCall();
 	
-	void GenerateArgments(const Lexical &argments);
+	void GenerateArgmentsSyntaxNode(const Lexical &argments);
 	
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;
 

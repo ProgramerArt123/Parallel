@@ -32,10 +32,7 @@ public:
 	void PushMod();
 	void PushInc(const char *variable, bool isBack);
 	void PushBlock();
-	void PushVariable(const char *name);
 	
-	std::shared_ptr<SyntaxNodeScope> &PushProcCallEnter(const char *name);
-	void PushProcCallExit();
 
 	void PushStatement();
 	void PushAssignmentStatement();
@@ -46,8 +43,10 @@ public:
 	const std::shared_ptr<SyntaxNodeScope> &DefineStruct(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &DefineUnion(const Lexical &lexical);
 	const std::shared_ptr<SyntaxNodeScope> &AppendFor(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> AppendWhile(const Lexical &lexical);
+	const std::shared_ptr<SyntaxNodeScope> AppendDoWhile(const Lexical &lexical);
 	void DefineEnum(const Lexical &lexical);
-	void ProcCall(const Lexical &lexical);
+	void AppendProcCall(const Lexical &lexical);
 	
 	
 	void PushReturn();
@@ -88,7 +87,7 @@ public:
 
 	virtual bool IsVariableExist(const char *name) const;
 	
-	void Generate(const Lexical &lexical, std::vector<std::shared_ptr<SyntaxNode>> &syntaxs);
+	void GenerateSyntaxNode(const Lexical &lexical, std::vector<std::shared_ptr<SyntaxNode>> &syntaxs);
 protected:
 	bool IsProcExist(const char *name);
 	virtual bool IsVariableExistInner(const char *name)const;

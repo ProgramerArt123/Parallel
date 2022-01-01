@@ -69,9 +69,9 @@ int main(){
 		do{
 			printf("do while\n");
 			break;
-		}while(b);
+		}while(x);
 		
-		while(c){
+		while(x){
 			printf("while\n");
 		}
 		int y = 1 % 2 + 5 * (6 + 9) / 3;

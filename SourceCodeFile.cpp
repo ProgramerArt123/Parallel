@@ -19,6 +19,12 @@ void UnionDefExit(const Lexical &lexical, Content &content);
 void ForStateEnter(const Lexical &lexical, Content &content); 
 void ForStateExit(const Lexical &lexical, Content &content);
 
+void WhileStateEnter(const Lexical &lexical, Content &content); 
+void WhileStateExit(const Lexical &lexical, Content &content);
+
+void DoWhileStateEnter(const Lexical &lexical, Content &content); 
+void DoWhileStateExit(const Lexical &lexical, Content &content);
+
 void VariableDef(const Lexical &lexical, Content &content);
 
 void ProcCall(const Lexical &lexical, Content &content);
@@ -33,6 +39,8 @@ SourceCodeFile::SourceCodeFile(const char *fileName):
 		m_config->BindActionFunction("UnionDef", &UnionDefEnter, &UnionDefExit);
 		
 		m_config->BindActionFunction("ForState", &ForStateEnter, &ForStateExit);
+		m_config->BindActionFunction("WhileState", &WhileStateEnter, &WhileStateExit);
+		m_config->BindActionFunction("DoWhileState", &DoWhileStateEnter, &DoWhileStateExit);
 		
 		m_config->BindActionFunction("ProcCall", &ProcCall);
 		
@@ -111,9 +119,28 @@ void ForStateExit(const Lexical &lexical, Content &content) {
 	syntax.PopScope();
 }
 
+void WhileStateEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PushScope(syntax.GetCurrentScope()->AppendWhile(lexical));
+}
+
+void WhileStateExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
+}
+
+void DoWhileStateEnter(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PushScope(syntax.GetCurrentScope()->AppendDoWhile(lexical));
+}
+void DoWhileStateExit(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	syntax.PopScope();
+}
+
 void ProcCall(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
 	const std::string &callName = lexical.GetChild(0)->GetContent();
 	std::cout << "ProcCall:" << callName << std::endl;
-	syntax.GetCurrentScope()->ProcCall(lexical);
+	syntax.GetCurrentScope()->AppendProcCall(lexical);
 }
