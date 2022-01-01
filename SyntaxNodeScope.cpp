@@ -170,7 +170,8 @@ void SyntaxNodeScope::DefineVariable(const Lexical &lexical) {
 	}
 	std::shared_ptr<SyntaxNodeVariable> variable(new SyntaxNodeVariable(*this,
 		lexical.GetLineNO(),varName.c_str(),
-		ProduceDataType(*lexical.GetChild(0)), GetCurrentPos()));
+		ProduceDataType(*lexical.GetChild(0)),
+		StatisticsKeyWord("*", lexical), GetCurrentPos()));
 	m_variables.insert(std::make_pair(varName, variable));	
 }
 

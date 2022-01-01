@@ -182,6 +182,17 @@ std::shared_ptr<DataType> SyntaxNode::ProduceDataType(const Lexical &lexical) {
 bool SyntaxNode::SearchKeyWord(const std::string keyWord, const Lexical &lexical) {
 	return lexical.ForeachTopLeftRigthInterrupt([&](const Lexical &current){return keyWord == current.GetContent();});
 }
+
+uint64_t SyntaxNode::StatisticsKeyWord(const std::string keyWord, const Lexical &lexical) {
+	uint64_t count = 0;
+	lexical.ForeachTopLeftRigthInterrupt([&](const Lexical &current){
+		if (keyWord == current.GetContent()){ 
+			count++;
+		}
+		return false;
+	});
+	return count;
+}
 void SyntaxNode::Error(uint64_t line, const std::string &info)const throw (std::string) {
 	throw "Syntax_Error=>line:【"  + std::to_string(m_line) + 
 	"】, content 【" + GetContent() + "】 【"  + std::to_string(line) + 

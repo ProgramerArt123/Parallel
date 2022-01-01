@@ -4,9 +4,11 @@
 SyntaxNodeVariable::SyntaxNodeVariable(SyntaxNodeScope &scope,
 	int line,
 	const char *name, 
-	std::shared_ptr<DataType> dataType, size_t pos):
+	std::shared_ptr<DataType> dataType,
+	uint64_t pointerDimension,
+	size_t pos):
 	SyntaxNode(scope,line, name), m_name(name), m_data_type(dataType),
-	m_scope_pos(pos){
+	m_pointer_dimension(pointerDimension), m_scope_pos(pos){
 	m_type = SYNTAX_NODE_TYPE_VARIABLE;
 }
 

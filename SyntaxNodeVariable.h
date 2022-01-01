@@ -13,7 +13,7 @@ public:
 	explicit SyntaxNodeVariable(SyntaxNodeScope &scope,
 		int line,
 		const char *name,
-		std::shared_ptr<DataType> dataType, size_t pos);
+		std::shared_ptr<DataType> dataType, uint64_t pointerDimension, size_t pos);
 	virtual ~SyntaxNodeVariable();
 
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;
@@ -25,13 +25,12 @@ public:
 	bool IsConst() const;
 private:
 	std::shared_ptr<SyntaxNodeAssignment> GetLastAssign();
-
 	const size_t GetScopePos()const;
 private:
 	std::string m_name;
 	const size_t m_scope_pos = 0;
 	const std::shared_ptr<DataType> m_data_type;
-
+	const uint64_t m_pointer_dimension = 0;
 };
 
 #endif
