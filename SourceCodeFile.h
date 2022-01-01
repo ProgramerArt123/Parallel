@@ -20,6 +20,7 @@ public:
 private:
 	const std::string m_file_name;
 	std::shared_ptr<Config> m_config;
+	SyntaxNodeScope m_implicit;
 };
 
 #endif

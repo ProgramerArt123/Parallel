@@ -1,15 +1,17 @@
 
 #include "common.h"
 #include "SyntaxNodeScope.h"
-#include "Content.h"
-#include "Generate.h"
+#include "Scanner.h"
+#include "SyntaxContent.h"
 #include "SourceCodeFile.h"
-std::shared_ptr<Config> GetConfig0();
+
+void ProcDef(const Lexical &lexical, const Content &content);
 
 SourceCodeFile::SourceCodeFile(const char *fileName):
-	m_file_name(fileName){
+	m_file_name(fileName), m_implicit(0){
 	m_scopes.push(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(0)));
-		m_config = GetConfig0();
+	m_config = GenerateConfig0();
+		m_config->BindActionFunction("ProcDef", &ProcDef);
 }
 
 SourceCodeFile::~SourceCodeFile() {
@@ -17,7 +19,7 @@ SourceCodeFile::~SourceCodeFile() {
 }
 
 void SourceCodeFile::Parse() throw (std::string) {
-	Content content(m_file_name, *m_config);
+	SyntaxContent content(m_file_name, *m_config);
 	content.Load();
 	content.Parse();
 	content.ForeachLexical();
@@ -25,4 +27,11 @@ void SourceCodeFile::Parse() throw (std::string) {
 
 void SourceCodeFile::OutputFile(std::unique_ptr<Output>& output) throw (std::exception) {
 	m_scopes.top()->OutputFile(output);
+}
+
+
+void ProcDef(const Lexical &lexical, const Content &content) {
+	const SyntaxContent &syntax = static_cast<const SyntaxContent &>(content);
+	std::cout << "ProcDef:" << lexical.GetChild(1)->GetContent() << std::endl;
+
 }
