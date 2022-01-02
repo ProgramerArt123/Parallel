@@ -3,13 +3,13 @@
 #include "Parallel.h"
 #include "SyntaxNodeProcDef.h"
 #include "SyntaxNode.h"
-SyntaxNode::SyntaxNode(const char *content, int priority) :
-	m_content(content){
-	m_line = yyget_lineno();
+SyntaxNode::SyntaxNode(int line, const char *content, int priority):
+	m_content(content), m_line(line){
 }
-SyntaxNode::SyntaxNode(SyntaxNodeScope &outer, const char *content, int priority):
-	m_content(content), m_outer(&outer) {
-	m_line = yyget_lineno();
+SyntaxNode::SyntaxNode(SyntaxNodeScope &outer, int line, const char *content, int priority)
+	: m_content(content)
+	, m_outer(&outer)
+	, m_line(line) {
 }
 SyntaxNode::~SyntaxNode() {
 }

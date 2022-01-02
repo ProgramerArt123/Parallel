@@ -5,7 +5,7 @@
 
 class SyntaxNodeInc : public SyntaxNodeCompute {
 public:
-	explicit SyntaxNodeInc(SyntaxNodeScope &outer, bool isBack);
+	explicit SyntaxNodeInc(SyntaxNodeScope &outer, int line, bool isBack);
 	virtual ~SyntaxNodeInc();
 	
 	void OutputInstructions(std::unique_ptr<Output>& output) override;

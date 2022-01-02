@@ -3,25 +3,26 @@
 #include "common.h"
 #include "SyntaxNodeScope.h"
 
-SyntaxNodeScope::SyntaxNodeScope(const char *content) :
-	SyntaxNode(content),m_parallel(*this) {
+SyntaxNodeScope::SyntaxNodeScope(int line, const char *content) :
+	SyntaxNode(line, content),m_parallel(*this) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
 
-SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, const SyntaxNodeProcDef *proc, const char *content):
-	SyntaxNode(outter, content), m_proc(proc),
+SyntaxNodeScope::SyntaxNodeScope(SyntaxNodeScope &outter, int line, const SyntaxNodeProcDef *proc, const char *content)
+	:
+	SyntaxNode(outter, line, content), m_proc(proc),
 	m_base_pos(outter.GetCurrentPos()),m_parallel(*this) {
 	m_type = SYNTAX_NODE_TYPE_SCOPE;
 }
 void SyntaxNodeScope::PushAddAssign(const char *variable) {
 	if (!IsVariableParamExist(variable)) {
-		throw "Error:" + std::string(variable) + " undefined";
+		throw error_info(std::string(variable) + " undefined");
 	}
-	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this));
+	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this,0));
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
 	assign->AddChild(var);
 	
-	std::shared_ptr<SyntaxNode> add(new SyntaxNodeAdd(*this));
+	std::shared_ptr<SyntaxNode> add(new SyntaxNodeAdd(*this, 0));
 	add->AddChildFront(var);
 	add->AddChildFront(m_stack.top());
 	m_stack.pop();
@@ -33,7 +34,7 @@ void SyntaxNodeScope::PushAddAssign(const char *variable) {
 }
 void SyntaxNodeScope::PushAdd() {
 	printf("plus\n");
-	std::shared_ptr<SyntaxNode> current(new SyntaxNodeAdd(*this));
+	std::shared_ptr<SyntaxNode> current(new SyntaxNodeAdd(*this, 0));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -43,7 +44,7 @@ void SyntaxNodeScope::PushAdd() {
 
 void SyntaxNodeScope::PushSub() {
 	printf("sub\n");
-	std::shared_ptr<SyntaxNode> current(new SyntaxNodeSub(*this));
+	std::shared_ptr<SyntaxNode> current(new SyntaxNodeSub(*this,0));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -53,7 +54,7 @@ void SyntaxNodeScope::PushSub() {
 
 void SyntaxNodeScope::PushMul() {
 	printf("mul\n"); 
-	std::shared_ptr<SyntaxNode> current(new SyntaxNodeMul(*this));
+	std::shared_ptr<SyntaxNode> current(new SyntaxNodeMul(*this, 0));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -62,7 +63,7 @@ void SyntaxNodeScope::PushMul() {
 }
 
 void SyntaxNodeScope::PushDiv() {
-	printf("div\n"); std::shared_ptr<SyntaxNode> current(new SyntaxNodeDiv(*this));
+	printf("div\n"); std::shared_ptr<SyntaxNode> current(new SyntaxNodeDiv(*this, 0));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -72,7 +73,7 @@ void SyntaxNodeScope::PushDiv() {
 
 void SyntaxNodeScope::PushMod() {
 	printf("mod\n");
-	std::shared_ptr<SyntaxNode> current(new SyntaxNodeMod(*this));
+	std::shared_ptr<SyntaxNode> current(new SyntaxNodeMod(*this, 0));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	current->AddChildFront(m_stack.top());
@@ -85,14 +86,14 @@ void SyntaxNodeScope::PushInc(const char *variable, bool isBack) {
 		throw error_info(std::string(variable) + " undefined");
 	}	
 	std::shared_ptr<SyntaxNode> var = m_variables[variable];
-	std::shared_ptr<SyntaxNode> inc(new SyntaxNodeInc(*this, isBack));
+	std::shared_ptr<SyntaxNode> inc(new SyntaxNodeInc(*this, 0, isBack));
 	inc->AddChild(var);
 	m_stack.push(inc);
 }
 
 void SyntaxNodeScope::PushBlock() {
 	printf("block\n");
-	std::shared_ptr<SyntaxNode> current(new SyntaxNode("()"));
+	std::shared_ptr<SyntaxNode> current(new SyntaxNode(0, "()"));
 	current->AddChildFront(m_stack.top());
 	m_stack.pop();
 	m_stack.push(current);
@@ -100,23 +101,23 @@ void SyntaxNodeScope::PushBlock() {
 
 void SyntaxNodeScope::PushNumber(int number) {
 	printf("+++%d\n", number);
-	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeNumber(*this, number)));
+	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeNumber(*this,0, number)));
 }
 
 void SyntaxNodeScope::PushString(const char *itera) {
-	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeString(*this, itera)));
+	m_stack.push(std::shared_ptr<SyntaxNode>(new SyntaxNodeString(*this, 0,itera)));
 }
 
 void SyntaxNodeScope::PushVariable(const char *name) {
 	if (!IsVariableParamExist(name)) {
-		throw "Error:" + std::string(name) + " undefined";
+		throw error_info(std::string(name) + " undefined");
 	}
 	m_stack.push(GetVariableParam(name));
 }
 
-std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcDefEnter(const char *name, bool isConst) {
+std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcDefEnter() {
 	printf("PushProcDefEnter\n");
-	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(*this, name, m_last_data_type, isConst);
+	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(*this, 0, m_last_variable.c_str(), m_last_data_type);
 	std::shared_ptr<SyntaxNode> current(proc);
 	m_stack.push(current);
 	return proc->GetBody();
@@ -128,7 +129,7 @@ void SyntaxNodeScope::PushProcDefExit() {
 
 std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcCallEnter(const char *name) {
 	printf("PushProcCallEnter\n");
-	SyntaxNodeProcCall *call = new SyntaxNodeProcCall(*this, name);
+	SyntaxNodeProcCall *call = new SyntaxNodeProcCall(*this, 0, name);
 	std::shared_ptr<SyntaxNode> current(call);
 	m_stack.push(current);
 	return call->GetArgments();
@@ -145,27 +146,27 @@ void SyntaxNodeScope::PushStatement() {
 	m_stack.pop();
 }
 
-void SyntaxNodeScope::PushAssignmentStatement(const char *variable) {
-	if (!IsVariableParamExist(variable)) {
-		throw error_info(std::string(variable) + " undefined");
+void SyntaxNodeScope::PushAssignmentStatement() {
+	if (!IsVariableParamExist(m_last_variable.c_str())) {
+		throw error_info(m_last_variable + " undefined");
 	}
-	std::shared_ptr<SyntaxNode> var = GetVariableParam(variable);
+	std::shared_ptr<SyntaxNode> var = GetVariableParam(m_last_variable.c_str());
 	if (static_cast<SyntaxNodeVariable *>(var.get())->IsConst()) {
-		throw error_info(std::string(variable) + " is const, can not be assgin");
+		throw error_info(m_last_variable + " is const, can not be assgin");
 	}
-	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this));
+	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this, 0));
 	assign->AddChild(var);
 	assign->AddChild(m_stack.top());
 	m_stack.pop();
 	
 	m_stack.push(assign);
 }
-void SyntaxNodeScope::PushInitStatement(const char *variable) {
-	if (!IsVariableParamExist(variable)) {
-		throw error_info(std::string(variable) + " undefined");
+void SyntaxNodeScope::PushInitStatement() {
+	if (!IsVariableParamExist(m_last_variable.c_str())) {
+		throw error_info(m_last_variable + " undefined");
 	}
-	std::shared_ptr<SyntaxNode> var = GetVariableParam(variable);
-	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this));
+	std::shared_ptr<SyntaxNode> var = GetVariableParam(m_last_variable.c_str());
+	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this, 0));
 	assign->AddChild(var);
 	assign->AddChild(m_stack.top());
 	m_stack.pop();
@@ -173,19 +174,24 @@ void SyntaxNodeScope::PushInitStatement(const char *variable) {
 	m_stack.push(assign);
 }
 
-void SyntaxNodeScope::DecalreVariable(const char *variable, bool isConst) {
-	if (IsVariableParamExistInner(variable)) {
-		throw "Error:" + std::string(variable) + " redefined";
+void SyntaxNodeScope::DecalreVariable() {
+	if (IsVariableParamExistInner(m_last_variable.c_str())) {
+		throw error_info(m_last_variable + " redefined");
 	}
-	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this, variable, 
-		m_last_data_type, isConst, GetCurrentPos()));
-	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(variable, varv));
+	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this,0,
+		m_last_variable.c_str(), 
+		m_last_data_type, GetCurrentPos()));
+	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(m_last_variable.c_str(), varv));
+	
+}
+void SyntaxNodeScope::SetVariableName(const char *variable) {
+	m_last_variable = variable;
 }
 void SyntaxNodeScope::PushReturn() {
 	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
 		throw error_info("Type Error"); 
 	}
-	std::shared_ptr<SyntaxNode> ret(new SyntaxNodeReturn(*this));
+	std::shared_ptr<SyntaxNode> ret(new SyntaxNodeReturn(*this, 0));
 	ret->AddChild(m_stack.top());
 	m_stack.pop();
 	AddChild(ret);
@@ -193,7 +199,7 @@ void SyntaxNodeScope::PushReturn() {
 
 std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushLoopEnter() {
 	printf("PushLoopEnter\n");
-	SyntaxNodeLoop *loop = new SyntaxNodeLoop(*this);
+	SyntaxNodeLoop *loop = new SyntaxNodeLoop(*this, 0);
 	std::shared_ptr<SyntaxNodeLoop> current = std::shared_ptr<SyntaxNodeLoop>(loop);
 	m_stack.push(current);
 	return current->GetBody();
@@ -204,19 +210,19 @@ void SyntaxNodeScope::PushLoopExit() {
 }
 
 void SyntaxNodeScope::AddArgment(uint64_t argment) {
-	std::shared_ptr<SyntaxNodeNumber> arg(new SyntaxNodeNumber(*this, argment));
+	std::shared_ptr<SyntaxNodeNumber> arg(new SyntaxNodeNumber(*this, 0, argment));
 	m_argments.push_back(arg);
 }
 
-void SyntaxNodeScope::AddParam(const char *param, bool isConst) {
+void SyntaxNodeScope::AddParam(const char *param) {
 	std::shared_ptr<SyntaxNodeVariable> variable(
-		new SyntaxNodeVariable(*this, param, m_last_data_type, isConst, GetCurrentPos()));
+		new SyntaxNodeVariable(*this, 0, param, m_last_data_type, GetCurrentPos()));
 	m_parameters.push_back(variable);
 }
 
-void SyntaxNodeScope::PushType(const char *type) {
+void SyntaxNodeScope::PushType(const char *type, bool isConst) {
 	if (0 == strcmp(type, "int")){		
-		m_last_data_type = std::shared_ptr<DataType>(new DataTypeInt());
+		m_last_data_type = std::shared_ptr<DataType>(new DataTypeInt(isConst));
 	}
 	else if (0 == strcmp(type, "void")) {		
 		m_last_data_type = std::shared_ptr<DataType>(new DataTypeVoid());

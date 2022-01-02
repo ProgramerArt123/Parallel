@@ -1,8 +1,9 @@
 #include "SyntaxNodeDiv.h"
 #include "common.h"
 
-SyntaxNodeDiv::SyntaxNodeDiv(SyntaxNodeScope &outer):
-	SyntaxNodeCompute(outer, "/"){
+SyntaxNodeDiv::SyntaxNodeDiv(SyntaxNodeScope &outer, int line)
+	:
+	SyntaxNodeCompute(outer, line, "/"){
 	m_type = SYNTAX_NODE_TYPE_DIV;
 }
 

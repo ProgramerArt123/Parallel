@@ -5,7 +5,7 @@
 
 class SyntaxNodeReturn : public SyntaxNode {
 public:
-	explicit SyntaxNodeReturn(SyntaxNodeScope &outer);
+	explicit SyntaxNodeReturn(SyntaxNodeScope &outer, int line);
 	virtual ~SyntaxNodeReturn();
 
 	void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives) override;

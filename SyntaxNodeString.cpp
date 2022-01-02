@@ -3,8 +3,8 @@
 #include "SyntaxNodeString.h"
 
 
-SyntaxNodeString::SyntaxNodeString(SyntaxNodeScope &outer, const char *litera):
-	SyntaxNode(outer, litera){
+SyntaxNodeString::SyntaxNodeString(SyntaxNodeScope &outer, int line, const char *litera):
+	SyntaxNode(outer, line, litera){
 	m_type = SYNTAX_NODE_TYPE_STRING;
 }
 

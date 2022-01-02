@@ -5,7 +5,7 @@
 
 class SyntaxNodeDiv : public SyntaxNodeCompute {
 public:
-	explicit SyntaxNodeDiv(SyntaxNodeScope &outer);
+	explicit SyntaxNodeDiv(SyntaxNodeScope &outer, int line);
 	virtual ~SyntaxNodeDiv();
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;

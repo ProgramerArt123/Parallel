@@ -17,8 +17,8 @@ class DataType;
 
 class SyntaxNodeScope : public SyntaxNode {
 public:
-	explicit SyntaxNodeScope(const char *content = "");
-	explicit SyntaxNodeScope(SyntaxNodeScope &outter, const SyntaxNodeProcDef *proc, const char *content = "");
+	explicit SyntaxNodeScope(int line, const char *content = "");
+	explicit SyntaxNodeScope(SyntaxNodeScope &outter, int line, const SyntaxNodeProcDef *proc, const char *content = "");
 	void PushAddAssign(const char *variable);
 	void PushAdd();
 	void PushSub();
@@ -31,25 +31,26 @@ public:
 	void PushString(const char *itera);
 	void PushVariable(const char *name);
 	
-	std::shared_ptr<SyntaxNodeScope> &PushProcDefEnter(const char *name, bool isConst);
+	std::shared_ptr<SyntaxNodeScope> &PushProcDefEnter();
 	void PushProcDefExit();
 
 	std::shared_ptr<SyntaxNodeScope> &PushProcCallEnter(const char *name);
 	void PushProcCallExit();
 
 	void PushStatement();
-	void PushAssignmentStatement(const char *variable);
-	void PushInitStatement(const char *variable);
-	void DecalreVariable(const char *variable, bool isConst);
+	void PushAssignmentStatement();
+	void PushInitStatement();
+	void DecalreVariable();
+	void SetVariableName(const char *variable);
 	void PushReturn();
 
 	std::shared_ptr<SyntaxNodeScope> &PushLoopEnter();
 	void PushLoopExit();
 
 	void AddArgment(uint64_t argment);
-	void AddParam(const char *param, bool isConst);
+	void AddParam(const char *param);
 	
-	void PushType(const char *type);
+	void PushType(const char *type, bool isConst);
 
 	void OutputFile(std::unique_ptr<Output>& output) throw (std::exception);
 
@@ -121,6 +122,8 @@ private:
 	std::stack<std::string> m_caches;
 	
 	std::shared_ptr<DataType> m_last_data_type;
+	
+	std::string m_last_variable;
 	
 	const SyntaxNodeProcDef *m_proc = NULL;
 };

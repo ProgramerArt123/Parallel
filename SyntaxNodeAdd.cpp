@@ -2,8 +2,8 @@
 
 #include "SyntaxNodeAdd.h"
 
-SyntaxNodeAdd::SyntaxNodeAdd(SyntaxNodeScope &outer):
-	SyntaxNodeCompute(outer, "+"){
+SyntaxNodeAdd::SyntaxNodeAdd(SyntaxNodeScope &outer, int line):
+	SyntaxNodeCompute(outer, line, "+"){
 	m_type = SYNTAX_NODE_TYPE_ADD;
 }
 

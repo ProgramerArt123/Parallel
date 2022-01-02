@@ -2,8 +2,8 @@
 
 #include "SyntaxNodeInc.h"
 
-SyntaxNodeInc::SyntaxNodeInc(SyntaxNodeScope &outer, bool isBack)
-	: SyntaxNodeCompute(outer, "++")
+SyntaxNodeInc::SyntaxNodeInc(SyntaxNodeScope &outer, int line, bool isBack)
+	: SyntaxNodeCompute(outer, line, "++")
 	, m_is_back(isBack) {
 	m_type = SYNTAX_NODE_TYPE_INC;
 }

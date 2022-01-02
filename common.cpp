@@ -12,14 +12,17 @@ void PushReturn() {
 	source->m_scopes.top()->PushReturn();
 }
 
-void PushAssignmentStatement(const char *variable) {
-	source->m_scopes.top()->PushAssignmentStatement(variable);
+void PushAssignmentStatement() {
+	source->m_scopes.top()->PushAssignmentStatement();
 }
-void PushInitStatement(const char *variable) {
-	source->m_scopes.top()->PushInitStatement(variable);
+void PushInitStatement() {
+	source->m_scopes.top()->PushInitStatement();
 }
-void DecalreVariable(const char *variable, bool isConst) {
-	source->m_scopes.top()->DecalreVariable(variable, isConst);
+void DecalreVariable() {
+	source->m_scopes.top()->DecalreVariable();
+}
+void SetVariableName(const char *variable){
+	source->m_scopes.top()->SetVariableName(variable);
 }
 void PushAddAssign(const char *variable) {
 	source->m_scopes.top()->PushAddAssign(variable);
@@ -74,16 +77,16 @@ void PushLoopExit() {
 	source->m_scopes.pop(); source->m_scopes.top()->PushLoopExit();
 }
 
-void PushProcDefEnter(const char *name, bool isConst) {
-	source->m_scopes.push(source->m_scopes.top()->PushProcDefEnter(name, isConst));
+void PushProcDefEnter() {
+	source->m_scopes.push(source->m_scopes.top()->PushProcDefEnter());
 }
 
 void PushProcDefExit() {
 	source->m_scopes.pop(); source->m_scopes.top()->PushProcDefExit();
 }
 
-void AddParam(const char *param, bool isConst) {
-	source->m_scopes.top()->AddParam(param, isConst);
+void AddParam(const char *param) {
+	source->m_scopes.top()->AddParam(param);
 }
 
 void PushProcCallEnter(const char *name) {
@@ -94,6 +97,6 @@ void PushProcCallExit() {
 	source->m_scopes.pop(); source->m_scopes.top()->PushProcCallExit();
 }
 
-void PushType(const char *type){
-	source->m_scopes.top()->PushType(type);
+void PushType(const char *type, bool isConst){
+	source->m_scopes.top()->PushType(type, isConst);
 }

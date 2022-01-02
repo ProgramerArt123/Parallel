@@ -1,20 +1,15 @@
-void yyerror(char* e);
-
-#include "lex.yy.c"
-#include "y.tab.c"
 
 #include "common.h"
 #include "SyntaxNodeScope.h"
+#include "Content.h"
+#include "Generate.h"
 #include "SourceCodeFile.h"
-
-void yyerror(char* e) {
-	throw error_info(e);
-};
+std::shared_ptr<Config> GetConfig0();
 
 SourceCodeFile::SourceCodeFile(const char *fileName):
 	m_file_name(fileName){
-	m_scopes.push(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope));
-
+	m_scopes.push(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(0)));
+		m_config = GetConfig0();
 }
 
 SourceCodeFile::~SourceCodeFile() {
@@ -22,15 +17,10 @@ SourceCodeFile::~SourceCodeFile() {
 }
 
 void SourceCodeFile::Parse() throw (std::string) {
-	FILE *in = fopen(m_file_name.c_str(), "r");
-	if (in) {
-		yyin = in;
-		yyparse();
-		fclose(in);
-	}
-	else {
-		throw "Error:" + m_file_name + " Open Failed!";
-	}
+	Content content(m_file_name, *m_config);
+	content.Load();
+	content.Parse();
+	content.ForeachLexical();
 }
 
 void SourceCodeFile::OutputFile(std::unique_ptr<Output>& output) throw (std::exception) {

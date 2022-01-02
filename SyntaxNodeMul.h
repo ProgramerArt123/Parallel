@@ -5,7 +5,7 @@
 
 class SyntaxNodeMul : public SyntaxNodeCompute {
 public:
-	explicit SyntaxNodeMul(SyntaxNodeScope &outer);
+	explicit SyntaxNodeMul(SyntaxNodeScope &outer, int line);
 	virtual ~SyntaxNodeMul();
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;

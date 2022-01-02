@@ -7,7 +7,7 @@ class SyntaxNodeScope;
 
 class SyntaxNodeAssignment : public SyntaxNode {
 public:
-	explicit SyntaxNodeAssignment(SyntaxNodeScope &scope);
+	explicit SyntaxNodeAssignment(SyntaxNodeScope &scope, int line);
 	virtual ~SyntaxNodeAssignment();
 
 	GENERATE_PARALLEL_RESULT GenerateParallel(const std::shared_ptr<SyntaxNode> &self, Parallel &parallel) throw (std::exception) override;

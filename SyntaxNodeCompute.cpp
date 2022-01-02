@@ -1,8 +1,8 @@
 #include "SyntaxNodeVariable.h"
 #include "SyntaxNodeCompute.h"
 
-SyntaxNodeCompute::SyntaxNodeCompute(SyntaxNodeScope &outer, const char *content, int priority):
-	SyntaxNode(outer, content, priority){
+SyntaxNodeCompute::SyntaxNodeCompute(SyntaxNodeScope &outer, int line, const char *content, int priority):
+	SyntaxNode(outer, line, content, priority){
 
 }
 SyntaxNodeCompute:: ~SyntaxNodeCompute() {

@@ -9,8 +9,10 @@ class DataType;
 
 class SyntaxNodeProcDef : public SyntaxNode {
 public:
-	explicit SyntaxNodeProcDef(SyntaxNodeScope &outter, const char *name, 
-		std::shared_ptr<DataType> dataType, bool isConst);
+	explicit SyntaxNodeProcDef(SyntaxNodeScope &outter,
+		int line,
+		const char *name, 
+		std::shared_ptr<DataType> dataType);
 	virtual ~SyntaxNodeProcDef();
 	
 	std::shared_ptr<SyntaxNodeScope> &GetBody();
@@ -30,7 +32,6 @@ private:
 private:
 	std::shared_ptr<SyntaxNodeScope> m_body;
 	const std::shared_ptr<DataType> m_data_type;
-	const bool m_is_const = false;
 };
 
 #endif

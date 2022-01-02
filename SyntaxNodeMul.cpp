@@ -1,8 +1,9 @@
 #include "SyntaxNodeMul.h"
 #include "common.h"
 
-SyntaxNodeMul::SyntaxNodeMul(SyntaxNodeScope &outer):
-	SyntaxNodeCompute(outer, "*"){
+SyntaxNodeMul::SyntaxNodeMul(SyntaxNodeScope &outer, int line)
+	:
+	SyntaxNodeCompute(outer, line, "*"){
 	m_type = SYNTAX_NODE_TYPE_MUL;
 }
 

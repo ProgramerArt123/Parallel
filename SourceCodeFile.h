@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include "Config.h"
 
 class SyntaxNodeScope;
 
@@ -18,6 +19,7 @@ public:
 	std::stack<std::shared_ptr<SyntaxNodeScope>> m_scopes;
 private:
 	const std::string m_file_name;
+	std::shared_ptr<Config> m_config;
 };
 
 #endif

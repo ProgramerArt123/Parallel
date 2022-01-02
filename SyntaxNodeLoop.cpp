@@ -1,9 +1,10 @@
 #include "SyntaxNodeLoop.h"
 #include "common.h"
 
-SyntaxNodeLoop::SyntaxNodeLoop(SyntaxNodeScope &outter) :
-	SyntaxNode(outter, "LOOP"),
-	m_body(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(outter, outter.GetProcDef(), "LOOP"))){
+SyntaxNodeLoop::SyntaxNodeLoop(SyntaxNodeScope &outter, int line)
+	:
+	SyntaxNode(outter, line, "LOOP"),
+	m_body(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(outter,line, outter.GetProcDef(), "LOOP"))){
 	m_type = SYNTAX_NODE_TYPE_LOOP;
 }
 

@@ -5,7 +5,7 @@
 
 class SyntaxNodeSub : public SyntaxNodeCompute {
 public:
-	explicit SyntaxNodeSub(SyntaxNodeScope &outer);
+	explicit SyntaxNodeSub(SyntaxNodeScope &outer, int line);
 	virtual ~SyntaxNodeSub();
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;

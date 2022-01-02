@@ -5,7 +5,7 @@
 
 class SyntaxNodeProcCall : public SyntaxNode {
 public:
-	explicit SyntaxNodeProcCall(SyntaxNodeScope &scope, const char *name);
+	explicit SyntaxNodeProcCall(SyntaxNodeScope &scope, int line, const char *name);
 	virtual ~SyntaxNodeProcCall();
 	
 	std::shared_ptr<SyntaxNodeScope> &GetArgments();

@@ -18,10 +18,9 @@ class SyntaxNodeScope;
 
 class SyntaxNode {
 public:
-	explicit SyntaxNode(const char *content = "", int priority = 0);
-	explicit SyntaxNode(SyntaxNodeScope &outer, const char *content = "", int priority = 0);
+	explicit SyntaxNode(int line, const char *content = "", int priority = 0);
+	explicit SyntaxNode(SyntaxNodeScope &outer, int line, const char *content = "", int priority = 0);
 	virtual ~SyntaxNode();
-
 	virtual void FindEffectives(std::shared_ptr<SyntaxNode> &self, std::set<std::shared_ptr<SyntaxNode>> &effectives);
 
 	std::shared_ptr<SyntaxNode> AddChild(SyntaxNode *child);
@@ -85,7 +84,7 @@ protected:
 
 	uint64_t m_parallel_index = UINT64_MAX;
 
-	int m_line = 0;
+	const int m_line = 0;
 	
 	size_t m_result_pos = 0;
 

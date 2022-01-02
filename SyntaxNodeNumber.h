@@ -5,7 +5,7 @@
 
 class SyntaxNodeNumber : public SyntaxNode {
 public:
-	explicit SyntaxNodeNumber(SyntaxNodeScope &outer, int value);
+	explicit SyntaxNodeNumber(SyntaxNodeScope &outer, int line, int value);
 	virtual ~SyntaxNodeNumber();
 	
 	void OutputInstructions(std::unique_ptr<Output>& output) override;

@@ -1,8 +1,9 @@
 #include "SyntaxNodeReturn.h"
 #include "common.h"
 
-SyntaxNodeReturn::SyntaxNodeReturn(SyntaxNodeScope &outer):
-	SyntaxNode(outer, "RETURN"){
+SyntaxNodeReturn::SyntaxNodeReturn(SyntaxNodeScope &outer, int line)
+	:
+	SyntaxNode(outer, line, "RETURN"){
 	m_type = SYNTAX_NODE_TYPE_RETURN;
 }
 

@@ -1,8 +1,9 @@
 #include "SyntaxNodeScope.h"
 #include "SyntaxNodeNumber.h"
 
-SyntaxNodeNumber::SyntaxNodeNumber(SyntaxNodeScope &outer, int value):
-	SyntaxNode(outer, std::to_string(value).c_str()),
+SyntaxNodeNumber::SyntaxNodeNumber(SyntaxNodeScope &outer, int line, int value)
+	:
+	SyntaxNode(outer, line, std::to_string(value).c_str()),
 	m_value(value){
 	m_type = SYNTAX_NODE_TYPE_NUMBER;
 }

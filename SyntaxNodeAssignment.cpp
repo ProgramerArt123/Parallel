@@ -2,8 +2,8 @@
 #include "SyntaxNodeVariable.h"
 #include "common.h"
 
-SyntaxNodeAssignment::SyntaxNodeAssignment(SyntaxNodeScope &scope):
-	SyntaxNode(scope, "="){
+SyntaxNodeAssignment::SyntaxNodeAssignment(SyntaxNodeScope &scope, int line):
+	SyntaxNode(scope, line, "="){
 	m_type = SYNTAX_NODE_TYPE_ASSIGNMENT;
 }
 

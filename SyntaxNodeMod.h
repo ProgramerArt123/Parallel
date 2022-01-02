@@ -5,7 +5,7 @@
 
 class SyntaxNodeMod : public SyntaxNodeCompute {
 public:
-	explicit SyntaxNodeMod(SyntaxNodeScope &outer);
+	explicit SyntaxNodeMod(SyntaxNodeScope &outer, int line);
 	virtual ~SyntaxNodeMod();
 
 	void OutputInstructions(std::unique_ptr<Output>& output) override;

@@ -1,8 +1,9 @@
 #include "SyntaxNodeMod.h"
 #include "common.h"
 
-SyntaxNodeMod::SyntaxNodeMod(SyntaxNodeScope &outer):
-	SyntaxNodeCompute(outer, "%"){
+SyntaxNodeMod::SyntaxNodeMod(SyntaxNodeScope &outer, int line)
+	:
+	SyntaxNodeCompute(outer, line, "%"){
 	m_type = SYNTAX_NODE_TYPE_MOD;
 }
 
