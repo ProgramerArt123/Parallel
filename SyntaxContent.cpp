@@ -11,7 +11,7 @@ SyntaxContent::~SyntaxContent() {
 	m_scopes.pop();
 }
 
-const std::shared_ptr<SyntaxNodeScope> &SyntaxContent::GetCurrentScope() const {
+std::shared_ptr<SyntaxNodeScope> &SyntaxContent::GetCurrentScope()  {
 	if (m_scopes.empty()) {
 		throw std::string("scopes is empty!");
 	}

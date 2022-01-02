@@ -9,7 +9,7 @@ class SyntaxContent : public Content {
 public:
 	explicit SyntaxContent(const std::string fileName, const Config &config);
 	virtual ~SyntaxContent();
-	const std::shared_ptr<SyntaxNodeScope> &GetCurrentScope() const;
+	std::shared_ptr<SyntaxNodeScope> &GetCurrentScope() ;
 	void PushScope(const std::shared_ptr<SyntaxNodeScope> &scope);
 	std::shared_ptr<SyntaxNodeScope> PopScope();
 private:

@@ -163,15 +163,14 @@ void SyntaxNodeScope::PushInitStatement() {
 //	m_stack.push(assign);
 }
 
-void SyntaxNodeScope::DecalreVariable() {
-//	if (IsVariableParamExistInner(m_last_variable.c_str())) {
-//		throw error_info(m_last_variable + " redefined");
-//	}
-//	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this,0,
-//		m_last_variable.c_str(), 
-//		m_last_data_type, GetCurrentPos()));
-//	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(m_last_variable.c_str(), varv));
-//	
+void SyntaxNodeScope::DecalreVariable(const char *name, std::shared_ptr<DataType> type) {
+	if (IsVariableParamExistInner(name)) {
+		throw error_info(std::string(name) + " redefined");
+	}
+	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this,0,
+		name, type, GetCurrentPos()));
+	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(name, varv));
+	
 }
 
 void SyntaxNodeScope::PushReturn() {

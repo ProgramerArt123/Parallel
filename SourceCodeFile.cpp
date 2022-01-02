@@ -7,11 +7,13 @@
 
 void ProcDefEnter(const Lexical &lexical,  Content &content);
 void ProcDefExit(const Lexical &lexical, Content &content);
+void VariableDef(const Lexical &lexical, Content &content);
 SourceCodeFile::SourceCodeFile(const char *fileName):
 	m_file_name(fileName), m_implicit(0){
 	m_scopes.push(std::shared_ptr<SyntaxNodeScope>(new SyntaxNodeScope(0)));
 	m_config = GenerateConfig0();
 		m_config->BindActionFunction("ProcDef", &ProcDefEnter, &ProcDefExit);
+		m_config->BindActionFunction("VariableDef", &VariableDef);
 }
 
 SourceCodeFile::~SourceCodeFile() {
@@ -50,10 +52,10 @@ void ProcDefEnter(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
 	const std::string &procName = lexical.GetChild(1)->GetContent();
 	std::cout << "ProcDef:" << procName << std::endl;
-	SyntaxNodeProcDef *procDef = new SyntaxNodeProcDef(*syntax.GetCurrentScope(),
-		lexical.GetLineNO(), procName.c_str(),
-		SourceCodeFile::ProduceDataType(*lexical.GetChild(0)));
-	std::shared_ptr<SyntaxNode> current(procDef);
+	std::shared_ptr<SyntaxNodeProcDef> procDef(new SyntaxNodeProcDef(*syntax.GetCurrentScope(),
+			lexical.GetLineNO(),
+			procName.c_str(),
+		SourceCodeFile::ProduceDataType(*lexical.GetChild(0))));
 	syntax.PushScope(procDef->GetBody());
 }
 
@@ -62,3 +64,9 @@ void ProcDefExit(const Lexical &lexical, Content &content) {
 	syntax.PopScope();
 }
 
+void VariableDef(const Lexical &lexical, Content &content) {
+	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
+	const std::string &varName = lexical.GetChild(1)->GetContent();
+	syntax.GetCurrentScope()->DecalreVariable(varName.c_str(), 
+		SourceCodeFile::ProduceDataType(*lexical.GetChild(0)));
+}

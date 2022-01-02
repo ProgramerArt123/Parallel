@@ -19,7 +19,7 @@ void PushInitStatement() {
 	source->m_scopes.top()->PushInitStatement();
 }
 void DecalreVariable() {
-	source->m_scopes.top()->DecalreVariable();
+//	source->m_scopes.top()->DecalreVariable();
 }
 void SetVariableName(const char *variable){
 //	source->m_scopes.top()->SetVariableName(variable);

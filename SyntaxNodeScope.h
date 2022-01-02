@@ -37,7 +37,7 @@ public:
 	void PushStatement();
 	void PushAssignmentStatement();
 	void PushInitStatement();
-	void DecalreVariable();
+	void DecalreVariable(const char *name, std::shared_ptr<DataType> type);
 	void PushReturn();
 
 	std::shared_ptr<SyntaxNodeScope> &PushLoopEnter();
