@@ -1,4 +1,4 @@
-#include <string.h>
+
 #include "common.h"
 #include "SyntaxContent.h"
 
@@ -24,15 +24,4 @@ std::shared_ptr<SyntaxNodeScope> SyntaxContent::PopScope() {
 	const std::shared_ptr<SyntaxNodeScope> top = GetCurrentScope();
 	m_scopes.pop();
 	return top;
-}
-std::shared_ptr<DataType> SyntaxContent::ProduceDataType(const char *type, bool isConst, bool isStatic, bool isVolatile) {
-	if (0 == strcmp(type, "int")) {		
-		return std::shared_ptr<DataType>(new DataTypeInt(isConst, isStatic, isVolatile));
-	}
-	else if (0 == strcmp(type, "void")) {		
-		return std::shared_ptr<DataType>(new DataTypeVoid(isConst, isStatic, isVolatile));
-	}
-	else {
-		throw error_info(std::string(type) + " undefined");
-	}
 }

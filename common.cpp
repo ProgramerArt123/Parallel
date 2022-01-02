@@ -2,7 +2,7 @@
 
 std::unique_ptr<SourceCodeFile> source;
 std::string error_info(std::string info) {
-	return "Error=>line:【" + std::to_string(yyget_lineno()) + "】, near 【" + yyget_text() + "】 " + info;
+	return "Error=>line:【"  + std::string("】, near 【")  + "】 " + info;
 }
 void PushStatement() {
 	source->m_scopes.top()->PushStatement();

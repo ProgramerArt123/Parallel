@@ -1,4 +1,4 @@
-
+#include <string.h>
 #include "common.h"
 #include "SyntaxNodeScope.h"
 #include "Scanner.h"
@@ -22,13 +22,29 @@ void SourceCodeFile::Parse() throw (std::string) {
 	SyntaxContent content(m_file_name, *m_config);
 	content.Load();
 	content.Parse();
-	content.ForeachLexical();
+	content.ForeachTryCommandAction();
 }
 
 void SourceCodeFile::OutputFile(std::unique_ptr<Output>& output) throw (std::exception) {
 	m_scopes.top()->OutputFile(output);
 }
-
+bool SourceCodeFile::SearchKeyWord(const std::string keyWord, const Lexical &lexical) {
+	return lexical.ForeachTopLeftRigthInterrupt([&](const Lexical &current){return keyWord == current.GetContent();});
+}
+std::shared_ptr<DataType> SourceCodeFile::ProduceDataType(const Lexical &lexical) {
+	bool isConst = SearchKeyWord("const", lexical);
+	bool isStatic = SearchKeyWord("static", lexical);
+	bool isVolatile = SearchKeyWord("volatile", lexical);
+	if (SearchKeyWord("int", lexical)) {		
+		return std::shared_ptr<DataType>(new DataTypeInt(isConst, isStatic, isVolatile));
+	}
+	else if (SearchKeyWord("void", lexical)) {		
+		return std::shared_ptr<DataType>(new DataTypeVoid(isConst, isStatic, isVolatile));
+	}
+	else {
+		throw error_info(" undefined");
+	}
+}
 
 void ProcDefEnter(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
@@ -36,7 +52,7 @@ void ProcDefEnter(const Lexical &lexical, Content &content) {
 	std::cout << "ProcDef:" << procName << std::endl;
 	SyntaxNodeProcDef *procDef = new SyntaxNodeProcDef(*syntax.GetCurrentScope(),
 		lexical.GetLineNO(), procName.c_str(),
-		std::shared_ptr<DataType>(new DataTypeVoid(false, false, false)));
+		SourceCodeFile::ProduceDataType(*lexical.GetChild(0)));
 	std::shared_ptr<SyntaxNode> current(procDef);
 	syntax.PushScope(procDef->GetBody());
 }
@@ -45,3 +61,4 @@ void ProcDefExit(const Lexical &lexical, Content &content) {
 	SyntaxContent &syntax = static_cast< SyntaxContent &>(content);
 	syntax.PopScope();
 }
+
