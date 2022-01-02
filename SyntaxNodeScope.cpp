@@ -115,17 +115,6 @@ void SyntaxNodeScope::PushVariable(const char *name) {
 	m_stack.push(GetVariableParam(name));
 }
 
-std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcDefEnter() {
-	printf("PushProcDefEnter\n");
-	SyntaxNodeProcDef *proc = new SyntaxNodeProcDef(*this, 0, m_last_variable.c_str(), m_last_data_type);
-	std::shared_ptr<SyntaxNode> current(proc);
-	m_stack.push(current);
-	return proc->GetBody();
-}
-
-void SyntaxNodeScope::PushProcDefExit() {
-	printf("PushProcDefExit\n");
-}
 
 std::shared_ptr<SyntaxNodeScope> &SyntaxNodeScope::PushProcCallEnter(const char *name) {
 	printf("PushProcCallEnter\n");
@@ -147,46 +136,44 @@ void SyntaxNodeScope::PushStatement() {
 }
 
 void SyntaxNodeScope::PushAssignmentStatement() {
-	if (!IsVariableParamExist(m_last_variable.c_str())) {
-		throw error_info(m_last_variable + " undefined");
-	}
-	std::shared_ptr<SyntaxNode> var = GetVariableParam(m_last_variable.c_str());
-	if (static_cast<SyntaxNodeVariable *>(var.get())->IsConst()) {
-		throw error_info(m_last_variable + " is const, can not be assgin");
-	}
-	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this, 0));
-	assign->AddChild(var);
-	assign->AddChild(m_stack.top());
-	m_stack.pop();
-	
-	m_stack.push(assign);
+	//if (!IsVariableParamExist(m_last_variable.c_str())) {
+	//	throw error_info(m_last_variable + " undefined");
+	//}
+//	std::shared_ptr<SyntaxNode> var = GetVariableParam(m_last_variable.c_str());
+//	if (static_cast<SyntaxNodeVariable *>(var.get())->IsConst()) {
+//		throw error_info(m_last_variable + " is const, can not be assgin");
+//	}
+//	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this, 0));
+//	assign->AddChild(var);
+//	assign->AddChild(m_stack.top());
+//	m_stack.pop();
+//	
+//	m_stack.push(assign);
 }
 void SyntaxNodeScope::PushInitStatement() {
-	if (!IsVariableParamExist(m_last_variable.c_str())) {
-		throw error_info(m_last_variable + " undefined");
-	}
-	std::shared_ptr<SyntaxNode> var = GetVariableParam(m_last_variable.c_str());
-	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this, 0));
-	assign->AddChild(var);
-	assign->AddChild(m_stack.top());
-	m_stack.pop();
-	
-	m_stack.push(assign);
+//	if (!IsVariableParamExist(m_last_variable.c_str())) {
+//		throw error_info(m_last_variable + " undefined");
+//	}
+//	std::shared_ptr<SyntaxNode> var = GetVariableParam(m_last_variable.c_str());
+//	std::shared_ptr<SyntaxNode> assign(new SyntaxNodeAssignment(*this, 0));
+//	assign->AddChild(var);
+//	assign->AddChild(m_stack.top());
+//	m_stack.pop();
+//	
+//	m_stack.push(assign);
 }
 
 void SyntaxNodeScope::DecalreVariable() {
-	if (IsVariableParamExistInner(m_last_variable.c_str())) {
-		throw error_info(m_last_variable + " redefined");
-	}
-	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this,0,
-		m_last_variable.c_str(), 
-		m_last_data_type, GetCurrentPos()));
-	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(m_last_variable.c_str(), varv));
-	
+//	if (IsVariableParamExistInner(m_last_variable.c_str())) {
+//		throw error_info(m_last_variable + " redefined");
+//	}
+//	std::shared_ptr<SyntaxNodeVariable> varv(new SyntaxNodeVariable(*this,0,
+//		m_last_variable.c_str(), 
+//		m_last_data_type, GetCurrentPos()));
+//	m_variables.insert(std::pair<std::string, std::shared_ptr<SyntaxNodeVariable>>(m_last_variable.c_str(), varv));
+//	
 }
-void SyntaxNodeScope::SetVariableName(const char *variable) {
-	m_last_variable = variable;
-}
+
 void SyntaxNodeScope::PushReturn() {
 	if (!CheckDataType(GetProcRetType(), m_stack.top())) {
 		throw error_info("Type Error"); 
@@ -215,21 +202,13 @@ void SyntaxNodeScope::AddArgment(uint64_t argment) {
 }
 
 void SyntaxNodeScope::AddParam(const char *param) {
-	std::shared_ptr<SyntaxNodeVariable> variable(
-		new SyntaxNodeVariable(*this, 0, param, m_last_data_type, GetCurrentPos()));
-	m_parameters.push_back(variable);
+//	std::shared_ptr<SyntaxNodeVariable> variable(
+//		new SyntaxNodeVariable(*this, 0, param, m_last_data_type, GetCurrentPos()));
+//	m_parameters.push_back(variable);
 }
 
 void SyntaxNodeScope::PushType(const char *type, bool isConst) {
-	if (0 == strcmp(type, "int")){		
-		m_last_data_type = std::shared_ptr<DataType>(new DataTypeInt(isConst));
-	}
-	else if (0 == strcmp(type, "void")) {		
-		m_last_data_type = std::shared_ptr<DataType>(new DataTypeVoid());
-	}
-	else {
-		throw error_info(std::string(type) + " undefined");
-	}
+
 }
 
 void SyntaxNodeScope::OutputFile(std::unique_ptr<Output>& output) throw (std::exception) {

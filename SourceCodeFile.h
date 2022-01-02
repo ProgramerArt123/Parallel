@@ -3,7 +3,8 @@
 
 #include <string>
 #include <memory>
-#include "Config.h"
+
+class Config;
 
 class SyntaxNodeScope;
 

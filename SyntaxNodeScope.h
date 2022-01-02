@@ -31,9 +31,6 @@ public:
 	void PushString(const char *itera);
 	void PushVariable(const char *name);
 	
-	std::shared_ptr<SyntaxNodeScope> &PushProcDefEnter();
-	void PushProcDefExit();
-
 	std::shared_ptr<SyntaxNodeScope> &PushProcCallEnter(const char *name);
 	void PushProcCallExit();
 
@@ -41,7 +38,6 @@ public:
 	void PushAssignmentStatement();
 	void PushInitStatement();
 	void DecalreVariable();
-	void SetVariableName(const char *variable);
 	void PushReturn();
 
 	std::shared_ptr<SyntaxNodeScope> &PushLoopEnter();
@@ -121,9 +117,6 @@ private:
 	std::stack<std::string> m_arguments;
 	std::stack<std::string> m_caches;
 	
-	std::shared_ptr<DataType> m_last_data_type;
-	
-	std::string m_last_variable;
 	
 	const SyntaxNodeProcDef *m_proc = NULL;
 };

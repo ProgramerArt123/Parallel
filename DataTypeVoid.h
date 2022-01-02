@@ -5,7 +5,7 @@
 
 class DataTypeVoid : public DataType {
 public:
-	explicit DataTypeVoid();
+	explicit DataTypeVoid(bool isConst, bool isStatic, bool isVolatile);
 	virtual ~DataTypeVoid();
 };
 

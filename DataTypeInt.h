@@ -5,7 +5,7 @@
 
 class DataTypeInt : public DataType {
 public:
-	explicit DataTypeInt(bool isConst);
+	explicit DataTypeInt(bool isConst, bool isStatic, bool isVolatile);
 	virtual ~DataTypeInt();
 };
 

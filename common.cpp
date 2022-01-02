@@ -22,7 +22,7 @@ void DecalreVariable() {
 	source->m_scopes.top()->DecalreVariable();
 }
 void SetVariableName(const char *variable){
-	source->m_scopes.top()->SetVariableName(variable);
+//	source->m_scopes.top()->SetVariableName(variable);
 }
 void PushAddAssign(const char *variable) {
 	source->m_scopes.top()->PushAddAssign(variable);
@@ -77,13 +77,7 @@ void PushLoopExit() {
 	source->m_scopes.pop(); source->m_scopes.top()->PushLoopExit();
 }
 
-void PushProcDefEnter() {
-	source->m_scopes.push(source->m_scopes.top()->PushProcDefEnter());
-}
 
-void PushProcDefExit() {
-	source->m_scopes.pop(); source->m_scopes.top()->PushProcDefExit();
-}
 
 void AddParam(const char *param) {
 	source->m_scopes.top()->AddParam(param);
